@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Numeri Utili - Tiziana Pascali</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="icona-app.png?v=2" type="image/png">
-    <link rel="apple-touch-icon" href="icona-app.png?v=2">   
+    <link rel="apple-touch-icon" href="icona-app.png?v=2">    
 </head>
-
 <body>
     <div id="app-container">
         <header>
             <div class="header-left">
-                <h1 onclick="goHome()" style="cursor:pointer; color:var(--primary); margin:0;">🗂️ Numeri Utili - versione Ospiti</h1>
+                <h1 onclick="goHome()" style="cursor:pointer; color:var(--primary); margin:0;">🗂️ Numeri Utili</h1>
                 <div class="subtitle-tiziana">Numeri Utili di Tiziana Pascali</div>
                 <div class="start-address-label">📍 Via Cascina Comune, 24 – Pregnana Milanese (MI)</div>
             </div>
@@ -26,162 +24,30 @@
             </div>
         </header>
 
-        <div id="view-main" class="grid-main"></div>
-        <div id="view-detail" class="hidden">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-                <button class="btn-header" onclick="goHome()" style="background:var(--primary)">⬅️ Torna</button>
-                <h2 id="title-detail" style="margin:0; color:var(--primary);">Categoria</h2>
-            </div>
-            <div id="sub-buttons-container"></div>
-            <div id="records-list" class="grid-records"></div>
-        </div>
+        <main id="main-content">
+            </main>
 
         <footer>
-            <div class="footer-left">
-                <button class="btn-footer" onclick="openSettings()">API KEY</button>
-                <button class="btn-footer" onclick="exportData()">ESPORTA</button>
-                <label class="btn-footer" style="cursor:pointer; display:inline-block;">
-                    IMPORTA <input type="file" onchange="importData(event)" style="display:none">
-                </label>
-            </div>
-            <div class="footer-right">
-                <button id="btn-reset-danger" class="btn-footer-reset" onclick="clearContactsOnly()">RESET
-                    SCHEDE</button>
-            </div>
+            <button class="btn-footer" onclick="window.print()">STAMPA PAGINA</button>
+            <button class="btn-footer-reset" onclick="resetApp()">RESET COMPLETO</button>
         </footer>
     </div>
 
     <div id="sidebar">
-        <div class="sidebar-header"><strong>Ricerca Google</strong><button onclick="toggleGoogleSearch()">×</button>
+        <div class="sidebar-header">
+            <span>Ricerca Google</span>
+            <button onclick="toggleGoogleSearch()" style="background:none; border:none; color:white; cursor:pointer; font-size:1.5rem;">&times;</button>
         </div>
-        <iframe id="google-iframe" src="about:blank"></iframe>
+        <iframe id="google-iframe" src="https://www.google.com/search?igu=1"></iframe>
     </div>
 
-    <div id="form-overlay" class="modal-overlay hidden">
-        <div class="form-card">
-            <h2 id="form-title" class="dynamic-title">Scheda Nominativo</h2>
-            <input type="hidden" id="f-id">
-            <div class="form-row">
-                <div class="form-group"><label>Categoria</label><select id="f-cat"
-                        onchange="updateFormSubCats()"></select></div>
-                <div class="form-group"><label>Sottocategoria</label><select id="f-subcat"
-                        onchange="updateFormSubSubCats()"></select></div>
-                <div id="f-ss-group" class="form-group hidden"><label>Livello 3</label><select
-                        id="f-subsubcat"></select></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Nome Attività</label><input type="text" id="f-nome"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Telefono</label><input type="text" id="f-tel"></div>
-                <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Via e Civico</label><input type="text" id="f-via"></div>
-                <div class="form-group"><label>Località</label><input type="text" id="f-loc" onblur="calculateKM()">
-                </div>
-                <div class="form-group" style="flex:0.4"><label>Prov.</label><select id="f-prov"></select></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>KM (da Pregnana)</label><input type="text" id="f-km"></div>
-                <div class="form-group"><label>URL Foto</label><input type="text" id="f-foto"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>E-mail</label><input type="email" id="f-email"></div>
-                <div class="form-group"><label>Sito Web</label><input type="text" id="f-web"></div>
-            </div>
-            <div id="f-ristorante-extra" class="hidden"
-                style="background:#f0f7ff; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <div class="form-row">
-                    <div class="form-group"><label>Cucina</label><input type="text" id="f-cucina"></div>
-                    <div class="form-group"><label>Costo</label><select id="f-costo">
-                            <option value="€">€</option>
-                            <option value="€€">€€</option>
-                            <option value="€€€">€€€</option>
-                        </select></div>
-                    <div class="form-group"><label>Giudizio</label><input type="text" id="f-giudizio"></div>
-                </div>
-            </div>
-            <div class="form-group"><label>Orari</label>
-                <table class="timetable" id="timetable-input"></table>
-            </div>
-            <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
-                <button class="btn-header" onclick="closeAddForm()" style="background:#666;">Chiudi</button>
-                <button id="btn-save-main" class="btn-header" onclick="saveContact()"
-                    style="background:var(--secondary);">Salva</button>
-            </div>
+    <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="form-card" onclick="event.stopPropagation()">
+            <div id="modal-content"></div>
         </div>
     </div>
 
-    <div id="search-overlay" class="modal-overlay hidden">
-        <div class="form-card" style="max-width:550px;">
-            <h2>Ricerca Avanzata</h2>
-            <div class="form-group"><label>Nome o Località</label><input type="text" id="s-nome"></div>
-            <div class="form-row">
-                <div class="form-group"><label>Categoria</label><select id="s-cat"
-                        onchange="updateSearchSubCats()"></select></div>
-                <div class="form-group"><label>Sottocategoria</label><select id="s-subcat"
-                        onchange="updateSearchSubSubCats()"></select></div>
-            </div>
-            <div id="s-ss-group" class="form-group hidden"><label>Livello 3</label><select id="s-subsubcat"></select>
-            </div>
-            <div id="s-ristorante-extra" class="hidden"
-                style="background:#f0f7ff; padding:10px; border-radius:8px; margin-bottom:15px;">
-                <div class="form-row">
-                    <div class="form-group"><label>Cucina</label><input type="text" id="s-cucina"></div>
-                    <div class="form-group"><label>Costo</label><select id="s-costo">
-                            <option value="">Tutti</option>
-                            <option value="€">€</option>
-                            <option value="€€">€€</option>
-                            <option value="€€€">€€€</option>
-                        </select></div>
-                </div>
-            </div>
-            <div class="form-group"><label>Aperto il giorno:</label><select id="s-giorno">
-                    <option value="">Qualsiasi</option>
-                    <option value="0">Lun</option>
-                    <option value="1">Mar</option>
-                    <option value="2">Mer</option>
-                    <option value="3">Gio</option>
-                    <option value="4">Ven</option>
-                    <option value="5">Sab</option>
-                    <option value="6">Dom</option>
-                </select></div>
-            <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
-                <button class="btn-header" onclick="closeSearchPanel()" style="background:#666;">CHIUDI</button>
-                <button class="btn-header" onclick="performSearch()" style="background:#4285F4;">Cerca</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="move-overlay" class="modal-overlay hidden">
-        <div class="form-card" style="max-width:450px;">
-            <h2>Sposta Nominativo</h2>
-            <p id="move-info"></p>
-            <input type="hidden" id="m-id">
-            <div class="form-group"><label>Nuova Sottocategoria</label><select id="m-subcat"
-                    onchange="updateMoveSubSubCats()"></select></div>
-            <div id="m-ss-group" class="form-group hidden"><label>Nuovo Livello 3</label><select
-                    id="m-subsubcat"></select></div>
-            <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
-                <button class="btn-header" onclick="closeMoveForm()" style="background:#666;">Annulla</button>
-                <button class="btn-header" onclick="confirmMove()" style="background:#f39c12;">Conferma</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="manage-overlay" class="modal-overlay hidden">
-        <div class="form-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>Gestione Struttura</h2><button class="btn-header" onclick="saveSchema()"
-                    style="background:var(--secondary);">SALVA</button>
-            </div>
-            <div id="manage-tree" style="margin-top:20px;"></div>
-            <button class="btn-header" onclick="closeManage()" style="background:#666; margin-top:20px;">Esci</button>
-        </div>
-    </div>
-
+    <script src="data.js"></script>
     <script src="script.js"></script>
 </body>
-
 </html>
