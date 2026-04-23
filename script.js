@@ -442,7 +442,47 @@ function fillForm(c) {
 }
 
 function lockForm(s) { document.querySelectorAll('#form-overlay input, #form-overlay select').forEach(i => i.disabled = s); }
-function openAddForm() { resetForm(); document.getElementById('form-overlay').classList.remove('hidden'); lockForm(false); document.getElementById('btn-save-main').classList.remove('hidden'); const sel = document.getElementById('f-cat'); sel.innerHTML = "<option value=''>Scegli...</option>"; Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); }
+function openAddForm() {
+    // 1. Usiamo il nome corretto del nuovo HTML: modal-overlay
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.remove('hidden');
+
+    // 2. Prepariamo il contenuto del modulo direttamente qui
+    const content = document.getElementById('modal-content');
+    content.innerHTML = `
+        <h2 class="dynamic-title">Aggiungi Nuovo Contatto</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Categoria</label>
+                <select id="f-cat" onchange="updateFormSubCats()">
+                    <option value="">Scegli...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Sottocategoria</label>
+                <select id="f-subcat" onchange="updateFormSubSubCats()">
+                    <option value="">Scegli...</option>
+                </select>
+            </div>
+        </div>
+        <div id="f-ss-group" class="form-group hidden">
+            <label>Sotto-Sottocategoria</label>
+            <select id="f-subsubcat">
+                <option value="">Scegli...</option>
+            </select>
+        </div>
+        <div style="margin-top:20px; text-align:right;">
+            <button class="btn-top" onclick="saveNewRecord()" style="background:var(--secondary)">SALVA</button>
+            <button class="btn-top" onclick="closeModal()" style="background:#555">ANNULLA</button>
+        </div>
+    `;
+
+    // 3. Riempiamo la tendina delle categorie
+    const sel = document.getElementById('f-cat');
+    Object.keys(schema).sort().forEach(c => {
+        sel.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+}
 function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
 function resetForm() { document.getElementById('f-id').value = ""; document.querySelectorAll('#form-overlay input').forEach(i => i.value = ""); initTimetable(); }
 function updateFormSubCats() { const c = document.getElementById('f-cat').value; const s = document.getElementById('f-subcat'); s.innerHTML = "<option value=''>Scegli...</option>"; if(schema[c]) schema[c].sub.sort().forEach(i => s.innerHTML += `<option value="${i}">${i}</option>`); }
