@@ -347,19 +347,16 @@ body.sidebar-open #sidebar {
     font-weight: bold;
     cursor: pointer;
 }
-/* --- SISTEMAZIONE FINESTRE CON GOOGLE APERTO --- */
-body.google-open .modal, 
-body.google-open .modal-content {
-    display: flex !important;
+/* --- CORREZIONE POSIZIONE MODULI (RICERCA, GESTISCI, AGGIUNGI) --- */
+body.sidebar-open .modal-overlay {
     justify-content: flex-start !important;
-    margin-left: 20px !important;
-    margin-right: auto !important;
-    transform: none !important;
-    left: 0 !important;
-    width: 55% !important; /* Ridotto un altro po' per sicurezza */
+    padding-left: 20px !important;
+    width: calc(100% - 450px) !important;
 }
 
-/* Assicura che lo sfondo scuro non copra la parte di Google */
-body.google-open .modal {
-    width: 66% !important;
+body.sidebar-open .form-card {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    width: 95% !important;
+    max-width: 800px !important;
 }
