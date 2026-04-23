@@ -205,8 +205,9 @@ body.sidebar-open .modal-overlay {
 }
 
 body.sidebar-open .form-card {
-    width: 65%;
-    max-width: none;
+    width: 65% !important; /* Cambialo in 65% o 60% */
+    max-width: none !important;
+    margin-left: 0 !important;
 }
 
 .dynamic-title {
