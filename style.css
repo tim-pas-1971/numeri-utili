@@ -187,8 +187,9 @@ footer {
 }
 
 body.sidebar-open .modal-overlay {
-    justify-content: flex-start;
-    padding-left: 20px;
+    justify-content: flex-start !important;
+    padding-left: 20px !important;
+    width: calc(100% - 450px) !important;
 }
 
 .form-card {
