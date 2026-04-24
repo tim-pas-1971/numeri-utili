@@ -27,8 +27,8 @@ const defaultSchema = {
     "CENTRI COMM.": { icon: "🏬", sub: ["Supermerkato"], subSub: {} },
     "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Centro Estetica"], subSub: {} },
     "GARDEN": { icon: "🌻", sub: ["Vivai"], subSub: {} },
-    "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento"], subSub: {} },
-    "SALUTE": { icon: "🏥", sub: ["Medico", "Farmacia"], subSub: {} },
+    "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe / Borse", "Gioielleria", "Animali"], subSub: {} },
+    "SALUTE": { icon: "🏥", sub: ["Centro Diagnostico, "Farmacia", "Laboratorio di analisi", "Medico Mutua / Specialista", "Ospedale", "Veterinario"], subSub: {} },
     "RISTORANTI": {
         icon: "🍴",
         sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"],
