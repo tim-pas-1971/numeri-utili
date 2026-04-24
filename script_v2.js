@@ -1,3 +1,4 @@
+// --- CODICE COMPLETO PER SCRIPT_V2.JS ---
 const PROVINCE = ["AG", "AL", "AN", "AO", "AR", "AP", "AT", "AV", "BA", "BT", "BL", "BN", "BO", "BR", "BS", "BZ", "CA", "CB", "CE", "CH", "CL", "CN", "CO", "CR", "CS", "CT", "CZ", "EN", "FC", "FE", "FG", "FI", "FM", "FR", "GE", "GO", "GR", "IM", "IS", "KR", "LC", "LE", "LI", "LO", "LT", "LU", "MB", "MC", "ME", "MI", "MN", "MO", "MS", "MT", "NA", "NO", "NU", "OR", "PA", "PC", "PD", "PE", "PG", "PI", "PN", "PO", "PR", "PT", "PU", "PV", "PZ", "RA", "RC", "RE", "RG", "RI", "RM", "RN", "RO", "SA", "SI", "SO", "SP", "SR", "SS", "SU", "SV", "TA", "TE", "TN", "TO", "TP", "TR", "TS", "TV", "UD", "VA", "VB", "VC", "VE", "VI", "VR", "VT", "VV"];
 
 const defaultSchema = {
@@ -22,24 +23,20 @@ let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
 let curCat = ""; let curSub = "";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Gestione Admin vs Ospite
     const params = new URLSearchParams(window.location.search);
     const isAdmin = params.get('admin') === '1';
     
     if (!isAdmin) {
-        // Nascondi tasti admin agli ospiti
         document.querySelectorAll('button[onclick*="openManage"], button[onclick*="openAddForm"], button[onclick*="toggleGoogleSearch"], .footer-left').forEach(el => el.style.display = 'none');
         const h1 = document.querySelector('h1');
         if(h1) h1.innerText = "🗂️ Numeri Utili - Ospiti";
     }
 
     renderMainGrid();
-    initTimetable();
     const pSel = document.getElementById('f-prov');
     if (pSel) PROVINCE.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
 });
 
-// --- FUNZIONI NAVIGAZIONE ---
 function renderMainGrid() {
     const g = document.getElementById('view-main'); if (!g) return;
     g.innerHTML = "";
@@ -54,49 +51,6 @@ function openCategory(cat) {
     document.getElementById('view-detail').classList.remove('hidden');
     document.getElementById('title-detail').innerText = cat;
     refreshSubButtons();
-    document.getElementById('records-list').innerHTML = `<div class="select-prompt">Seleziona una sottocategoria.</div>`;
-}
-
-function goHome() {
-    document.getElementById('view-main').classList.remove('hidden');
-    document.getElementById('view-detail').classList.add('hidden');
-}
-
-// --- FUNZIONI MODULI ---
-function openAddForm() {
-    resetForm();
-    const overlay = document.getElementById('form-overlay');
-    if (overlay) overlay.classList.remove('hidden');
-    const sel = document.getElementById('f-cat');
-    if (sel) {
-        sel.innerHTML = "<option value=''>Scegli...</option>";
-        Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-    }
-}
-
-function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
-
-function openSearchPanel() { document.getElementById('search-overlay').classList.remove('hidden'); }
-function closeSearchPanel() { document.getElementById('search-overlay').classList.add('hidden'); }
-
-function openManage() { document.getElementById('manage-overlay').classList.remove('hidden'); }
-function closeManage() { document.getElementById('manage-overlay').classList.add('hidden'); }
-
-function toggleGoogleSearch() {
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) sidebar.classList.toggle('open');
-    const iframe = document.getElementById('google-iframe');
-    if (iframe && iframe.src === "about:blank") iframe.src = "https://www.google.com/search?igu=1";
-}
-
-// --- LOGICA DATI ---
-function updateFormSubCats() {
-    const c = document.getElementById('f-cat').value;
-    const s = document.getElementById('f-subcat');
-    if (s && schema[c]) {
-        s.innerHTML = "<option value=''>Scegli...</option>";
-        schema[c].sub.sort().forEach(i => s.innerHTML += `<option value="${i}">${i}</option>`);
-    }
 }
 
 function refreshSubButtons() {
@@ -120,6 +74,26 @@ function renderRecords() {
     });
 }
 
-function initTimetable() { /* Funzione opzionale se la usi */ }
-function resetForm() { document.querySelectorAll('#form-overlay input').forEach(i => i.value = ""); }
-function saveContact() { alert("Funzione Salva attiva!"); closeAddForm(); }
+function openAddForm() {
+    document.getElementById('form-overlay').classList.remove('hidden');
+    const sel = document.getElementById('f-cat');
+    sel.innerHTML = "<option value=''>Scegli...</option>";
+    Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+}
+
+function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
+function goHome() { document.getElementById('view-main').classList.remove('hidden'); document.getElementById('view-detail').classList.add('hidden'); }
+function openSearchPanel() { document.getElementById('search-overlay').classList.remove('hidden'); }
+function closeSearchPanel() { document.getElementById('search-overlay').classList.add('hidden'); }
+function openManage() { document.getElementById('manage-overlay').classList.remove('hidden'); }
+function closeManage() { document.getElementById('manage-overlay').classList.add('hidden'); }
+function toggleGoogleSearch() { document.getElementById('sidebar').classList.toggle('open'); }
+function updateFormSubCats() {
+    const c = document.getElementById('f-cat').value;
+    const s = document.getElementById('f-subcat');
+    if (s && schema[c]) {
+        s.innerHTML = "<option value=''>Scegli...</option>";
+        schema[c].sub.sort().forEach(i => s.innerHTML += `<option value="${i}">${i}</option>`);
+    }
+}
+function saveContact() { alert("Salvataggio simulato!"); closeAddForm(); }
