@@ -448,18 +448,20 @@ function fillForm(c) {
 
 function lockForm(s) { document.querySelectorAll('#form-overlay input, #form-overlay select').forEach(i => i.disabled = s); }
 function openAddForm() {
-    resetForm();
+    // 1. Reset dei campi
+    if (typeof resetForm === "function") resetForm();
     
-    // 1. Cerchiamo il contenitore (usiamo entrambi i nomi per sicurezza)
-    const overlay = document.getElementById('form-overlay') || document.getElementById('modal-overlay');
+    // 2. Mostra il modulo (proviamo tutti gli ID possibili)
+    const overlay = document.getElementById('form-overlay') || 
+                    document.getElementById('modal-overlay') || 
+                    document.getElementById('add-form');
+    
     if (overlay) {
         overlay.classList.remove('hidden');
+        overlay.style.display = 'block'; // Forza la visibilità
     }
 
-    // 2. Sblocchiamo i campi (nel caso fossero rimasti bloccati da una visualizzazione precedente)
-    lockForm(false);
-
-    // 3. Riempiamo la tendina delle Categorie (f-cat) prendendole dallo schema
+    // 3. Popola la tendina Categoria
     const sel = document.getElementById('f-cat');
     if (sel) {
         sel.innerHTML = "<option value=''>Scegli...</option>";
@@ -467,6 +469,9 @@ function openAddForm() {
             sel.innerHTML += `<option value="${c}">${c}</option>`;
         });
     }
+    
+    // 4. Sblocca i campi
+    if (typeof lockForm === "function") lockForm(false);
 }
 function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
 function resetForm() { document.getElementById('f-id').value = ""; document.querySelectorAll('#form-overlay input').forEach(i => i.value = ""); initTimetable(); }
