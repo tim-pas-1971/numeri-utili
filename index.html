@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Numeri Utili - Tiziana Pascali</title>
     <style>
-        :root { --primary: #003366; --secondary: #28a745; --bg: #f0f4f8; }
+        :root { --primary: #003366; --secondary: #28a745; --bg: #f0f4f8; --accent: #d9534f; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; overflow-x: hidden; }
         
-        /* Layout Dinamico per Google Sidebar */
         #app-wrapper { display: flex; transition: 0.4s; width: 100%; }
         #main-content { flex: 1; transition: 0.4s; padding-right: 20px; }
         #app-wrapper.sidebar-open #main-content { flex: 0 0 66.6%; }
@@ -21,20 +20,20 @@
         .btn-top { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 5px; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 4000; }
-        .form-card { background: white; padding: 25px; border-radius: 15px; width: 95%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+        .form-card { background: white; padding: 25px; border-radius: 15px; width: 95%; max-width: 850px; max-height: 90vh; overflow-y: auto; }
         
         .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
-        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; }
+        label { font-size: 0.85em; font-weight: bold; color: var(--primary); }
+        input, select, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; }
         
-        /* Tabella Orari (Immagine 3b) */
         .timetable { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
-        .timetable td { padding: 4px; border-bottom: 1px solid #eee; }
-        .timetable input[type="time"] { padding: 2px; width: 70px; }
-
-        /* Gestione Albero (Immagine 1b) */
-        .tree-item { margin-left: 20px; border-left: 1px dashed #ccc; padding-left: 10px; }
+        .timetable td { padding: 5px; border-bottom: 1px solid #eee; text-align: center; }
+        .timetable input[type="time"] { width: 70px; }
+        
         .hidden { display: none !important; }
+        .tree-item { margin-left: 20px; border-left: 1px dashed #ccc; padding-left: 10px; padding-top: 5px; }
+        .admin-tech-btns { display: flex; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; }
     </style>
 </head>
 <body>
@@ -44,7 +43,7 @@
         <header>
             <div class="header-left">
                 <h1 onclick="location.reload()" style="cursor:pointer">📂 Numeri Utili</h1>
-                <div style="color:#d9534f; font-weight:bold;">Rubrica Personale di Tiziana Pascali</div>
+                <div style="color:var(--accent); font-weight:bold;">Rubrica Personale di Tiziana Pascali</div>
                 <small>📍 Via Cascina Comune, 24 – Pregnana Milanese (MI)</small>
             </div>
             <div id="admin-menu">
@@ -57,7 +56,7 @@
 
         <div id="view-main" class="grid-main"></div>
         <div id="view-detail" class="hidden">
-            <button class="btn-top" onclick="location.reload()" style="margin-bottom:20px;">⬅️ Torna</button>
+            <button class="btn-top" onclick="location.reload()" style="margin-bottom:20px;">⬅️ Torna Home</button>
             <h2 id="title-detail" style="color:var(--primary)"></h2>
             <div id="sub-buttons-container" style="margin-bottom:20px;"></div>
             <div id="records-list"></div>
@@ -74,61 +73,90 @@
 
 <div id="form-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2 style="color:var(--secondary)">🆕 Nuova Scheda Nominativo</h2>
+        <h2 style="color:var(--secondary); margin-top:0;">🆕 Nuova Scheda Nominativo</h2>
+        
         <div class="form-row">
             <div class="form-group"><label>Categoria</label><select id="f-cat" onchange="updateSub()"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub()"></select></div>
-            <div id="f-ss-group" class="form-group hidden"><label>Livello 3 (Etnico)</label><select id="f-ss"></select></div>
+            <div id="f-ss-group" class="form-group hidden"><label>Livello 3 (es. Etnico)</label><select id="f-ss"></select></div>
         </div>
         
-        <div class="form-group"><label>Nome Attività</label><input type="text" id="f-nome"></div>
+        <div class="form-group"><label>Nome Attività / Nominativo</label><input type="text" id="f-nome"></div>
         
-        <div id="f-extra-ristoranti" class="hidden" style="background:#eef9f0; padding:10px; border-radius:8px; margin: 10px 0;">
-            <div class="form-row">
-                <div class="form-group"><label>Tipo Cucina</label><input type="text" id="f-cucina"></div>
-                <div class="form-group"><label>Costo</label><select id="f-costo"><option>€</option><option>€€</option><option>€€€</option></select></div>
-                <div class="form-group"><label>Giudizio</label><input type="text" id="f-voto"></div>
-            </div>
-        </div>
-
         <div class="form-row">
             <div class="form-group"><label>Telefono</label><input type="text" id="f-tel"></div>
             <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
+            <div class="form-group"><label>Sito Web</label><input type="text" id="f-web" placeholder="https://..."></div>
         </div>
 
-        <div class="form-group"><label>Tabella Orari (3b)</label>
-            <table class="timetable" id="f-orari-table"></table>
+        <div class="form-row">
+            <div class="form-group"><label>Indirizzo</label><input type="text" id="f-via"></div>
+            <div class="form-group"><label>Località</label><input type="text" id="f-loc"></div>
+            <div class="form-group"><label>Prov.</label><select id="f-prov"></select></div>
         </div>
+
+        <div class="form-row">
+            <div class="form-group"><label>Email</label><input type="email" id="f-mail"></div>
+            <div class="form-group"><label>P. IVA</label><input type="text" id="f-piva"></div>
+            <div class="form-group"><label>Cod. Fiscale</label><input type="text" id="f-cf"></div>
+        </div>
+
+        <div id="f-extra-ristoranti" class="hidden" style="background:#eef9f0; padding:15px; border-radius:8px; margin: 10px 0;">
+            <div class="form-row">
+                <div class="form-group"><label>Tipo Cucina</label><input type="text" id="f-cucina"></div>
+                <div class="form-group"><label>Costo</label><select id="f-costo"><option>€</option><option>€€</option><option>€€€</option></select></div>
+                <div class="form-group"><label>Giudizio (1-5)</label><input type="number" id="f-voto" min="1" max="5"></div>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top:15px;"><label>Orari di Apertura</label>
+            <table class="timetable" id="f-orari-table">
+                <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
+                <tbody id="orari-body"></tbody>
+            </table>
+        </div>
+
+        <div class="form-group" style="margin-top:10px;"><label>Note</label><textarea id="f-note" rows="2"></textarea></div>
 
         <div style="text-align:right; margin-top:20px;">
             <button class="btn-top" onclick="closeMod('form-overlay')" style="background:#666">Annulla</button>
-            <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA</button>
+            <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA SCHEDA</button>
         </div>
+    </div>
+</div>
+
+<div id="manage-overlay" class="modal-overlay hidden">
+    <div class="form-card">
+        <h2>⚙️ Gestione Struttura e Dati</h2>
+        <div id="tree-container" style="background:#f9f9f9; padding:15px; border-radius:8px; max-height:300px; overflow-y:auto;"></div>
+        
+        <div class="admin-tech-btns">
+            <button class="btn-top" onclick="alert('Funzione API Key')" style="background:#555">API KEY</button>
+            <button class="btn-top" onclick="alert('Esportazione avviata...')" style="background:#0056b3">ESPORTA</button>
+            <button class="btn-top" onclick="alert('Seleziona file da importare')" style="background:#0056b3">IMPORTA</button>
+            <button class="btn-top" onclick="resetAll()" style="background:var(--accent)">RESET SCHEDE</button>
+        </div>
+        
+        <button class="btn-top" onclick="closeMod('manage-overlay')" style="margin-top:20px; width:100%">Chiudi</button>
     </div>
 </div>
 
 <div id="search-overlay" class="modal-overlay hidden">
     <div class="form-card">
         <h2>🔎 Ricerca Avanzata</h2>
-        <div class="form-group"><label>Nome o Località</label><input type="text" id="s-testo"></div>
+        <div class="form-group"><label>Cerca per Nome, Località o Note</label><input type="text" id="s-testo" onkeyup="liveSearch()"></div>
         <div class="form-row">
             <div class="form-group"><label>Categoria</label><select id="s-cat" onchange="updateSearchSub()"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="s-sub"></select></div>
         </div>
-        <button class="btn-top" onclick="closeMod('search-overlay')">Chiudi</button>
-        <button class="btn-top" onclick="alert('Ricerca in corso...')">Cerca</button>
-    </div>
-</div>
-
-<div id="manage-overlay" class="modal-overlay hidden">
-    <div class="form-card">
-        <h2>⚙️ Gestione Struttura</h2>
-        <div id="tree-container" style="background:#f9f9f9; padding:15px; border-radius:8px;"></div>
-        <button class="btn-top" onclick="closeMod('manage-overlay')" style="margin-top:20px;">Chiudi</button>
+        <div id="search-results" style="margin-top:15px; max-height:250px; overflow-y:auto;"></div>
+        <button class="btn-top" onclick="closeMod('search-overlay')" style="margin-top:20px; width:100%">Chiudi</button>
     </div>
 </div>
 
 <script>
+    const PROVINCE = ["AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BS","BZ","CA","CB","CE","CH","CL","CN","CO","CR","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LC","LE","LI","LO","LT","LU","MB","MC","ME","MI","MN","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PV","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SO","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VA","VB","VC","VE","VI","VR","VT","VV"];
+    
     const schema = {
         "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
         "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"] },
@@ -137,12 +165,12 @@
         "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato"] },
         "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Centro Estetica"] },
         "GARDEN": { icon: "🌻", sub: ["Vivai"] },
-        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria"] },
+        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali"] },
         "SALUTE": { icon: "🏥", sub: ["Farmacia", "Diagnostica", "Medico", "Ospedale", "Veterinario"] },
         "RISTORANTI": { 
             icon: "🍴", 
-            sub: ["Etnico", "Pizzeria", "Trattoria"], 
-            subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano"] } 
+            sub: ["Etnico", "Pizzeria", "Trattoria", "Agriturismo"], 
+            subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano", "Indiano"] } 
         }
     };
 
@@ -154,6 +182,25 @@
         
         renderMain();
         buildOrariTable();
+        // Popola tendina province
+        const pSel = document.getElementById('f-prov');
+        PROVINCE.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
+    }
+
+    function buildOrariTable() {
+        const tbody = document.getElementById('orari-body');
+        const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+        tbody.innerHTML = "";
+        giorni.forEach((g, i) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${g}</b></td>
+                    <td><input type="time" class="m-ap"> - <input type="time" class="m-ch"></td>
+                    <td><input type="checkbox" class="m-chiuso"></td>
+                    <td><input type="time" class="p-ap"> - <input type="time" class="p-ch"></td>
+                    <td><input type="checkbox" class="p-chiuso"></td>
+                </tr>`;
+        });
     }
 
     function renderMain() {
@@ -164,35 +211,32 @@
         });
     }
 
-    function buildOrariTable() {
-        const t = document.getElementById('f-orari-table');
-        const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-        giorni.forEach(g => {
-            t.innerHTML += `<tr><td><b>${g}</b></td><td>M: <input type="time"> - <input type="time"></td><td>P: <input type="time"> - <input type="time"></td><td>Ch <input type="checkbox"></td></tr>`;
-        });
-    }
-
     function openCat(c) {
         document.getElementById('view-main').classList.add('hidden');
-        const vd = document.getElementById('view-detail');
-        vd.classList.remove('hidden');
+        document.getElementById('view-detail').classList.remove('hidden');
         document.getElementById('title-detail').innerText = c;
         const subCont = document.getElementById('sub-buttons-container');
         subCont.innerHTML = "";
         schema[c].sub.sort().forEach(s => {
-            subCont.innerHTML += `<button class="btn-top" style="background:#ddd; color:black" onclick="renderRecs('${c}','${s}')">${s}</button>`;
+            subCont.innerHTML += `<button class="btn-top" style="background:#eee; color:black; margin-bottom:5px;" onclick="renderRecs('${c}','${s}')">${s}</button>`;
         });
     }
 
     function renderRecs(c, s) {
         const list = document.getElementById('records-list');
         const fil = contacts.filter(x => x.cat === c && x.sub === s);
-        list.innerHTML = fil.length ? "" : "Nessun dato.";
-        fil.forEach(x => { list.innerHTML += `<div style="background:white; padding:10px; margin:5px; border-radius:8px; border-left:4px solid green"><b>${x.nome}</b><br>${x.tel}</div>`; });
+        list.innerHTML = fil.length ? "" : "<p style='padding:20px'>Nessun contatto salvato.</p>";
+        fil.forEach(x => { 
+            list.innerHTML += `<div style="background:white; padding:15px; margin:5px; border-radius:10px; border-left:5px solid var(--secondary); box-shadow:0 2px 5px rgba(0,0,0,0.1)">
+                <b>${x.nome}</b><br>📞 ${x.tel || x.cell}<br>📍 ${x.via} - ${x.loc} (${x.prov})<br>
+                <small>${x.mail || ''}</small>
+            </div>`; 
+        });
     }
 
     function openAddForm() {
-        document.getElementById('form-overlay').classList.remove('hidden');
+        closeMod('search-overlay'); closeMod('manage-overlay');
+        openMod('form-overlay');
         const sel = document.getElementById('f-cat');
         sel.innerHTML = '<option value="">Scegli...</option>';
         Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
@@ -203,11 +247,8 @@
         const sub = document.getElementById('f-sub');
         sub.innerHTML = '<option value="">Scegli...</option>';
         if(schema[cat]) schema[cat].sub.sort().forEach(s => sub.innerHTML += `<option value="${s}">${s}</option>`);
-        
-        // Gestione Ristoranti (Immagine 3c)
-        const extra = document.getElementById('f-extra-ristoranti');
-        if(cat === "RISTORANTI") extra.classList.remove('hidden');
-        else extra.classList.add('hidden');
+        document.getElementById('f-extra-ristoranti').classList.toggle('hidden', cat !== "RISTORANTI");
+        updateSubSub();
     }
 
     function updateSubSub() {
@@ -222,52 +263,52 @@
         } else { group.classList.add('hidden'); }
     }
 
+    function saveData() {
+        const nome = document.getElementById('f-nome').value;
+        if(!nome) return alert("Inserisci il Nome!");
+        
+        const nuovoContatto = {
+            nome: nome,
+            cat: document.getElementById('f-cat').value,
+            sub: document.getElementById('f-sub').value,
+            tel: document.getElementById('f-tel').value,
+            cell: document.getElementById('f-cell').value,
+            web: document.getElementById('f-web').value,
+            via: document.getElementById('f-via').value,
+            loc: document.getElementById('f-loc').value,
+            prov: document.getElementById('f-prov').value,
+            mail: document.getElementById('f-mail').value,
+            note: document.getElementById('f-note').value
+        };
+        
+        contacts.push(nuovoContatto);
+        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        alert("Scheda Salvata!");
+        location.reload();
+    }
+
     function openManage() {
-        document.getElementById('manage-overlay').classList.remove('hidden');
+        openMod('manage-overlay');
         const tree = document.getElementById('tree-container');
         tree.innerHTML = "";
         Object.keys(schema).sort().forEach(c => {
             let html = `<div><b>${schema[c].icon} ${c}</b>`;
             schema[c].sub.forEach(s => { html += `<div class="tree-item"> - ${s}</div>`; });
-            html += `</div>`;
+            html += `</div><br>`;
             tree.innerHTML += html;
         });
     }
 
-    function openSearch() {
-        document.getElementById('search-overlay').classList.remove('hidden');
-        const s = document.getElementById('s-cat');
-        s.innerHTML = '<option value="">Tutte</option>';
-        Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
-    }
-
-    function updateSearchSub() {
-        const c = document.getElementById('s-cat').value;
-        const s = document.getElementById('s-sub');
-        s.innerHTML = '<option value="">Tutte</option>';
-        if(schema[c]) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
-    }
-
     function toggleGoogle() {
-        const wrapper = document.getElementById('app-wrapper');
-        const frame = document.getElementById('g-frame');
-        wrapper.classList.toggle('sidebar-open');
-        if(wrapper.classList.contains('sidebar-open')) frame.src = "https://www.google.com/search?igu=1";
+        const w = document.getElementById('app-wrapper');
+        w.classList.toggle('sidebar-open');
+        if(w.classList.contains('sidebar-open')) document.getElementById('g-frame').src = "https://www.google.com/search?igu=1";
     }
 
-    function saveData() {
-        const n = document.getElementById('f-nome').value;
-        const c = document.getElementById('f-cat').value;
-        const s = document.getElementById('f-sub').value;
-        if(!n || !c) return alert("Nome e Categoria obbligatori!");
-        contacts.push({nome: n, cat: c, sub: s, tel: document.getElementById('f-tel').value});
-        localStorage.setItem('app_contacts', JSON.stringify(contacts));
-        alert("Salvato!");
-        location.reload();
-    }
-
+    function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    
+    function resetAll() { if(confirm("Cancellare TUTTI i dati?")) { localStorage.clear(); location.reload(); }}
+
     window.onload = init;
 </script>
 </body>
