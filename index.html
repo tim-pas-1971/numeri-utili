@@ -6,10 +6,10 @@
     <title>Numeri Utili - Tiziana Pascali</title>
     <style>
         :root { --primary: #003366; --secondary: #28a745; --bg: #f0f4f8; --accent: #d9534f; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
         
-        #app-wrapper { display: flex; transition: 0.4s; width: 100%; }
-        #main-content { flex: 1; transition: 0.4s; padding-right: 20px; }
+        #app-wrapper { display: flex; transition: 0.4s; flex: 1; width: 100%; }
+        #main-content { flex: 1; transition: 0.4s; padding-right: 20px; min-width: 0; }
         #app-wrapper.sidebar-open #main-content { flex: 0 0 66.6%; }
         #sidebar { position: fixed; right: -33.3%; top: 0; width: 33.3%; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: 0.4s; z-index: 3000; visibility: hidden; }
         #app-wrapper.sidebar-open #sidebar { right: 0; visibility: visible; }
@@ -19,21 +19,31 @@
         .card-cat { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid var(--primary); }
         .btn-top { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 5px; }
         
+        /* Footer Tasti Tecnici */
+        .footer-admin { margin-top: auto; padding: 20px 0; border-top: 2px solid #ddd; display: flex; justify-content: flex-start; align-items: center; gap: 15px; }
+        .btn-tech { background: #555; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9em; }
+        .btn-reset { background: var(--accent) !important; margin-left: auto; }
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 4000; }
         .form-card { background: white; padding: 25px; border-radius: 15px; width: 95%; max-width: 850px; max-height: 90vh; overflow-y: auto; }
-        
         .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
-        label { font-size: 0.85em; font-weight: bold; color: var(--primary); }
+        label { font-weight: bold; font-size: 0.9em; color: var(--primary); }
         input, select, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; }
         
         .timetable { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
         .timetable td { padding: 5px; border-bottom: 1px solid #eee; text-align: center; }
-        .timetable input[type="time"] { width: 70px; }
         
         .hidden { display: none !important; }
-        .tree-item { margin-left: 20px; border-left: 1px dashed #ccc; padding-left: 10px; padding-top: 5px; }
-        .admin-tech-btns { display: flex; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; }
+
+        /* GESTISCI - Albero (Immagine 1b) */
+        .tree-container { background: #f9f9f9; padding: 15px; border-radius: 8px; max-height: 450px; overflow-y: auto; }
+        .tree-node { margin-bottom: 10px; padding: 8px; background: white; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tree-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .tree-sub { margin-left: 25px; border-left: 1px dashed #bbb; padding-left: 15px; margin-top: 5px; }
+        .tree-sub-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+        .tree-btns button { border: none; background: #eee; cursor: pointer; margin-left: 4px; padding: 3px 6px; border-radius: 3px; font-size: 0.9em; }
+        .btn-add-node { color: var(--secondary); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -57,14 +67,21 @@
         <div id="view-main" class="grid-main"></div>
         <div id="view-detail" class="hidden">
             <button class="btn-top" onclick="location.reload()" style="margin-bottom:20px;">⬅️ Torna Home</button>
-            <h2 id="title-detail" style="color:var(--primary)"></h2>
+            <h2 id="title-detail"></h2>
             <div id="sub-buttons-container" style="margin-bottom:20px;"></div>
             <div id="records-list"></div>
+        </div>
+
+        <div id="admin-footer" class="footer-admin hidden">
+            <button class="btn-tech" onclick="alert('API KEY: Configurata')">API KEY</button>
+            <button class="btn-tech" onclick="alert('ESPORTA: Download avviato')">ESPORTA</button>
+            <button class="btn-tech" onclick="alert('IMPORTA: Seleziona file')">IMPORTA</button>
+            <button class="btn-tech btn-reset" onclick="resetAll()">RESET SCHEDE</button>
         </div>
     </div>
 
     <div id="sidebar">
-        <div style="padding:15px; background:var(--primary); color:white; display:flex; justify-content:space-between;">
+        <div style="padding:15px; background:var(--primary); color:white; display:flex; justify-content:space-between; align-items:center;">
             <b>Google Search</b><button onclick="toggleGoogle()" style="color:white; background:none; border:none; cursor:pointer; font-size:20px;">X</button>
         </div>
         <iframe id="g-frame" src="about:blank" style="width:100%; height:calc(100% - 50px); border:none;"></iframe>
@@ -73,70 +90,44 @@
 
 <div id="form-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2 style="color:var(--secondary); margin-top:0;">🆕 Nuova Scheda Nominativo</h2>
-        
+        <h2 style="color:var(--secondary); margin:0 0 15px 0;">🆕 Nuova Scheda Nominativo</h2>
         <div class="form-row">
             <div class="form-group"><label>Categoria</label><select id="f-cat" onchange="updateSub()"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub()"></select></div>
             <div id="f-ss-group" class="form-group hidden"><label>Livello 3 (es. Etnico)</label><select id="f-ss"></select></div>
         </div>
-        
-        <div class="form-group"><label>Nome Attività / Nominativo</label><input type="text" id="f-nome"></div>
-        
+        <div class="form-group"><label>Nome Attività</label><input type="text" id="f-nome"></div>
         <div class="form-row">
-            <div class="form-group"><label>Telefono</label><input type="text" id="f-tel"></div>
-            <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
-            <div class="form-group"><label>Sito Web</label><input type="text" id="f-web" placeholder="https://..."></div>
+            <div class="form-group"><label>Tel.</label><input type="text" id="f-tel"></div>
+            <div class="form-group"><label>Cell.</label><input type="text" id="f-cell"></div>
+            <div class="form-group"><label>Sito Web</label><input type="text" id="f-web"></div>
         </div>
-
         <div class="form-row">
-            <div class="form-group"><label>Indirizzo</label><input type="text" id="f-via"></div>
+            <div class="form-group" style="flex:2"><label>Indirizzo</label><input type="text" id="f-via"></div>
             <div class="form-group"><label>Località</label><input type="text" id="f-loc"></div>
             <div class="form-group"><label>Prov.</label><select id="f-prov"></select></div>
         </div>
-
-        <div class="form-row">
-            <div class="form-group"><label>Email</label><input type="email" id="f-mail"></div>
-            <div class="form-group"><label>P. IVA</label><input type="text" id="f-piva"></div>
-            <div class="form-group"><label>Cod. Fiscale</label><input type="text" id="f-cf"></div>
-        </div>
-
-        <div id="f-extra-ristoranti" class="hidden" style="background:#eef9f0; padding:15px; border-radius:8px; margin: 10px 0;">
-            <div class="form-row">
-                <div class="form-group"><label>Tipo Cucina</label><input type="text" id="f-cucina"></div>
-                <div class="form-group"><label>Costo</label><select id="f-costo"><option>€</option><option>€€</option><option>€€€</option></select></div>
-                <div class="form-group"><label>Giudizio (1-5)</label><input type="number" id="f-voto" min="1" max="5"></div>
-            </div>
-        </div>
-
-        <div class="form-group" style="margin-top:15px;"><label>Orari di Apertura</label>
-            <table class="timetable" id="f-orari-table">
-                <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
-                <tbody id="orari-body"></tbody>
-            </table>
-        </div>
-
-        <div class="form-group" style="margin-top:10px;"><label>Note</label><textarea id="f-note" rows="2"></textarea></div>
-
+        
+        <label>Orari (Ch. M. e Ch. P. per chiusure separate)</label>
+        <table class="timetable">
+            <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
+            <tbody id="orari-body"></tbody>
+        </table>
+        
         <div style="text-align:right; margin-top:20px;">
             <button class="btn-top" onclick="closeMod('form-overlay')" style="background:#666">Annulla</button>
-            <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA SCHEDA</button>
+            <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA</button>
         </div>
     </div>
 </div>
 
 <div id="manage-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2>⚙️ Gestione Struttura e Dati</h2>
-        <div id="tree-container" style="background:#f9f9f9; padding:15px; border-radius:8px; max-height:300px; overflow-y:auto;"></div>
-        
-        <div class="admin-tech-btns">
-            <button class="btn-top" onclick="alert('Funzione API Key')" style="background:#555">API KEY</button>
-            <button class="btn-top" onclick="alert('Esportazione avviata...')" style="background:#0056b3">ESPORTA</button>
-            <button class="btn-top" onclick="alert('Seleziona file da importare')" style="background:#0056b3">IMPORTA</button>
-            <button class="btn-top" onclick="resetAll()" style="background:var(--accent)">RESET SCHEDE</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h2>⚙️ Gestione Struttura</h2>
+            <button class="btn-top" style="background:var(--secondary)" onclick="alert('Aggiungi Nuova Sezione Principale')">Aggiungi Sezione [+]</button>
         </div>
-        
+        <div id="tree-container" class="tree-container"></div>
         <button class="btn-top" onclick="closeMod('manage-overlay')" style="margin-top:20px; width:100%">Chiudi</button>
     </div>
 </div>
@@ -144,13 +135,13 @@
 <div id="search-overlay" class="modal-overlay hidden">
     <div class="form-card">
         <h2>🔎 Ricerca Avanzata</h2>
-        <div class="form-group"><label>Cerca per Nome, Località o Note</label><input type="text" id="s-testo" onkeyup="liveSearch()"></div>
+        <div class="form-group"><label>Cerca Nome o Località</label><input type="text" id="s-testo" placeholder="Scrivi qui..."></div>
         <div class="form-row">
-            <div class="form-group"><label>Categoria</label><select id="s-cat" onchange="updateSearchSub()"></select></div>
-            <div class="form-group"><label>Sottocategoria</label><select id="s-sub"></select></div>
+            <div class="form-group"><label>Filtra Categoria</label><select id="s-cat" onchange="updateSearchSub()"></select></div>
+            <div class="form-group"><label>Filtra Sottocategoria</label><select id="s-sub"></select></div>
         </div>
-        <div id="search-results" style="margin-top:15px; max-height:250px; overflow-y:auto;"></div>
-        <button class="btn-top" onclick="closeMod('search-overlay')" style="margin-top:20px; width:100%">Chiudi</button>
+        <div id="search-results" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
+        <button class="btn-top" onclick="closeMod('search-overlay')" style="margin-top:20px; width:100%">Esci</button>
     </div>
 </div>
 
@@ -160,29 +151,21 @@
     const schema = {
         "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
         "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"] },
-        "BRICOLAGE": { icon: "🛠️", sub: ["Ferramenta"] },
-        "CASA (PROF.)": { icon: "🏠", sub: ["Idraulico", "Elettricista", "Muratore"] },
-        "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato"] },
-        "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Centro Estetica"] },
-        "GARDEN": { icon: "🌻", sub: ["Vivai"] },
-        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali"] },
-        "SALUTE": { icon: "🏥", sub: ["Farmacia", "Diagnostica", "Medico", "Ospedale", "Veterinario"] },
-        "RISTORANTI": { 
-            icon: "🍴", 
-            sub: ["Etnico", "Pizzeria", "Trattoria", "Agriturismo"], 
-            subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano", "Indiano"] } 
-        }
+        "SALUTE": { icon: "🏥", sub: ["Farmacia", "Medico", "Ospedale"] },
+        "RISTORANTI": { icon: "🍴", sub: ["Etnico", "Pizzeria", "Trattoria"], subSub: { "Etnico": ["Cinese", "Giapponese"] } }
     };
 
     let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
 
     function init() {
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
-        if (!isAdmin) document.getElementById('admin-menu').style.display='none';
-        
+        if (isAdmin) {
+            document.getElementById('admin-footer').classList.remove('hidden');
+        } else {
+            document.getElementById('admin-menu').querySelectorAll('button:not([onclick*="Search"])').forEach(b => b.style.display='none');
+        }
         renderMain();
         buildOrariTable();
-        // Popola tendina province
         const pSel = document.getElementById('f-prov');
         PROVINCE.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
     }
@@ -191,15 +174,8 @@
         const tbody = document.getElementById('orari-body');
         const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         tbody.innerHTML = "";
-        giorni.forEach((g, i) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td><b>${g}</b></td>
-                    <td><input type="time" class="m-ap"> - <input type="time" class="m-ch"></td>
-                    <td><input type="checkbox" class="m-chiuso"></td>
-                    <td><input type="time" class="p-ap"> - <input type="time" class="p-ch"></td>
-                    <td><input type="checkbox" class="p-chiuso"></td>
-                </tr>`;
+        giorni.forEach(g => {
+            tbody.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time"> - <input type="time"></td><td><input type="checkbox"></td><td><input type="time"> - <input type="time"></td><td><input type="checkbox"></td></tr>`;
         });
     }
 
@@ -222,20 +198,41 @@
         });
     }
 
-    function renderRecs(c, s) {
-        const list = document.getElementById('records-list');
-        const fil = contacts.filter(x => x.cat === c && x.sub === s);
-        list.innerHTML = fil.length ? "" : "<p style='padding:20px'>Nessun contatto salvato.</p>";
-        fil.forEach(x => { 
-            list.innerHTML += `<div style="background:white; padding:15px; margin:5px; border-radius:10px; border-left:5px solid var(--secondary); box-shadow:0 2px 5px rgba(0,0,0,0.1)">
-                <b>${x.nome}</b><br>📞 ${x.tel || x.cell}<br>📍 ${x.via} - ${x.loc} (${x.prov})<br>
-                <small>${x.mail || ''}</small>
-            </div>`; 
+    function openManage() {
+        openMod('manage-overlay');
+        const tree = document.getElementById('tree-container');
+        tree.innerHTML = "";
+        Object.keys(schema).sort().forEach(c => {
+            let html = `<div class="tree-node"><div class="tree-header"><span>${schema[c].icon} ${c}</span><span class="tree-btns"><button class="btn-add-node" title="Aggiungi Sottocategoria">[+]</button><button>✏️</button><button>❌</button></span></div>`;
+            schema[c].sub.forEach(s => {
+                html += `<div class="tree-sub"><div class="tree-sub-item"><span> - ${s}</span><span class="tree-btns"><button class="btn-add-node" title="Aggiungi Livello 3">[+]</button><button>✏️</button><button>❌</button></span></div>`;
+                if(schema[c].subSub?.[s]) {
+                   schema[c].subSub[s].forEach(ss => {
+                       html += `<div style="margin-left:25px; font-size:0.9em; display:flex; justify-content:space-between;"><span> -- ${ss}</span><span class="tree-btns"><button>✏️</button><button>❌</button></span></div>`;
+                   });
+                }
+                html += `</div>`;
+            });
+            html += `</div>`;
+            tree.innerHTML += html;
         });
     }
 
+    function openSearch() {
+        openMod('search-overlay');
+        const s = document.getElementById('s-cat');
+        s.innerHTML = '<option value="">Tutte</option>';
+        Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+    }
+
+    function updateSearchSub() {
+        const c = document.getElementById('s-cat').value;
+        const s = document.getElementById('s-sub');
+        s.innerHTML = '<option value="">Tutte</option>';
+        if(schema[c]) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
+    }
+
     function openAddForm() {
-        closeMod('search-overlay'); closeMod('manage-overlay');
         openMod('form-overlay');
         const sel = document.getElementById('f-cat');
         sel.innerHTML = '<option value="">Scegli...</option>';
@@ -247,67 +244,16 @@
         const sub = document.getElementById('f-sub');
         sub.innerHTML = '<option value="">Scegli...</option>';
         if(schema[cat]) schema[cat].sub.sort().forEach(s => sub.innerHTML += `<option value="${s}">${s}</option>`);
-        document.getElementById('f-extra-ristoranti').classList.toggle('hidden', cat !== "RISTORANTI");
-        updateSubSub();
     }
 
-    function updateSubSub() {
-        const cat = document.getElementById('f-cat').value;
-        const sub = document.getElementById('f-sub').value;
-        const group = document.getElementById('f-ss-group');
-        const ss = document.getElementById('f-ss');
-        if(schema[cat]?.subSub?.[sub]) {
-            group.classList.remove('hidden');
-            ss.innerHTML = '<option value="">Scegli...</option>';
-            schema[cat].subSub[sub].sort().forEach(x => ss.innerHTML += `<option value="${x}">${x}</option>`);
-        } else { group.classList.add('hidden'); }
-    }
-
-    function saveData() {
-        const nome = document.getElementById('f-nome').value;
-        if(!nome) return alert("Inserisci il Nome!");
-        
-        const nuovoContatto = {
-            nome: nome,
-            cat: document.getElementById('f-cat').value,
-            sub: document.getElementById('f-sub').value,
-            tel: document.getElementById('f-tel').value,
-            cell: document.getElementById('f-cell').value,
-            web: document.getElementById('f-web').value,
-            via: document.getElementById('f-via').value,
-            loc: document.getElementById('f-loc').value,
-            prov: document.getElementById('f-prov').value,
-            mail: document.getElementById('f-mail').value,
-            note: document.getElementById('f-note').value
-        };
-        
-        contacts.push(nuovoContatto);
-        localStorage.setItem('app_contacts', JSON.stringify(contacts));
-        alert("Scheda Salvata!");
-        location.reload();
-    }
-
-    function openManage() {
-        openMod('manage-overlay');
-        const tree = document.getElementById('tree-container');
-        tree.innerHTML = "";
-        Object.keys(schema).sort().forEach(c => {
-            let html = `<div><b>${schema[c].icon} ${c}</b>`;
-            schema[c].sub.forEach(s => { html += `<div class="tree-item"> - ${s}</div>`; });
-            html += `</div><br>`;
-            tree.innerHTML += html;
-        });
-    }
-
+    function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
     function toggleGoogle() {
         const w = document.getElementById('app-wrapper');
         w.classList.toggle('sidebar-open');
         if(w.classList.contains('sidebar-open')) document.getElementById('g-frame').src = "https://www.google.com/search?igu=1";
     }
-
-    function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    function resetAll() { if(confirm("Cancellare TUTTI i dati?")) { localStorage.clear(); location.reload(); }}
+    function resetAll() { if(confirm("RESET TOTALE?")) { localStorage.clear(); location.reload(); } }
 
     window.onload = init;
 </script>
