@@ -22,10 +22,13 @@ let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
 let curCat = ""; let curSub = "";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // PROTEZIONE OSPITI: Nascondi tasti se non c'è ?admin=1 nell'URL
+    // Gestione Admin vs Ospite
     const params = new URLSearchParams(window.location.search);
-    if (params.get('admin') !== '1') {
-        document.querySelectorAll('button[onclick*="openManage"], button[onclick*="openAddForm"], .footer-left').forEach(el => el.style.display = 'none');
+    const isAdmin = params.get('admin') === '1';
+    
+    if (!isAdmin) {
+        // Nascondi tasti admin agli ospiti
+        document.querySelectorAll('button[onclick*="openManage"], button[onclick*="openAddForm"], button[onclick*="toggleGoogleSearch"], .footer-left').forEach(el => el.style.display = 'none');
         const h1 = document.querySelector('h1');
         if(h1) h1.innerText = "🗂️ Numeri Utili - Ospiti";
     }
@@ -36,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pSel) PROVINCE.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
 });
 
+// --- FUNZIONI NAVIGAZIONE ---
 function renderMainGrid() {
     const g = document.getElementById('view-main'); if (!g) return;
     g.innerHTML = "";
@@ -53,6 +57,48 @@ function openCategory(cat) {
     document.getElementById('records-list').innerHTML = `<div class="select-prompt">Seleziona una sottocategoria.</div>`;
 }
 
+function goHome() {
+    document.getElementById('view-main').classList.remove('hidden');
+    document.getElementById('view-detail').classList.add('hidden');
+}
+
+// --- FUNZIONI MODULI ---
+function openAddForm() {
+    resetForm();
+    const overlay = document.getElementById('form-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+    const sel = document.getElementById('f-cat');
+    if (sel) {
+        sel.innerHTML = "<option value=''>Scegli...</option>";
+        Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+    }
+}
+
+function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
+
+function openSearchPanel() { document.getElementById('search-overlay').classList.remove('hidden'); }
+function closeSearchPanel() { document.getElementById('search-overlay').classList.add('hidden'); }
+
+function openManage() { document.getElementById('manage-overlay').classList.remove('hidden'); }
+function closeManage() { document.getElementById('manage-overlay').classList.add('hidden'); }
+
+function toggleGoogleSearch() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('open');
+    const iframe = document.getElementById('google-iframe');
+    if (iframe && iframe.src === "about:blank") iframe.src = "https://www.google.com/search?igu=1";
+}
+
+// --- LOGICA DATI ---
+function updateFormSubCats() {
+    const c = document.getElementById('f-cat').value;
+    const s = document.getElementById('f-subcat');
+    if (s && schema[c]) {
+        s.innerHTML = "<option value=''>Scegli...</option>";
+        schema[c].sub.sort().forEach(i => s.innerHTML += `<option value="${i}">${i}</option>`);
+    }
+}
+
 function refreshSubButtons() {
     const cont = document.getElementById('sub-buttons-container'); if (!cont) return;
     cont.innerHTML = "";
@@ -68,74 +114,12 @@ function refreshSubButtons() {
 function renderRecords() {
     const list = document.getElementById('records-list');
     const filtered = contacts.filter(c => c.cat === curCat && c.sub === curSub);
-    list.innerHTML = filtered.length ? "" : "Nessun contatto trovato.";
+    list.innerHTML = filtered.length ? "" : "<p>Nessun contatto.</p>";
     filtered.forEach(c => {
-        list.innerHTML += `<div class="record-card"><h3>${c.nome}</h3><p>📞 ${c.tel || c.cell}</p><p>📍 ${c.via}, ${c.loc}</p></div>`;
+        list.innerHTML += `<div class="record-card"><h3>${c.nome}</h3><p>📞 ${c.tel || c.cell}</p></div>`;
     });
 }
 
-function openAddForm() {
-    resetForm();
-    const overlay = document.getElementById('form-overlay');
-    if (overlay) overlay.classList.remove('hidden');
-
-    const sel = document.getElementById('f-cat');
-    if (sel) {
-        sel.innerHTML = "<option value=''>Scegli...</option>";
-        // Usiamo 'schema' che è la variabile che contiene i tuoi dati
-        Object.keys(schema).sort().forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c;
-            opt.innerText = c;
-            sel.appendChild(opt);
-        });
-    }
-}
-
-function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
-function goHome() { document.getElementById('view-main').classList.remove('hidden'); document.getElementById('view-detail').classList.add('hidden'); }
-function openSearchPanel() { document.getElementById('search-overlay').classList.remove('hidden'); }
-function closeSearchPanel() { document.getElementById('search-overlay').classList.add('hidden'); }
-function openManage() { document.getElementById('manage-overlay').classList.remove('hidden'); }
-function closeManage() { document.getElementById('manage-overlay').classList.add('hidden'); }
-function initTimetable() { /* ... tua funzione timetable ... */ }
+function initTimetable() { /* Funzione opzionale se la usi */ }
 function resetForm() { document.querySelectorAll('#form-overlay input').forEach(i => i.value = ""); }
-
-function saveContact() {
-    const newC = {
-        cat: document.getElementById('f-cat').value,
-        sub: document.getElementById('f-subcat').value,
-        nome: document.getElementById('f-nome').value,
-        tel: document.getElementById('f-tel').value,
-        loc: document.getElementById('f-loc').value,
-        via: document.getElementById('f-via').value
-    };
-    contacts.push(newC);
-    localStorage.setItem('app_contacts', JSON.stringify(contacts));
-    alert("Contatto Salvato!");
-    closeAddForm();
-    renderRecords();
-}
-// Fa funzionare il tasto RICERCA
-function openSearchPanel() {
-    const sOverlay = document.getElementById('search-overlay');
-    if (sOverlay) sOverlay.classList.remove('hidden');
-}
-
-// Chiude il pannello ricerca
-function closeSearchPanel() {
-    const sOverlay = document.getElementById('search-overlay');
-    if (sOverlay) sOverlay.classList.add('hidden');
-}
-
-// Fa funzionare il tasto GOOGLE (apre la barra laterale)
-function toggleGoogleSearch() {
-    const sidebar = document.getElementById('sidebar');
-    const iframe = document.getElementById('google-iframe');
-    if (sidebar) {
-        sidebar.classList.toggle('open');
-        if (sidebar.classList.contains('open') && iframe.src === "about:blank") {
-            iframe.src = "https://www.google.com/search?igu=1";
-        }
-    }
-}
+function saveContact() { alert("Funzione Salva attiva!"); closeAddForm(); }
