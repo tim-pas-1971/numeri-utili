@@ -403,3 +403,10 @@ body.sidebar-open .form-card {
 .modal-overlay {
     z-index: 9999 !important;
 }
+@media (min-width: 768px) {
+    #app-container { display: flex; flex-wrap: wrap; }
+    header { width: 100%; }
+    #view-main { width: 30%; }
+    #view-detail { width: 70%; display: block !important; }
+    .hidden { display: none !important; }
+}
