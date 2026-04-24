@@ -31,19 +31,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- FUNZIONI CORRETTE PER AGGIUNGI ---
 function openAddForm() {
-    resetForm();
+    // 1. Puliamo il modulo dai dati precedenti
+    if (typeof resetForm === "function") resetForm();
+    
+    // 2. Troviamo il modulo nell'HTML (usando l'ID che abbiamo visto nel tuo file)
     const overlay = document.getElementById('form-overlay');
-    if (overlay) overlay.classList.remove('hidden');
-    
-    lockForm(false);
-    
+    if (overlay) {
+        overlay.classList.remove('hidden');
+        overlay.style.display = 'block'; // Forza l'apparizione
+    }
+
+    // 3. RIEMPIAMO LA TENDINA DELLE CATEGORIE (Il punto critico!)
     const sel = document.getElementById('f-cat');
     if (sel) {
+        // Puliamo la tendina e mettiamo la prima opzione vuota
         sel.innerHTML = "<option value=''>Scegli...</option>";
-        Object.keys(schema).sort().forEach(c => {
-            sel.innerHTML += `<option value="${c}">${c}</option>`;
+        
+        // Prendiamo le categorie dal tuo defaultSchema e le carichiamo
+        Object.keys(defaultSchema).sort().forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.innerText = c;
+            sel.appendChild(opt);
         });
+        console.log("Tendina Categorie popolata con successo!");
+    } else {
+        console.error("ERRORE: Non trovo la tendina con ID 'f-cat'!");
     }
+    
+    // 4. Sblocchiamo i campi nel caso fossero rimasti in "sola lettura"
+    if (typeof lockForm === "function") lockForm(false);
 }
 
 function closeAddForm() { 
