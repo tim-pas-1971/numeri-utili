@@ -76,10 +76,20 @@ function renderRecords() {
 
 function openAddForm() {
     resetForm();
-    document.getElementById('form-overlay').classList.remove('hidden');
+    const overlay = document.getElementById('form-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+
     const sel = document.getElementById('f-cat');
-    sel.innerHTML = "<option value=''>Scegli...</option>";
-    Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+    if (sel) {
+        sel.innerHTML = "<option value=''>Scegli...</option>";
+        // Usiamo 'schema' che è la variabile che contiene i tuoi dati
+        Object.keys(schema).sort().forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.innerText = c;
+            sel.appendChild(opt);
+        });
+    }
 }
 
 function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
@@ -105,4 +115,27 @@ function saveContact() {
     alert("Contatto Salvato!");
     closeAddForm();
     renderRecords();
+}
+// Fa funzionare il tasto RICERCA
+function openSearchPanel() {
+    const sOverlay = document.getElementById('search-overlay');
+    if (sOverlay) sOverlay.classList.remove('hidden');
+}
+
+// Chiude il pannello ricerca
+function closeSearchPanel() {
+    const sOverlay = document.getElementById('search-overlay');
+    if (sOverlay) sOverlay.classList.add('hidden');
+}
+
+// Fa funzionare il tasto GOOGLE (apre la barra laterale)
+function toggleGoogleSearch() {
+    const sidebar = document.getElementById('sidebar');
+    const iframe = document.getElementById('google-iframe');
+    if (sidebar) {
+        sidebar.classList.toggle('open');
+        if (sidebar.classList.contains('open') && iframe.src === "about:blank") {
+            iframe.src = "https://www.google.com/search?igu=1";
+        }
+    }
 }
