@@ -17,8 +17,9 @@ async function supabaseRequest(endpoint, method = 'GET', body = null) {
     return await response.json();
 }
 
-// --- DATI E CONFIGURAZIONE (ORIGINALE TIZIANA) ---
+// --- DATI E CONFIGURAZIONE (CORRETTO) ---
 const PROVINCE = ["AG", "AL", "AN", "AO", "AR", "AP", "AT", "AV", "BA", "BT", "BL", "BN", "BO", "BR", "BS", "BZ", "CA", "CB", "CE", "CH", "CL", "CN", "CO", "CR", "CS", "CT", "CZ", "EN", "FC", "FE", "FG", "FI", "FM", "FR", "GE", "GO", "GR", "IM", "IS", "KR", "LC", "LE", "LI", "LO", "LT", "LU", "MB", "MC", "ME", "MI", "MN", "MO", "MS", "MT", "NA", "NO", "NU", "OR", "PA", "PC", "PD", "PE", "PG", "PI", "PN", "PO", "PR", "PT", "PU", "PV", "PZ", "RA", "RC", "RE", "RG", "RI", "RM", "RN", "RO", "SA", "SI", "SO", "SP", "SR", "SS", "SU", "SV", "TA", "TE", "TN", "TO", "TP", "TR", "TS", "TV", "UD", "VA", "VB", "VC", "VE", "VI", "VR", "VT", "VV"];
+
 const defaultSchema = {
     "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"], subSub: {} },
     "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"], subSub: {} },
@@ -28,7 +29,11 @@ const defaultSchema = {
     "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Centro Estetica"], subSub: {} },
     "GARDEN": { icon: "🌻", sub: ["Vivai"], subSub: {} },
     "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe / Borse", "Gioielleria", "Animali"], subSub: {} },
-    "SALUTE": { icon: "🏥", sub: ["Centro Diagnostico, "Farmacia", "Laboratorio di analisi", "Medico Mutua / Specialista", "Ospedale", "Veterinario"], subSub: {} },
+    "SALUTE": { 
+        icon: "🏥", 
+        sub: ["Centro Diagnostico", "Farmacia", "Laboratorio di analisi", "Medico Mutua / Specialista", "Ospedale", "Veterinario"], 
+        subSub: {} 
+    },
     "RISTORANTI": {
         icon: "🍴",
         sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"],
