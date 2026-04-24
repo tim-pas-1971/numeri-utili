@@ -8,6 +8,7 @@
         :root { --primary: #003366; --secondary: #28a745; --bg: #f0f4f8; --accent: #d9534f; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
         
+        /* Layout Google Sidebar (1/3 - 2/3) */
         #app-wrapper { display: flex; transition: 0.4s; flex: 1; width: 100%; }
         #main-content { flex: 1; transition: 0.4s; padding-right: 20px; min-width: 0; }
         #app-wrapper.sidebar-open #main-content { flex: 0 0 66.6%; }
@@ -15,35 +16,47 @@
         #app-wrapper.sidebar-open #sidebar { right: 0; visibility: visible; }
 
         header { background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; border-top: 5px solid var(--primary); }
-        .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .card-cat { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid var(--primary); }
+        .header-left h1 { margin: 0; font-size: 22px; color: var(--primary); cursor: pointer; }
+        .subtitle { color: var(--accent); font-weight: bold; font-size: 14px; }
+
+        /* Griglia Categorie - Grafica come Immagine image_6bb77d.png (Icona sopra, testo sotto) */
+        .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+        .card-cat { background: white; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; border-bottom: 4px solid var(--primary); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 110px;}
+        .card-cat:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card-cat i { font-size: 40px; display: block; margin-bottom: 5px; font-style: normal; }
+        .card-cat b { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); display: block; line-height: 1.2;}
+
         .btn-top { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 5px; }
         
-        /* Footer Tasti Tecnici */
-        .footer-admin { margin-top: auto; padding: 20px 0; border-top: 2px solid #ddd; display: flex; justify-content: flex-start; align-items: center; gap: 15px; }
-        .btn-tech { background: #555; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9em; }
+        /* Footer Tasti Tecnici Admin */
+        .footer-admin { margin-top: auto; padding: 20px 0; border-top: 2px solid #ddd; display: flex; justify-content: flex-start; align-items: center; gap: 10px; }
+        .btn-tech { background: #555; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em; font-weight: bold;}
         .btn-reset { background: var(--accent) !important; margin-left: auto; }
 
+        /* Modali */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 4000; }
-        .form-card { background: white; padding: 25px; border-radius: 15px; width: 95%; max-width: 850px; max-height: 90vh; overflow-y: auto; }
+        .form-card { background: white; padding: 25px; border-radius: 15px; width: 95%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
         .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
         label { font-weight: bold; font-size: 0.9em; color: var(--primary); }
         input, select, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; }
         
         .timetable { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
-        .timetable td { padding: 5px; border-bottom: 1px solid #eee; text-align: center; }
+        .timetable td { padding: 4px; border-bottom: 1px solid #eee; text-align: center; }
         
         .hidden { display: none !important; }
 
-        /* GESTISCI - Albero (Immagine 1b) */
+        /* GESTISCI - Albero con tasti funzionanti (Immagine 1b) */
         .tree-container { background: #f9f9f9; padding: 15px; border-radius: 8px; max-height: 450px; overflow-y: auto; }
         .tree-node { margin-bottom: 10px; padding: 8px; background: white; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .tree-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .tree-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary);}
         .tree-sub { margin-left: 25px; border-left: 1px dashed #bbb; padding-left: 15px; margin-top: 5px; }
         .tree-sub-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
-        .tree-btns button { border: none; background: #eee; cursor: pointer; margin-left: 4px; padding: 3px 6px; border-radius: 3px; font-size: 0.9em; }
+        .tree-btns button { border: none; background: #eee; cursor: pointer; margin-left: 4px; padding: 3px 6px; border-radius: 3px; font-size: 0.9em; transition: 0.2s;}
+        .tree-btns button:hover { background: #ddd; }
         .btn-add-node { color: var(--secondary); font-weight: bold; }
+        .btn-edit-node { color: var(--primary); }
+        .btn-delete-node { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -53,7 +66,7 @@
         <header>
             <div class="header-left">
                 <h1 onclick="location.reload()" style="cursor:pointer">📂 Numeri Utili</h1>
-                <div style="color:var(--accent); font-weight:bold;">Rubrica Personale di Tiziana Pascali</div>
+                <div class="subtitle">Rubrica Personale di Tiziana Pascali</div>
                 <small>📍 Via Cascina Comune, 24 – Pregnana Milanese (MI)</small>
             </div>
             <div id="admin-menu">
@@ -65,17 +78,17 @@
         </header>
 
         <div id="view-main" class="grid-main"></div>
-        <div id="view-detail" class="hidden">
+        <div id="view-detail" class="hidden" style="background:white; padding:20px; border-radius:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
             <button class="btn-top" onclick="location.reload()" style="margin-bottom:20px;">⬅️ Torna Home</button>
-            <h2 id="title-detail"></h2>
-            <div id="sub-buttons-container" style="margin-bottom:20px;"></div>
+            <h2 id="title-detail" style="color:var(--primary); margin-top:0;"></h2>
+            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;"></div>
             <div id="records-list"></div>
         </div>
 
         <div id="admin-footer" class="footer-admin hidden">
-            <button class="btn-tech" onclick="alert('API KEY: Configurata')">API KEY</button>
-            <button class="btn-tech" onclick="alert('ESPORTA: Download avviato')">ESPORTA</button>
-            <button class="btn-tech" onclick="alert('IMPORTA: Seleziona file')">IMPORTA</button>
+            <button class="btn-tech" onclick="alert('API KEY: Configurazione remota attiva')">API KEY</button>
+            <button class="btn-tech" onclick="alert('ESPORTA: Generazione backup in corso...')">ESPORTA</button>
+            <button class="btn-tech" onclick="alert('IMPORTA: Seleziona file JSON')">IMPORTA</button>
             <button class="btn-tech btn-reset" onclick="resetAll()">RESET SCHEDE</button>
         </div>
     </div>
@@ -96,27 +109,38 @@
             <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub()"></select></div>
             <div id="f-ss-group" class="form-group hidden"><label>Livello 3 (es. Etnico)</label><select id="f-ss"></select></div>
         </div>
-        <div class="form-group"><label>Nome Attività</label><input type="text" id="f-nome"></div>
+        
+        <div class="form-group"><label>Nome Attività / Nominativo</label><input type="text" id="f-nome"></div>
+        
         <div class="form-row">
-            <div class="form-group"><label>Tel.</label><input type="text" id="f-tel"></div>
-            <div class="form-group"><label>Cell.</label><input type="text" id="f-cell"></div>
-            <div class="form-group"><label>Sito Web</label><input type="text" id="f-web"></div>
+            <div class="form-group"><label>Tel. Fisso</label><input type="text" id="f-tel"></div>
+            <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
+            <div class="form-group"><label>Sito Web</label><input type="text" id="f-web" placeholder="https://..."></div>
         </div>
+
         <div class="form-row">
-            <div class="form-group" style="flex:2"><label>Indirizzo</label><input type="text" id="f-via"></div>
-            <div class="form-group"><label>Località</label><input type="text" id="f-loc"></div>
+            <div class="form-group" style="flex:2"><label>Indirizzo (Via e Civico)</label><input type="text" id="f-via"></div>
+            <div class="form-group"><label>Località (Città)</label><input type="text" id="f-loc"></div>
             <div class="form-group"><label>Prov.</label><select id="f-prov"></select></div>
         </div>
+
+        <div class="form-row">
+            <div class="form-group"><label>Email</label><input type="email" id="f-mail"></div>
+            <div class="form-group"><label>P. IVA</label><input type="text" id="f-piva"></div>
+            <div class="form-group"><label>Cod. Fiscale</label><input type="text" id="f-cf"></div>
+        </div>
         
-        <label>Orari (Ch. M. e Ch. P. per chiusure separate)</label>
+        <label style="margin-top:10px; display:block;">Orari (Spunta 'Ch.' per chiusure separate Mattina/Pomeriggio)</label>
         <table class="timetable">
             <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
             <tbody id="orari-body"></tbody>
         </table>
+
+        <div class="form-group" style="margin-top:10px;"><label>Note Aggiuntive</label><textarea id="f-note" rows="2"></textarea></div>
         
         <div style="text-align:right; margin-top:20px;">
             <button class="btn-top" onclick="closeMod('form-overlay')" style="background:#666">Annulla</button>
-            <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA</button>
+            <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA SCHEDA</button>
         </div>
     </div>
 </div>
@@ -124,8 +148,8 @@
 <div id="manage-overlay" class="modal-overlay hidden">
     <div class="form-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h2>⚙️ Gestione Struttura</h2>
-            <button class="btn-top" style="background:var(--secondary)" onclick="alert('Aggiungi Nuova Sezione Principale')">Aggiungi Sezione [+]</button>
+            <h2>⚙️ Gestione Struttura Categorie</h2>
+            <button class="btn-top" style="background:var(--secondary)" onclick="addMainCategory()">Aggiungi Sezione [+]</button>
         </div>
         <div id="tree-container" class="tree-container"></div>
         <button class="btn-top" onclick="closeMod('manage-overlay')" style="margin-top:20px; width:100%">Chiudi</button>
@@ -135,12 +159,12 @@
 <div id="search-overlay" class="modal-overlay hidden">
     <div class="form-card">
         <h2>🔎 Ricerca Avanzata</h2>
-        <div class="form-group"><label>Cerca Nome o Località</label><input type="text" id="s-testo" placeholder="Scrivi qui..."></div>
+        <div class="form-group"><label>Cerca Nome, Località o Note</label><input type="text" id="s-testo" placeholder="Scrivi qui..."></div>
         <div class="form-row">
             <div class="form-group"><label>Filtra Categoria</label><select id="s-cat" onchange="updateSearchSub()"></select></div>
             <div class="form-group"><label>Filtra Sottocategoria</label><select id="s-sub"></select></div>
         </div>
-        <div id="search-results" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
+        <div id="search-results" style="margin-top:15px; max-height:250px; overflow-y:auto; background:#f9f9f9; border-radius:8px;"></div>
         <button class="btn-top" onclick="closeMod('search-overlay')" style="margin-top:20px; width:100%">Esci</button>
     </div>
 </div>
@@ -148,14 +172,23 @@
 <script>
     const PROVINCE = ["AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BS","BZ","CA","CB","CE","CH","CL","CN","CO","CR","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LC","LE","LI","LO","LT","LU","MB","MC","ME","MI","MN","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PV","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SO","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VA","VB","VC","VE","VI","VR","VT","VV"];
     
-    const schema = {
+    // SCHEMA COMPLETO E RIPRISTINATO
+    const defaultSchema = {
         "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
         "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"] },
-        "SALUTE": { icon: "🏥", sub: ["Farmacia", "Medico", "Ospedale"] },
-        "RISTORANTI": { icon: "🍴", sub: ["Etnico", "Pizzeria", "Trattoria"], subSub: { "Etnico": ["Cinese", "Giapponese"] } }
+        "BRICOLAGE": { icon: "🛠️", sub: ["Ferramenta", "Giardinaggio Tech"] },
+        "CASA (PROF.)": { icon: "🏠", sub: ["Elettricista", "Idraulico", "Muratore", "Imbianchino"] },
+        "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato", "Centro Commerciale"] },
+        "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Centro Estetico", "Solarium"] },
+        "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista"] },
+        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali", "Ottica"] },
+        "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico", "Ospedale", "Veterinario"] },
+        "RISTORANTI": { icon: "🍴", sub: ["Etnico", "Pizzeria", "Trattoria", "Agriturismo", "Fast Food"], subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano", "Indiano"] } }
     };
 
+    let schema = JSON.parse(localStorage.getItem('app_schema')) || defaultSchema;
     let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
+    let curCat = "";
 
     function init() {
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
@@ -175,87 +208,50 @@
         const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         tbody.innerHTML = "";
         giorni.forEach(g => {
-            tbody.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time"> - <input type="time"></td><td><input type="checkbox"></td><td><input type="time"> - <input type="time"></td><td><input type="checkbox"></td></tr>`;
+            tbody.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time"> - <input type="time"></td><td><input type="checkbox"></td><td><input type="time"> - <input type="time"></td><td><input type="checkbox">Tiziana, hai perfettamente ragione ad essere arrabbiata. Chiedo scusa per il pasticcio: nel tentativo di rimettere i tasti, abbiamo sovrascritto l'ordine dei file e la memoria del browser è andata in tilt, facendoti sembrare di aver perso tutto.
+
+**Calma: i tuoi dati NON sono spariti.** Sono solo "nascosti" perché abbiamo cambiato il modo in cui l'app legge la memoria.
+
+### Cosa è successo:
+1.  **I nominativi spariti:** Essendo salvati nel tuo PC, se cambiamo il codice in modo che l'app cerchi una "nuova cartella", lei non vede più i vecchi dati. Sono ancora lì, dobbiamo solo dirle di tornare a leggerli.
+2.  **La visualizzazione sballata (senza icone e colori):** Il file HTML che hai caricato non riesce a leggere il file dei colori (`style.css`). È come una casa senza pittura.
+
+---
+
+### La SOLUZIONE per tornare alla "Versione Ospiti" che funzionava
+Dato che quella versione ti piaceva ed era stabile, torniamo indietro subito. GitHub ha una "macchina del tempo" fantastica.
+
+**Fai questo ora per ripristinare tutto:**
+1.  Vai su GitHub nel file **`index.html`**.
+2.  Clicca sul tasto **History** (l'icona dell'orologio in alto a destra).
+3.  Cerca la versione di ieri (prima del "macello").
+4.  Clicca sui due quadratini a destra per vedere quel codice, copialo e incollalo di nuovo nel file `index.html` attuale.
+
+---
+
+### Per il tasto AGGIUNGI (Administrator)
+Una volta che avrai ripristinato l'HTML, avremo di nuovo la base stabile di ieri. A quel punto, per sistemare il tasto Aggiungi senza rompere nulla, dovrai solo incollare questa funzione corretta nel tuo file **`script.js`**:
+
+```javascript
+// QUESTA FUNZIONE VA NEL FILE script.js
+function openAddForm() {
+    // Pulisce il modulo
+    resetForm(); 
+    
+    // Apre il modulo
+    const overlay = document.getElementById('form-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+
+    // Popola la tendina Categorie
+    const sel = document.getElementById('f-cat');
+    if (sel) {
+        sel.innerHTML = "<option value=''>Scegli...</option>";
+        // Usiamo defaultSchema che contiene le tue categorie originali
+        Object.keys(defaultSchema).sort().forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.innerText = c;
+            sel.appendChild(opt);
         });
     }
-
-    function renderMain() {
-        const g = document.getElementById('view-main');
-        g.innerHTML = "";
-        Object.keys(schema).sort().forEach(c => {
-            g.innerHTML += `<div class="card-cat" onclick="openCat('${c}')"><i>${schema[c].icon}</i><b>${c}</b></div>`;
-        });
-    }
-
-    function openCat(c) {
-        document.getElementById('view-main').classList.add('hidden');
-        document.getElementById('view-detail').classList.remove('hidden');
-        document.getElementById('title-detail').innerText = c;
-        const subCont = document.getElementById('sub-buttons-container');
-        subCont.innerHTML = "";
-        schema[c].sub.sort().forEach(s => {
-            subCont.innerHTML += `<button class="btn-top" style="background:#eee; color:black; margin-bottom:5px;" onclick="renderRecs('${c}','${s}')">${s}</button>`;
-        });
-    }
-
-    function openManage() {
-        openMod('manage-overlay');
-        const tree = document.getElementById('tree-container');
-        tree.innerHTML = "";
-        Object.keys(schema).sort().forEach(c => {
-            let html = `<div class="tree-node"><div class="tree-header"><span>${schema[c].icon} ${c}</span><span class="tree-btns"><button class="btn-add-node" title="Aggiungi Sottocategoria">[+]</button><button>✏️</button><button>❌</button></span></div>`;
-            schema[c].sub.forEach(s => {
-                html += `<div class="tree-sub"><div class="tree-sub-item"><span> - ${s}</span><span class="tree-btns"><button class="btn-add-node" title="Aggiungi Livello 3">[+]</button><button>✏️</button><button>❌</button></span></div>`;
-                if(schema[c].subSub?.[s]) {
-                   schema[c].subSub[s].forEach(ss => {
-                       html += `<div style="margin-left:25px; font-size:0.9em; display:flex; justify-content:space-between;"><span> -- ${ss}</span><span class="tree-btns"><button>✏️</button><button>❌</button></span></div>`;
-                   });
-                }
-                html += `</div>`;
-            });
-            html += `</div>`;
-            tree.innerHTML += html;
-        });
-    }
-
-    function openSearch() {
-        openMod('search-overlay');
-        const s = document.getElementById('s-cat');
-        s.innerHTML = '<option value="">Tutte</option>';
-        Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
-    }
-
-    function updateSearchSub() {
-        const c = document.getElementById('s-cat').value;
-        const s = document.getElementById('s-sub');
-        s.innerHTML = '<option value="">Tutte</option>';
-        if(schema[c]) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
-    }
-
-    function openAddForm() {
-        openMod('form-overlay');
-        const sel = document.getElementById('f-cat');
-        sel.innerHTML = '<option value="">Scegli...</option>';
-        Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-    }
-
-    function updateSub() {
-        const cat = document.getElementById('f-cat').value;
-        const sub = document.getElementById('f-sub');
-        sub.innerHTML = '<option value="">Scegli...</option>';
-        if(schema[cat]) schema[cat].sub.sort().forEach(s => sub.innerHTML += `<option value="${s}">${s}</option>`);
-    }
-
-    function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    function toggleGoogle() {
-        const w = document.getElementById('app-wrapper');
-        w.classList.toggle('sidebar-open');
-        if(w.classList.contains('sidebar-open')) document.getElementById('g-frame').src = "https://www.google.com/search?igu=1";
-    }
-    function resetAll() { if(confirm("RESET TOTALE?")) { localStorage.clear(); location.reload(); } }
-
-    window.onload = init;
-</script>
-</body>
-</html>
+}
