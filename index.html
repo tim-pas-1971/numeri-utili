@@ -1,20 +1,37 @@
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Numeri Utili - Tiziana Pascali</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --primary: #003366; --secondary: #28a745; --bg: #f4f7f6; --text: #333; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        header { background: white; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .card-cat { background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; border-left: 5px solid var(--primary); }
+        .card-cat:hover { transform: translateY(-5px); }
+        .card-cat i { font-size: 2em; display: block; margin-bottom: 10px; }
+        .btn-top { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-left: 5px; font-weight: bold; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .form-card { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .hidden { display: none !important; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
+        #sidebar { position: fixed; right: -400px; top: 0; width: 400px; height: 100%; background: white; box-shadow: -2px 0 5px rgba(0,0,0,0.2); transition: 0.3s; z-index: 1100; }
+        #sidebar.open { right: 0; }
+        iframe { width: 100%; height: calc(100% - 50px); border: none; }
+    </style>
 </head>
-
 <body>
     <div id="app-container">
         <header>
             <div class="header-left">
-                <h1 onclick="goHome()" style="cursor:pointer; color:var(--primary); margin:0;">🗂️ Numeri Utili</h1>
-                <div class="subtitle-tiziana">Rubrica Personale di Tiziana Pascali</div>
-                <div class="start-address-label">📍 Via Cascina Comune, 24 – Pregnana Milanese (MI)</div>
+                <h1 onclick="goHome()" style="cursor:pointer; color:var(--primary); margin:0;">📂 Numeri Utili</h1>
+                <div style="color:red; font-weight:bold;">Rubrica Personale di Tiziana Pascali</div>
+                <small>📍 Via Cascina Comune, 24 – Pregnana Milanese (MI)</small>
             </div>
             <div class="header-right">
                 <button class="btn-top" onclick="openManage()">GESTISCI</button>
@@ -25,97 +42,141 @@
         </header>
 
         <div id="view-main" class="grid-main"></div>
+        
         <div id="view-detail" class="hidden">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-                <button class="btn-header" onclick="goHome()" style="background:var(--primary)">⬅️ Torna</button>
-                <h2 id="title-detail" style="margin:0; color:var(--primary);">Categoria</h2>
-            </div>
-            <div id="sub-buttons-container"></div>
-            <div id="records-list" class="grid-records"></div>
+            <button class="btn-top" onclick="goHome()">⬅️ Torna</button>
+            <h2 id="title-detail"></h2>
+            <div id="sub-buttons-container" style="margin: 20px 0;"></div>
+            <div id="records-list"></div>
         </div>
-
-        <footer>
-            <div class="footer-left">
-                <button class="btn-footer" onclick="openSettings()">API KEY</button>
-                <button class="btn-footer" onclick="exportData()">ESPORTA</button>
-                <label class="btn-footer" style="cursor:pointer; display:inline-block;">
-                    IMPORTA <input type="file" onchange="importData(event)" style="display:none">
-                </label>
-            </div>
-            <div class="footer-right">
-                </div>
-        </footer>
-    </div>
-
-    <div id="sidebar">
-        <div class="sidebar-header"><strong>Ricerca Google</strong><button onclick="toggleGoogleSearch()">×</button></div>
-        <iframe id="google-iframe" src="about:blank"></iframe>
     </div>
 
     <div id="form-overlay" class="modal-overlay hidden">
         <div class="form-card">
-            <h2 id="form-title" class="dynamic-title">Scheda Nominativo</h2>
-            <input type="hidden" id="f-id">
+            <h2>Scheda Nominativo</h2>
             <div class="form-row">
-                <div class="form-group"><label>Categoria</label><select id="f-cat" onchange="updateFormSubCats()"></select></div>
-                <div class="form-group"><label>Sottocategoria</label><select id="f-subcat" onchange="updateFormSubSubCats()"></select></div>
-                <div id="f-ss-group" class="form-group hidden"><label>Livello 3</label><select id="f-subsubcat"></select></div>
+                <div class="form-group"><label>Categoria</label><select id="f-cat" onchange="updateSub()"></select></div>
+                <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub()"></select></div>
             </div>
+            <div id="ss-group" class="form-group hidden"><label>Livello 3</label><select id="f-ss"></select></div>
+            <div class="form-group"><label>Nome</label><input type="text" id="f-nome"></div>
             <div class="form-row">
-                <div class="form-group"><label>Nome Attività</label><input type="text" id="f-nome"></div>
+                <div class="form-group"><label>Tel</label><input type="text" id="f-tel"></div>
+                <div class="form-group"><label>Cell</label><input type="text" id="f-cell"></div>
             </div>
-            <div class="form-row">
-                <div class="form-group"><label>Telefono</label><input type="text" id="f-tel"></div>
-                <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Via e Civico</label><input type="text" id="f-via"></div>
-                <div class="form-group"><label>Località</label><input type="text" id="f-loc" onblur="calculateKM()"></div>
-                <div class="form-group" style="flex:0.4"><label>Prov.</label><select id="f-prov"></select></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>KM (da Pregnana)</label><input type="text" id="f-km"></div>
-                <div class="form-group"><label>URL Foto</label><input type="text" id="f-foto"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>E-mail</label><input type="email" id="f-email"></div>
-                <div class="form-group"><label>Sito Web</label><input type="text" id="f-web"></div>
-            </div>
-            <div id="f-ristorante-extra" class="hidden" style="background:#f0f7ff; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <div class="form-row">
-                    <div class="form-group"><label>Cucina</label><input type="text" id="f-cucina"></div>
-                    <div class="form-group"><label>Costo</label><select id="f-costo"><option value="€">€</option><option value="€€">€€</option><option value="€€€">€€€</option></select></div>
-                    <div class="form-group"><label>Giudizio</label><input type="text" id="f-giudizio"></div>
-                </div>
-            </div>
-            <div class="form-group"><label>Orari</label><table class="timetable" id="timetable-input"></table></div>
-            <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
-                <button class="btn-header" onclick="closeAddForm()" style="background:#666;">Chiudi</button>
-                <button id="btn-save-main" class="btn-header" onclick="saveContact()" style="background:var(--secondary);">Salva</button>
+            <div class="form-group"><label>Orari</label><table id="f-orari"></table></div>
+            <div style="text-align:right; margin-top:20px;">
+                <button class="btn-top" onclick="closeAddForm()" style="background:#666">Chiudi</button>
+                <button class="btn-top" onclick="save()" style="background:var(--secondary)">Salva</button>
             </div>
         </div>
     </div>
 
     <div id="search-overlay" class="modal-overlay hidden">
-        <div class="form-card" style="max-width:550px;">
+        <div class="form-card">
             <h2>Ricerca Avanzata</h2>
-            <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
-                <button class="btn-header" onclick="closeSearchPanel()" style="background:#666;">CHIUDI</button>
-                <button class="btn-header" onclick="performSearch()" style="background:#4285F4;">Cerca</button>
-            </div>
+            <input type="text" placeholder="Cerca nome..." style="width:100%; margin-bottom:10px;">
+            <button class="btn-top" onclick="closeSearchPanel()">CHIUDI</button>
         </div>
     </div>
 
     <div id="manage-overlay" class="modal-overlay hidden">
         <div class="form-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>Gestione Struttura</h2><button class="btn-header" onclick="saveSchema()" style="background:var(--secondary);">SALVA</button>
-            </div>
-            <div id="manage-tree" style="margin-top:20px;"></div>
-            <button class="btn-header" onclick="closeManage()" style="background:#666; margin-top:20px;">Esci</button>
+            <h2>Gestione Struttura</h2>
+            <p>Sezione in manutenzione...</p>
+            <button class="btn-top" onclick="closeManage()">Esci</button>
         </div>
     </div>
 
-    <script src="script_v2.js"></script>
+    <div id="sidebar">
+        <div style="padding:10px; background:#eee;"><b>Google</b> <button onclick="toggleGoogleSearch()">X</button></div>
+        <iframe id="g-frame" src="about:blank"></iframe>
+    </div>
+
+    <script>
+        const schema = {
+            "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
+            "SALUTE": { icon: "🏥", sub: ["Farmacia", "Medico", "Ospedale", "Veterinario"] },
+            "RISTORANTI": { icon: "🍴", sub: ["Pizzeria", "Etnico", "Trattoria"], subSub: {"Etnico": ["Cinese", "Giapponese"]} }
+            // ...aggiungerai le altre qui
+        };
+
+        let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
+
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('admin') !== '1') {
+                document.querySelectorAll('button[onclick*="openManage"], button[onclick*="openAddForm"], button[onclick*="toggleGoogleSearch"]').forEach(b => b.style.display='none');
+            }
+            renderMain();
+            initOrari();
+        }
+
+        function renderMain() {
+            const g = document.getElementById('view-main');
+            g.innerHTML = "";
+            Object.keys(schema).sort().forEach(c => {
+                g.innerHTML += `<div class="card-cat" onclick="openCat('${c}')"><i>${schema[c].icon}</i><b>${c}</b></div>`;
+            });
+        }
+
+        function openCat(c) {
+            document.getElementById('view-main').classList.add('hidden');
+            document.getElementById('view-detail').classList.remove('hidden');
+            document.getElementById('title-detail').innerText = c;
+        }
+
+        function goHome() {
+            document.getElementById('view-main').classList.remove('hidden');
+            document.getElementById('view-detail').classList.add('hidden');
+        }
+
+        function openAddForm() {
+            document.getElementById('form-overlay').classList.remove('hidden');
+            const s = document.getElementById('f-cat');
+            s.innerHTML = '<option>Scegli...</option>';
+            Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+        }
+
+        function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
+        function openSearchPanel() { document.getElementById('search-overlay').classList.remove('hidden'); }
+        function closeSearchPanel() { document.getElementById('search-overlay').classList.add('hidden'); }
+        function openManage() { document.getElementById('manage-overlay').classList.remove('hidden'); }
+        function closeManage() { document.getElementById('manage-overlay').classList.add('hidden'); }
+        function toggleGoogleSearch() { 
+            const s = document.getElementById('sidebar'); s.classList.toggle('open');
+            if(s.classList.contains('open')) document.getElementById('g-frame').src = "https://www.google.com/search?igu=1";
+        }
+
+        function updateSub() {
+            const cat = document.getElementById('f-cat').value;
+            const s = document.getElementById('f-sub');
+            s.innerHTML = '<option>Scegli...</option>';
+            if(schema[cat]) schema[cat].sub.sort().forEach(sub => s.innerHTML += `<option value="${sub}">${sub}</option>`);
+        }
+
+        function updateSubSub() {
+            const cat = document.getElementById('f-cat').value;
+            const sub = document.getElementById('f-sub').value;
+            const group = document.getElementById('ss-group');
+            const s = document.getElementById('f-ss');
+            if(schema[cat]?.subSub?.[sub]) {
+                group.classList.remove('hidden');
+                s.innerHTML = '<option>Scegli...</option>';
+                schema[cat].subSub[sub].sort().forEach(ss => s.innerHTML += `<option value="${ss}">${ss}</option>`);
+            } else { group.classList.add('hidden'); }
+        }
+
+        function initOrari() {
+            const t = document.getElementById('f-orari');
+            ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(d => {
+                t.innerHTML += `<tr><td>${d}</td><td><input type="time"> - <input type="time"></td></tr>`;
+            });
+        }
+
+        function save() { alert("Simulazione: Contatto salvato!"); closeAddForm(); }
+
+        window.onload = init;
+    </script>
 </body>
 </html>
