@@ -88,7 +88,7 @@
 
 <div id="form-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2 style="color:var(--secondary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">🆕 Nuova Scheda Nominativo</h2>
+        <h2 id="form-title" style="color:var(--secondary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">🆕 Nuova Scheda Nominativo</h2>
         
         <div class="form-row">
             <div class="form-group"><label>Categoria Principale</label><select id="f-cat" onchange="updateSub('f')"></select></div>
@@ -386,7 +386,13 @@
     }
 
     function openAddForm() { 
-        openMod('form-overlay'); const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>';
+        openMod('form-overlay');
+        // Reset del titolo e dei campi
+        document.getElementById('form-title').innerText = "Nuova Scheda Nominativo";
+        document.getElementById('form-overlay').querySelectorAll('input').forEach(i => i.value = "");
+        
+        const sel = document.getElementById('f-cat'); 
+        sel.innerHTML = '<option value="">Scegli...</option>';
         Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
     }
 
