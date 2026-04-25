@@ -293,7 +293,6 @@
 
     function renderRecs(c, s, ss) {
         const list = document.getElementById('records-list');
-        // Filtro i contatti per categoria, sottocategoria e (se c'è) sottosottocategoria
         const fil = contacts.filter(x => {
             const matchBase = x.cat === c && x.sub === s;
             return ss ? (matchBase && x.ss === ss) : matchBase;
@@ -303,11 +302,10 @@
 
         fil.forEach(x => {
             const index = contacts.indexOf(x);
-            // Indirizzo per Google Maps
             const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
             
             list.innerHTML += `
-            <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; text-align:left;">
+            <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; text-align:left; cursor:pointer;" onclick="showFullDetails(${index})">
                 <div style="font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">
                     ${x.cat} > ${x.sub} ${x.ss ? '> ' + x.ss : ''}
                 </div>
@@ -319,11 +317,10 @@
                     📏 Distanza: ${x.km || '-'} Km
                 </div>
 
-                <div style="margin-top:15px; display:flex; gap:5px; background:#f1f1f1; padding:5px; border-radius:8px; justify-content: space-around; border: 1px solid #ddd;">
+                <div style="margin-top:15px; display:flex; gap:10px; background:#f1f1f1; padding:5px; border-radius:8px; justify-content: space-around; border: 1px solid #ddd;" onclick="event.stopPropagation()">
                     <button title="Mappa" style="border:1px solid #ccc; background:white; cursor:pointer; padding:8px; border-radius:4px; font-size:1.2em;" onclick="window.open('${mapUrl}')">🗺️</button>
                     <button title="Sposta" style="border:1px solid #ccc; background:white; cursor:pointer; padding:8px; border-radius:4px; font-size:1.2em;" onclick="moveContact(${index})">🚚</button>
                     <button title="Modifica" style="border:1px solid #ccc; background:white; cursor:pointer; padding:8px; border-radius:4px; font-size:1.2em;" onclick="editContact(${index})">📝</button>
-                    <button title="Duplica" style="border:1px solid #ccc; background:white; cursor:pointer; padding:8px; border-radius:4px; font-size:1.2em;" onclick="duplicateContact(${index})">👯</button>
                     <button title="Elimina" style="border:1px solid #ccc; background:white; cursor:pointer; padding:8px; border-radius:4px; font-size:1.2em;" onclick="deleteContact(${index})">🗑️</button>
                 </div>
             </div>`;
@@ -375,12 +372,20 @@
     function saveData() {
         const n = document.getElementById('f-nome').value;
         if(!n) return alert("Inserisci il nome!");
+        
         contacts.push({
-            nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value,
-            via: document.getElementById('f-via').value, loc: document.getElementById('f-loc').value,
-            km: document.getElementById('f-km').value, foto: document.getElementById('f-foto').value,
-            tel: document.getElementById('f-tel').value, cell: document.getElementById('f-cell').value
+            nome: n, 
+            cat: document.getElementById('f-cat').value, 
+            sub: document.getElementById('f-sub').value,
+            ss: document.getElementById('f-ss') ? document.getElementById('f-ss').value : '',
+            via: document.getElementById('f-via').value, 
+            loc: document.getElementById('f-loc').value,
+            km: document.getElementById('f-km').value, 
+            foto: document.getElementById('f-foto').value,
+            tel: document.getElementById('f-tel').value, 
+            cell: document.getElementById('f-cell').value
         });
+        
         localStorage.setItem('app_contacts', JSON.stringify(contacts));
         location.reload();
     }
@@ -416,6 +421,23 @@
 // --- MOTORI TASTI FUNZIONE ---
 
     // 🚚 SPOSTA: Cambia categoria al volo
+    function showFullDetails(i) {
+        const x = contacts[i];
+        if(!x) return;
+
+        let messaggio = `🔍 DETTAGLI NOMINATIVO\n\n`;
+        messaggio += `Nome: ${x.nome}\n`;
+        messaggio += `Categoria: ${x.cat}\n`;
+        messaggio += `Sottocategoria: ${x.sub}${x.ss ? ' (' + x.ss + ')' : ''}\n`;
+        messaggio += `---------------------------\n`;
+        messaggio += `📍 Indirizzo: ${x.via}, ${x.loc}\n`;
+        messaggio += `📏 Distanza: ${x.km || '-'} Km\n`;
+        messaggio += `📞 Tel: ${x.tel || '-'}\n`;
+        messaggio += `📱 Cell: ${x.cell || '-'}\n`;
+        messaggio += `📝 Note: ${x.note || 'Nessuna'}`;
+
+        alert(messaggio);
+    }
     function moveContact(i) {
         const nuovaCat = prompt("In quale categoria vuoi spostarlo? (Es: NEGOZI)");
         if (nuovaCat && schema[nuovaCat]) {
@@ -459,35 +481,7 @@
         // Rimuove l'originale per evitare doppioni dopo il salvataggio
         contacts.splice(i, 1); 
     }
-
-    function duplicateContact(i) {
-        const x = contacts[i];
-        if(!x) return;
-        openAddForm(); 
-        
-        document.getElementById('form-title').innerText = "👯 Duplica: " + x.nome;
-        document.getElementById('f-nome').value = x.nome + " (Copia)";
-        
-        // Carica le categorie anche qui
-        document.getElementById('f-cat').value = x.cat || '';
-        updateSub('f');
-        document.getElementById('f-sub').value = x.sub || '';
-        
-        if(x.ss) {
-            updateSubSub('f');
-            document.getElementById('f-ss').value = x.ss;
-        }
-
-        document.getElementById('f-via').value = x.via || '';
-        document.getElementById('f-loc').value = x.loc || '';
-        document.getElementById('f-km').value = x.km || '';
-        document.getElementById('f-foto').value = x.foto || '';
-        document.getElementById('f-tel').value = x.tel || '';
-        document.getElementById('f-cell').value = x.cell || '';
-        
-        alert("Dati copiati! Modifica se vuoi e clicca SALVA.");
-    }
-
+   
     // 💾 SALVATAGGIO POTENZIATO (Km e Foto)
     // Sostituisci la tua vecchia funzione saveData() con questa se diversa
     function saveData() {
