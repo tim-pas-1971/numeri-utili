@@ -56,12 +56,24 @@
 
 <div id="app-wrapper">
     <div id="main-content">
-        <header>
-            <div class="header-left">
-                <h1 onclick="location.reload()">📂 Numeri Utili</h1>
-                <div style="color:var(--accent); font-weight:bold; font-size:14px; margin-top:5px;">Rubrica Personale di Tiziana Pascali</div>
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: white; border-bottom: 2px solid #eee;">
+            <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 40px; cursor: pointer;" onclick="location.reload()">📂</div>
+                
+                <div style="display: flex; flex-direction: column;">
+                    <h1 onclick="location.reload()" style="margin: 0; color: #003366; font-size: 1.8em; font-family: sans-serif; cursor: pointer;">Numeri Utili</h1>
+                    
+                    <div style="color: red; font-style: italic; font-weight: bold; font-size: 1.1em; margin-top: 2px;">
+                        Numeri Utili di Tiziana Pascali
+                    </div>
+                    
+                    <div style="color: #555; font-size: 0.9em; margin-top: 4px; display: flex; align-items: center; gap: 5px;">
+                        📍 <span style="border-bottom: 1px dashed #ccc;">Via Cascina Comune, 24 – Pregnana Milanese (MI)</span>
+                    </div>
+                </div>
             </div>
-            <div id="admin-menu">
+
+            <div id="admin-menu" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
                 <button class="btn-top" onclick="openManage()">GESTISCI</button>
                 <button class="btn-top" onclick="openSearch()">RICERCA</button>
                 <button class="btn-top" onclick="openAddForm()" style="background:var(--secondary)">AGGIUNGI</button>
