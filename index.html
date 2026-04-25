@@ -243,34 +243,58 @@
 
     function showSubSub(c, s) {
         const container = document.getElementById('subsub-container');
-        container.innerHTML = "";
-        if (!schema[c].subSub || !schema[c].subSub[s]) return;
+        container.innerHTML = ""; // Puliamo tutto prima di disegnare
+        
+        if (!schema[c].subSub || !schema[c].subSub[s]) {
+            container.style.display = "none"; // Se non ci sono sottosottocategorie, sparisce lo spazio
+            return;
+        }
 
-        const row = document.createElement('div');
-        row.style.display = "flex";
-        row.style.flexWrap = "wrap";
-        row.style.gap = "2px";
-        row.style.background = "#e9ecef";
-        row.style.padding = "5px";
-        row.style.borderRadius = "0 0 8px 8px";
+        container.style.display = "flex";
+        container.style.flexWrap = "wrap";
+        container.style.gap = "5px";
+        container.style.background = "#e9ecef";
+        container.style.padding = "8px";
+        container.style.marginTop = "2px";
+        container.style.borderRadius = "0 0 8px 8px";
+        container.style.border = "1px solid #ccc";
 
         schema[c].subSub[s].sort().forEach(ss => {
             const btn = document.createElement('button');
             btn.innerText = ss;
             btn.className = "nav-btn-l3";
+            // Stile base: Verde chiaro
             Object.assign(btn.style, {
-                border: "none", background: "#28a745", color: "white",
-                padding: "8px 15px", cursor: "pointer", borderRadius: "5px", fontSize: "0.85em"
+                border: "1px solid #1e7e34", 
+                background: "#28a745", 
+                color: "white",
+                padding: "8px 15px", 
+                cursor: "pointer", 
+                borderRadius: "5px", 
+                fontSize: "0.85em",
+                fontWeight: "600",
+                transition: "0.2s"
             });
 
             btn.onclick = () => {
-                document.querySelectorAll('.nav-btn-l3').forEach(b => b.style.background = "#28a745");
-                btn.style.background = "#218838"; // Verde più scuro quando attivo
+                // RESET di tutti i tasti di livello 3
+                document.querySelectorAll('.nav-btn-l3').forEach(b => {
+                    b.style.background = "#28a745";
+                    b.style.border = "1px solid #1e7e34";
+                    b.style.color = "white";
+                    b.style.boxShadow = "none";
+                });
+                
+                // EVIDENZIAZIONE FORTE del tasto cliccato
+                btn.style.background = "#0b4d1a"; // Verde molto scuro
+                btn.style.border = "2px solid #ffcc00"; // Bordo Giallo acceso
+                btn.style.color = "#ffffff"; 
+                btn.style.boxShadow = "0 0 8px rgba(255, 204, 0, 0.6)"; // Un leggero bagliore
+                
                 renderRecs(c, s, ss);
             };
-            row.appendChild(btn);
+            container.appendChild(btn);
         });
-        container.appendChild(row);
     }
 
     function renderRecs(c, s) {
