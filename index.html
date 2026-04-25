@@ -202,95 +202,88 @@
         const sc = document.getElementById('sub-buttons-container'); 
         sc.innerHTML = "";
         
-        // Contenitore orizzontale per Livello 2
+        // 1. CREIAMO LA RIGA PER IL LIVELLO 2 (Blu/Arancio)
         const row2 = document.createElement('div');
         row2.style.display = "flex";
         row2.style.flexWrap = "wrap";
-        row2.style.gap = "2px";
-        row2.style.marginBottom = "5px";
+        row2.style.gap = "4px";
         row2.style.background = "#003366";
-        row2.style.padding = "2px";
-        row2.style.borderRadius = "8px 8px 0 0";
+        row2.style.padding = "10px";
+        row2.style.borderRadius = "8px";
+        row2.style.width = "100%"; // Forza la larghezza intera
+        row2.style.boxSizing = "border-box";
+
+        // 2. CREIAMO LA RIGA PER IL LIVELLO 3 (Verde) - Inizialmente nascosta
+        const row3 = document.createElement('div');
+        row3.id = "subsub-container";
+        row3.style.display = "none"; // Si accende solo se serve
+        row3.style.width = "100%";
+        row3.style.marginTop = "5px";
 
         schema[c].sub.sort().forEach(s => {
             const btn = document.createElement('button');
             btn.innerText = s;
             btn.className = "nav-btn-l2";
-            // Stile base come da immagine (Blu scuro)
             Object.assign(btn.style, {
                 border: "none", background: "transparent", color: "white",
-                padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em"
+                padding: "10px 15px", cursor: "pointer", fontWeight: "bold", 
+                fontSize: "0.9em", borderRadius: "5px"
             });
 
             btn.onclick = () => {
-                // Reset colori e imposta Arancio al cliccato
+                // Colora il tasto attivo di Arancio
                 document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
                 btn.style.background = "#f0ad4e"; 
-                btn.style.borderRadius = "5px";
                 
                 renderRecs(c, s); 
-                showSubSub(c, s);
+                // Chiamiamo la funzione per disegnare la riga sotto
+                showSubSub(c, s, row3);
             };
             row2.appendChild(btn);
         });
-        sc.appendChild(row2);
 
-        // Contenitore per Livello 3 (inizialmente vuoto)
-        const row3 = document.createElement('div');
-        row3.id = "subsub-container";
+        // AGGIUNGIAMO LE RIGHE AL CONTENITORE (Prima la blu, poi la verde sotto)
+        sc.appendChild(row2);
         sc.appendChild(row3);
     }
 
-    function showSubSub(c, s) {
-        const container = document.getElementById('subsub-container');
-        container.innerHTML = ""; // Puliamo tutto prima di disegnare
+    function showSubSub(c, s, container) {
+        container.innerHTML = "";
         
         if (!schema[c].subSub || !schema[c].subSub[s]) {
-            container.style.display = "none"; // Se non ci sono sottosottocategorie, sparisce lo spazio
+            container.style.display = "none";
             return;
         }
 
         container.style.display = "flex";
         container.style.flexWrap = "wrap";
-        container.style.gap = "5px";
+        container.style.gap = "8px";
         container.style.background = "#e9ecef";
-        container.style.padding = "8px";
-        container.style.marginTop = "2px";
-        container.style.borderRadius = "0 0 8px 8px";
+        container.style.padding = "10px";
+        container.style.borderRadius = "8px";
         container.style.border = "1px solid #ccc";
+        container.style.boxSizing = "border-box";
 
         schema[c].subSub[s].sort().forEach(ss => {
             const btn = document.createElement('button');
             btn.innerText = ss;
             btn.className = "nav-btn-l3";
-            // Stile base: Verde chiaro
             Object.assign(btn.style, {
-                border: "1px solid #1e7e34", 
-                background: "#28a745", 
-                color: "white",
-                padding: "8px 15px", 
-                cursor: "pointer", 
-                borderRadius: "5px", 
-                fontSize: "0.85em",
-                fontWeight: "600",
-                transition: "0.2s"
+                border: "1px solid #1e7e34", background: "#28a745", color: "white",
+                padding: "8px 15px", cursor: "pointer", borderRadius: "5px", 
+                fontSize: "0.85em", fontWeight: "600"
             });
 
             btn.onclick = () => {
-                // RESET di tutti i tasti di livello 3
                 document.querySelectorAll('.nav-btn-l3').forEach(b => {
                     b.style.background = "#28a745";
                     b.style.border = "1px solid #1e7e34";
-                    b.style.color = "white";
                     b.style.boxShadow = "none";
                 });
-                
-                // EVIDENZIAZIONE FORTE del tasto cliccato
-                btn.style.background = "#0b4d1a"; // Verde molto scuro
-                btn.style.border = "2px solid #ffcc00"; // Bordo Giallo acceso
-                btn.style.color = "#ffffff"; 
-                btn.style.boxShadow = "0 0 8px rgba(255, 204, 0, 0.6)"; // Un leggero bagliore
-                
+                // Evidenziazione forte Giallo/Verde scuro
+                btn.style.background = "#0b4d1a";
+                btn.style.border = "2px solid #ffcc00";
+                btn.style.boxShadow = "0 0 8px rgba(255, 204, 0, 0.6)";
                 renderRecs(c, s, ss);
             };
             container.appendChild(btn);
