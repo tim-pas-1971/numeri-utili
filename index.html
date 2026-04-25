@@ -101,7 +101,7 @@
         <div class="form-row">
             <div class="form-group"><label>Telefono Fisso</label><input type="text" id="f-tel"></div>
             <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
-            <div class="form-group"><label>Km (da Pregnana)</label><input type="text" id="f-km"></div>
+            <div class="form-group"><label>Km (da Pregnana)</label><input type="number" id="f-km"placeholder="Es: 15"></div>
         </div>
 
         <div class="form-row">
@@ -115,7 +115,8 @@
             <div class="form-group"><label>Email</label><input type="email" id="f-mail"></div>
         </div>
 
-        <div class="form-group"><label>URL Immagine Foto (Anteprima)</label><input type="text" id="f-foto" placeholder="Incolla link immagine..."></div>
+        <div class="form-group"><label>URL Immagine Foto (Anteprima)</label><input type="text" id="f-foto" placeholder="Incolla link immagine..." onchange="document.getElementById('img-preview').src=this.value">
+    <img id="img-preview" src="" style="width:100%; max-height:100px; object-fit:cover; margin-top:5px; border-radius:5px; display:block;">></div>
 
         <label style="margin-top:20px; display:block;">Orari di Apertura (Spunta 'Ch.' per chiusura)</label>
         <table class="timetable">
@@ -388,6 +389,73 @@
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
     function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
     function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
+
+// --- MOTORI TASTI FUNZIONE ---
+
+    // 🚚 SPOSTA: Cambia categoria al volo
+    function moveContact(i) {
+        const nuovaCat = prompt("In quale categoria vuoi spostarlo? (Es: NEGOZI)");
+        if (nuovaCat && schema[nuovaCat]) {
+            contacts[i].cat = nuovaCat;
+            localStorage.setItem('app_contacts', JSON.stringify(contacts));
+            alert("Spostato con successo!");
+            location.reload();
+        } else if (nuovaCat) {
+            alert("Categoria non trovata o scritta male.");
+        }
+    }
+
+    // 📝 MODIFICA: Carica i dati nel modulo e cancella il vecchio
+    function editContact(i) {
+        const x = contacts[i];
+        openAddForm(); 
+        document.getElementById('f-nome').value = x.nome;
+        document.getElementById('f-via').value = x.via || '';
+        document.getElementById('f-loc').value = x.loc || '';
+        document.getElementById('f-km').value = x.km || '';
+        document.getElementById('f-foto').value = x.foto || '';
+        document.getElementById('f-tel').value = x.tel || '';
+        document.getElementById('f-cell').value = x.cell || '';
+        // Rimuove l'originale: salvando il modulo se ne creerà uno nuovo aggiornato
+        contacts.splice(i, 1); 
+    }
+
+    // 👯 DUPLICA: Carica i dati ma NON cancella il vecchio
+    function duplicateContact(i) {
+        const x = contacts[i];
+        openAddForm(); 
+        document.getElementById('f-nome').value = x.nome + " (Copia)";
+        document.getElementById('f-via').value = x.via || '';
+        document.getElementById('f-loc').value = x.loc || '';
+        document.getElementById('f-km').value = x.km || '';
+        document.getElementById('f-foto').value = x.foto || '';
+        document.getElementById('f-tel').value = x.tel || '';
+        document.getElementById('f-cell').value = x.cell || '';
+        alert("Dati copiati! Modifica e clicca SALVA per creare il doppione.");
+    }
+
+    // 💾 SALVATAGGIO POTENZIATO (Km e Foto)
+    // Sostituisci la tua vecchia funzione saveData() con questa se diversa
+    function saveData() {
+        const n = document.getElementById('f-nome').value;
+        if(!n) return alert("Inserisci almeno il nome!");
+        
+        contacts.push({
+            nome: n, 
+            cat: document.getElementById('f-cat').value, 
+            sub: document.getElementById('f-sub').value,
+            ss: document.getElementById('f-ss') ? document.getElementById('f-ss').value : '',
+            via: document.getElementById('f-via').value, 
+            loc: document.getElementById('f-loc').value,
+            km: document.getElementById('f-km').value, 
+            foto: document.getElementById('f-foto').value,
+            tel: document.getElementById('f-tel').value, 
+            cell: document.getElementById('f-cell').value
+        });
+        
+        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        location.reload();
+    }
     
    window.onload = init;
 
