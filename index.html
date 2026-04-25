@@ -201,69 +201,76 @@
         document.getElementById('title-detail').innerText = c;
         const sc = document.getElementById('sub-buttons-container'); 
         sc.innerHTML = "";
+        
+        // Contenitore orizzontale per Livello 2
+        const row2 = document.createElement('div');
+        row2.style.display = "flex";
+        row2.style.flexWrap = "wrap";
+        row2.style.gap = "2px";
+        row2.style.marginBottom = "5px";
+        row2.style.background = "#003366";
+        row2.style.padding = "2px";
+        row2.style.borderRadius = "8px 8px 0 0";
 
         schema[c].sub.sort().forEach(s => {
-            const group = document.createElement('div');
-            group.style.marginBottom = "10px";
-            
-            // Bottone Sottocategoria (Livello 2)
             const btn = document.createElement('button');
-            btn.className = "btn-top sub-btn"; // Aggiungiamo una classe per gestirli
-            btn.style.background = "#003366"; // Colore scuro base
-            btn.style.color = "white";
             btn.innerText = s;
-            
+            btn.className = "nav-btn-l2";
+            // Stile base come da immagine (Blu scuro)
+            Object.assign(btn.style, {
+                border: "none", background: "transparent", color: "white",
+                padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em"
+            });
+
             btn.onclick = () => {
-                // Rendo tutti i tasti scuri e coloro solo questo di Arancione
-                document.querySelectorAll('.btn-top').forEach(b => b.style.background = "#003366");
+                // Reset colori e imposta Arancio al cliccato
+                document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
                 btn.style.background = "#f0ad4e"; 
+                btn.style.borderRadius = "5px";
                 
                 renderRecs(c, s); 
-                
-                const subPanel = document.getElementById('panel-' + s.replace(/\s+/g, ''));
-                if (subPanel) {
-                    document.querySelectorAll('.sub-ss-panel').forEach(p => {
-                        if (p !== subPanel) p.classList.add('hidden');
-                    });
-                    subPanel.classList.toggle('hidden');
-                }
+                showSubSub(c, s);
             };
-            
-            group.appendChild(btn);
-
-            // Pannello Sottosottocategorie (Livello 3)
-            if (schema[c].subSub && schema[c].subSub[s]) {
-                const subPanel = document.createElement('div');
-                subPanel.id = 'panel-' + s.replace(/\s+/g, '');
-                subPanel.className = "sub-ss-panel hidden";
-                subPanel.style.display = "flex";
-                subPanel.style.flexWrap = "wrap";
-                subPanel.style.gap = "8px";
-                subPanel.style.marginTop = "10px";
-                subPanel.style.padding = "10px";
-                subPanel.style.background = "#f8f9fa";
-                subPanel.style.borderRadius = "8px";
-
-                schema[c].subSub[s].sort().forEach(ss => {
-                    const ssBtn = document.createElement('button');
-                    ssBtn.className = "btn-top ss-btn";
-                    ssBtn.style.background = "#5bc0de"; // Azzurro base
-                    ssBtn.style.color = "white";
-                    ssBtn.style.fontSize = "0.85em";
-                    ssBtn.innerText = ss;
-                    
-                    ssBtn.onclick = () => {
-                        // Evidenzio il tasto Livello 3 (es. Verde come in foto)
-                        document.querySelectorAll('.ss-btn').forEach(b => b.style.background = "#5bc0de");
-                        ssBtn.style.background = "#28a745"; // Verde attivo
-                        renderRecs(c, s, ss);
-                    };
-                    subPanel.appendChild(ssBtn);
-                });
-                group.appendChild(subPanel);
-            }
-            sc.appendChild(group);
+            row2.appendChild(btn);
         });
+        sc.appendChild(row2);
+
+        // Contenitore per Livello 3 (inizialmente vuoto)
+        const row3 = document.createElement('div');
+        row3.id = "subsub-container";
+        sc.appendChild(row3);
+    }
+
+    function showSubSub(c, s) {
+        const container = document.getElementById('subsub-container');
+        container.innerHTML = "";
+        if (!schema[c].subSub || !schema[c].subSub[s]) return;
+
+        const row = document.createElement('div');
+        row.style.display = "flex";
+        row.style.flexWrap = "wrap";
+        row.style.gap = "2px";
+        row.style.background = "#e9ecef";
+        row.style.padding = "5px";
+        row.style.borderRadius = "0 0 8px 8px";
+
+        schema[c].subSub[s].sort().forEach(ss => {
+            const btn = document.createElement('button');
+            btn.innerText = ss;
+            btn.className = "nav-btn-l3";
+            Object.assign(btn.style, {
+                border: "none", background: "#28a745", color: "white",
+                padding: "8px 15px", cursor: "pointer", borderRadius: "5px", fontSize: "0.85em"
+            });
+
+            btn.onclick = () => {
+                document.querySelectorAll('.nav-btn-l3').forEach(b => b.style.background = "#28a745");
+                btn.style.background = "#218838"; // Verde più scuro quando attivo
+                renderRecs(c, s, ss);
+            };
+            row.appendChild(btn);
+        });
+        container.appendChild(row);
     }
 
     function renderRecs(c, s) {
