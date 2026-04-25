@@ -314,7 +314,9 @@
                 
                 <div style="margin-top:10px; line-height:1.6; color:#333;">
                     📍 ${x.via}, ${x.loc}<br>
-                    📏 Distanza: ${x.km || '-'} Km
+                    📏 Distanza: ${x.km || '-'} Km<br>
+                    📞 Tel: <a href="tel:${x.tel}" style="text-decoration:none; color:#003366; font-weight:bold;" onclick="event.stopPropagation()">${x.tel || '-'}</a><br>
+                    📱 Cell: <a href="tel:${x.cell}" style="text-decoration:none; color:#003366; font-weight:bold;" onclick="event.stopPropagation()">${x.cell || '-'}</a>
                 </div>
 
                 <div style="margin-top:15px; display:flex; gap:10px; background:#f1f1f1; padding:5px; border-radius:8px; justify-content: space-around; border: 1px solid #ddd;" onclick="event.stopPropagation()">
@@ -392,10 +394,21 @@
 
     function openAddForm() { 
         openMod('form-overlay');
-        // Reset del titolo e dei campi
         document.getElementById('form-title').innerText = "Nuova Scheda Nominativo";
-        document.getElementById('form-overlay').querySelectorAll('input').forEach(i => i.value = "");
         
+        // Mostriamo di nuovo il tasto SALVA
+        const saveBtn = document.querySelector('button[onclick="saveData()"]');
+        if(saveBtn) saveBtn.style.display = "block";
+
+        // Riabilitiamo i campi
+        document.querySelectorAll('#form-overlay input, #form-overlay select').forEach(el => {
+            el.readOnly = false;
+            el.disabled = false;
+            el.style.background = "white";
+            el.value = ""; // Svuota i campi
+        });
+        
+        // Ricarica le categorie nel menu a tendina
         const sel = document.getElementById('f-cat'); 
         sel.innerHTML = '<option value="">Scegli...</option>';
         Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
@@ -425,18 +438,40 @@
         const x = contacts[i];
         if(!x) return;
 
-        let messaggio = `🔍 DETTAGLI NOMINATIVO\n\n`;
-        messaggio += `Nome: ${x.nome}\n`;
-        messaggio += `Categoria: ${x.cat}\n`;
-        messaggio += `Sottocategoria: ${x.sub}${x.ss ? ' (' + x.ss + ')' : ''}\n`;
-        messaggio += `---------------------------\n`;
-        messaggio += `📍 Indirizzo: ${x.via}, ${x.loc}\n`;
-        messaggio += `📏 Distanza: ${x.km || '-'} Km\n`;
-        messaggio += `📞 Tel: ${x.tel || '-'}\n`;
-        messaggio += `📱 Cell: ${x.cell || '-'}\n`;
-        messaggio += `📝 Note: ${x.note || 'Nessuna'}`;
+        // Apriamo il modulo che già esiste
+        openAddForm(); 
+        
+        // Cambiamo il titolo per far capire che siamo in sola lettura
+        document.getElementById('form-title').innerText = "🔍 Visualizzazione: " + x.nome;
+        
+        // Nascondiamo il tasto SALVA per evitare pasticci
+        const saveBtn = document.querySelector('button[onclick="saveData()"]');
+        if(saveBtn) saveBtn.style.display = "none";
 
-        alert(messaggio);
+        // Riempiamo i campi con i dati
+        document.getElementById('f-nome').value = x.nome || '';
+        document.getElementById('f-cat').value = x.cat || '';
+        updateSub('f'); 
+        document.getElementById('f-sub').value = x.sub || '';
+        
+        if(x.ss) {
+            updateSubSub('f');
+            document.getElementById('f-ss').value = x.ss;
+        }
+
+        document.getElementById('f-tel').value = x.tel || '';
+        document.getElementById('f-cell').value = x.cell || '';
+        document.getElementById('f-km').value = x.km || '';
+        document.getElementById('f-via').value = x.via || '';
+        document.getElementById('f-loc').value = x.loc || '';
+        document.getElementById('f-foto').value = x.foto || '';
+
+        // Rendiamo tutti i campi "Sola Lettura"
+        document.querySelectorAll('#form-overlay input, #form-overlay select').forEach(el => {
+            el.readOnly = true;
+            el.disabled = true;
+            el.style.background = "#f9f9f9"; // Grigino per far capire che non si tocca
+        });
     }
     function moveContact(i) {
         const nuovaCat = prompt("In quale categoria vuoi spostarlo? (Es: NEGOZI)");
