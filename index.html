@@ -169,14 +169,8 @@
         "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista", "Manutenzione Verde"] },
         "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali", "Ottica", "Casalinghi"] },
         "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico Mutua", "Medico Specialista", "Ospedale", "Veterinario"] },
-        "RISTORANTI": { 
-            icon: "🍴", 
-            sub: ["Pizzeria / Ristorante Classico", "Etnico", "Osteria / Trattoria", "Agriturismo", "Altro", "Pub / Birreria", "Vegetariano / Vegano"], 
-            subSub: { 
-                "Etnico": ["Cinese", "Giapponese", "Messicano", "Greco", "Indiano", "Africa", "Altro", "Asia", "EstEuropa"], 
-                "Pizzeria / Ristorante Classico": ["Carne", "Pesce"]
-            } 
-        },
+        "RISTORANTI": { icon: "🍴", sub: ["Pizzeria / Ristorante Classico", "Etnico", "Osteria / Trattoria", "Agriturismo", "Altro", "Birreria / Pub", "Vegetariano / Vegano"], subSub: { "Etnico": ["Cinese", "Giapponese", "Africa", "Altro", "Asia", "EstEuropa"] } }
+    };
 
     let schema = JSON.parse(localStorage.getItem('app_schema')) || defaultSchema;
     let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
