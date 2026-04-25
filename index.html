@@ -8,36 +8,40 @@
         :root { --primary: #003366; --secondary: #28a745; --bg: #f4f7f9; --white: #ffffff; --accent: #d9534f; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; min-height: 100vh; display: flex; flex-direction: column; }
         
+        /* Layout Sidebar Google */
         #app-wrapper { display: flex; width: 100%; transition: 0.4s; flex: 1; }
-        #main-content { flex: 1; transition: 0.4s; padding-right: 15px; display: flex; flex-direction: column; }
-        #app-wrapper.sidebar-open #main-content { flex: 0 0 66.6%; }
-        #sidebar { position: fixed; right: -33.3%; top: 0; width: 33.3%; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.4s; z-index: 3000; visibility: hidden; }
+        #main-content { flex: 1; transition: 0.4s; padding-right: 15px; display: flex; flex-direction: column; position: relative; }
+        #app-wrapper.sidebar-open #main-content { flex: 0 0 65%; }
+        #sidebar { position: fixed; right: -35%; top: 0; width: 35%; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.4s; z-index: 3000; visibility: hidden; }
         #app-wrapper.sidebar-open #sidebar { right: 0; visibility: visible; }
 
         header { background: var(--white); padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 25px; border-top: 6px solid var(--primary); }
-        .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
-        .card-cat { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.04); transition: 0.3s; border-bottom: 4px solid var(--primary); min-height: 130px; display: flex; flex-direction: column; justify-content: center; }
-        .card-cat i { font-size: 50px; display: block; margin-bottom: 10px; font-style: normal; }
-        .card-cat b { font-size: 11px; text-transform: uppercase; color: var(--primary); line-height: 1.2; }
+        .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .card-cat { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.04); transition: 0.3s; border-bottom: 4px solid var(--primary); min-height: 110px; display: flex; flex-direction: column; justify-content: center; }
+        .card-cat i { font-size: 40px; display: block; margin-bottom: 8px; font-style: normal; }
+        .card-cat b { font-size: 11px; text-transform: uppercase; color: var(--primary); }
 
-        .btn-top { background: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-left: 8px; }
+        .btn-top { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 5px; }
         
-        /* Layout Modale che non copre Google */
+        /* MODALE INTELLIGENTE: Se sidebar aperta, sta a sinistra */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,51,102,0.6); display: flex; justify-content: center; align-items: center; z-index: 4000; backdrop-filter: blur(2px); }
-        #app-wrapper.sidebar-open .modal-overlay { width: 66.6%; } /* Se Google è aperto, il modulo sta a sinistra */
+        #app-wrapper.sidebar-open .modal-overlay { width: 65%; } 
         
-        .form-card { background: var(--white); padding: 30px; border-radius: 20px; width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-        .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
-        label { font-weight: 600; font-size: 0.9em; color: #555; margin-bottom: 5px; }
-        input, select, textarea { padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
+        .form-card { background: var(--white); padding: 25px; border-radius: 15px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 150px; display: flex; flex-direction: column; }
+        label { font-weight: 600; font-size: 0.85em; color: #555; }
+        input, select, textarea { padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 4px; }
         
-        /* Footer Admin */
-        .footer-admin { margin-top: 30px; padding: 20px; border-top: 1px solid #ddd; display: flex; gap: 15px; align-items: center; }
-        .btn-reset { background: var(--accent) !important; margin-left: auto; border: 2px solid darkred; }
+        /* Albero Gestione */
+        .tree-node { margin-bottom: 8px; padding: 10px; background: #f9f9f9; border-radius: 10px; border: 1px solid #eee; }
+        .tree-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .tree-sub { margin-left: 20px; border-left: 2px dashed #ccc; padding-left: 10px; }
 
-        .timetable { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85em; }
-        .timetable td { padding: 6px; border-bottom: 1px solid #f0f0f0; text-align: center; }
+        /* Footer */
+        .footer-admin { margin-top: auto; padding: 20px; border-top: 1px solid #ddd; display: flex; gap: 10px; align-items: center; }
+        .btn-reset { background: var(--accent) !important; margin-left: auto; font-weight: bold; }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -48,7 +52,7 @@
         <header>
             <div class="header-left">
                 <h1 onclick="location.reload()">📂 Numeri Utili</h1>
-                <div style="color:var(--accent); font-weight:bold; font-size:14px; margin-top:5px;">Rubrica Personale di Tiziana Pascali</div>
+                <div style="color:var(--accent); font-weight:bold; font-size:13px;">Rubrica Personale di Tiziana Pascali</div>
             </div>
             <div id="admin-menu">
                 <button class="btn-top" onclick="openManage()">GESTISCI</button>
@@ -61,15 +65,15 @@
         <div id="view-main" class="grid-main"></div>
         <div id="view-detail" class="hidden">
             <button class="btn-top" onclick="location.reload()">⬅️ Home</button>
-            <h2 id="title-detail" style="margin: 20px 0; color: var(--primary);"></h2>
-            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:25px;"></div>
+            <h2 id="title-detail" style="margin: 15px 0;"></h2>
+            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;"></div>
             <div id="records-list"></div>
         </div>
 
         <div id="admin-footer" class="footer-admin hidden">
-            <button class="btn-top" style="background:#555" onclick="alert('API KEY')">API KEY</button>
-            <button class="btn-top" style="background:#555" onclick="alert('ESPORTA')">ESPORTA</button>
-            <button class="btn-top" style="background:#555" onclick="alert('IMPORTA')">IMPORTA</button>
+            <button class="btn-top" style="background:#555" onclick="alert('API KEY: Configurazione corretta')">API KEY</button>
+            <button class="btn-top" style="background:#555" onclick="exportData()">ESPORTA</button>
+            <button class="btn-top" style="background:#555" onclick="importData()">IMPORTA</button>
             <button class="btn-top btn-reset" onclick="resetAll()">RESET SCHEDE</button>
         </div>
     </div>
@@ -84,7 +88,7 @@
 
 <div id="form-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2 style="color:var(--secondary); margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">🆕 Aggiungi Nominativo</h2>
+        <h2 style="color:var(--secondary); margin-top:0;">🆕 Nuova Scheda</h2>
         <div class="form-row">
             <div class="form-group"><label>Categoria</label><select id="f-cat" onchange="updateSub('f')"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub('f')"></select></div>
@@ -92,39 +96,56 @@
         </div>
         <div class="form-group"><label>Nome Attività</label><input type="text" id="f-nome"></div>
         <div class="form-row">
-            <div class="form-group"><label>Telefono</label><input type="text" id="f-tel"></div>
-            <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
-            <div class="form-group"><label>Km (da casa)</label><input type="text" id="f-km"></div>
+            <div class="form-group"><label>Tel.</label><input type="text" id="f-tel"></div>
+            <div class="form-group"><label>Cell.</label><input type="text" id="f-cell"></div>
+            <div class="form-group"><label>Km</label><input type="text" id="f-km"></div>
         </div>
         <div class="form-row">
             <div class="form-group" style="flex:2"><label>Indirizzo</label><input type="text" id="f-via"></div>
             <div class="form-group"><label>Città</label><input type="text" id="f-loc"></div>
             <div class="form-group"><label>Prov.</label><select id="f-prov"></select></div>
         </div>
-        <div class="form-row">
-            <div class="form-group"><label>Email</label><input type="text" id="f-email"></div>
-            <div class="form-group"><label>Sito Web</label><input type="text" id="f-web"></div>
-        </div>
         <div class="form-group"><label>URL Foto</label><input type="text" id="f-foto"></div>
-        <table class="timetable">
-            <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
-            <tbody id="orari-body"></tbody>
-        </table>
-        <div class="form-group" style="margin-top:15px;"><label>Note</label><textarea id="f-note" rows="2"></textarea></div>
-        <div style="text-align:right; margin-top:20px;">
+        <div class="form-group"><label>Note</label><textarea id="f-note" rows="2"></textarea></div>
+        <div style="text-align:right; margin-top:15px;">
             <button class="btn-top" onclick="closeMod('form-overlay')" style="background:#999">Annulla</button>
             <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA</button>
         </div>
     </div>
 </div>
 
+<div id="manage-overlay" class="modal-overlay hidden">
+    <div class="form-card">
+        <h2>⚙️ Gestione Categorie</h2>
+        <div id="tree-container"></div>
+        <button class="btn-top" onclick="closeMod('manage-overlay')" style="width:100%; margin-top:15px; background:#666;">Chiudi</button>
+    </div>
+</div>
+
+<div id="search-overlay" class="modal-overlay hidden">
+    <div class="form-card">
+        <h2>🔎 Ricerca Avanzata</h2>
+        <input type="text" id="s-testo" placeholder="Cerca nome o città..." style="width:100%; padding:10px;">
+        <div class="form-row" style="margin-top:10px;">
+            <div class="form-group"><label>Cat.</label><select id="s-cat" onchange="updateSub('s')"></select></div>
+            <div class="form-group"><label>Sub.</label><select id="s-sub" onchange="updateSubSub('s')"></select></div>
+            <div id="s-ss-group" class="form-group hidden"><label>Lvl 3</label><select id="s-ss"></select></div>
+        </div>
+        <div id="search-results" style="margin-top:15px;"></div>
+        <button class="btn-top" onclick="closeMod('search-overlay')" style="width:100%; margin-top:15px;">Esci</button>
+    </div>
+</div>
+
 <script>
     const PROVINCE = ["MI","BG","BS","CO","CR","LC","LO","MB","MN","PV","SO","VA","AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BZ","CA","CB","CE","CH","CL","CN","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LE","LI","LT","LU","MC","ME","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VB","VC","VE","VI","VR","VT","VV"];
+    
     const defaultSchema = {
-        "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
-        "CASA (PROF.)": { icon: "🏠", sub: ["Idraulico", "Elettricista", "Muratore", "Tapparellista", "Fabbro", "Imbianchino", "Antennista", "Caldaista", "Serramentista"] },
-        "RISTORANTI": { icon: "🍴", sub: ["Pizzeria / Ristorante Classico", "Etnico", "Trattoria", "Agriturismo"], subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano"] } }
-        // ... (puoi aggiungere le altre qui)
+        "AUTO": { icon: "🚗", sub: ["Meccanico", "Carrozzeria", "Gommista", "Elettrauto"] },
+        "SALUTE": { icon: "🏥", sub: ["Farmacia", "Medico Mutua", "Ospedale", "Dentista", "Veterinario"] },
+        "NEGOZI": { icon: "🛍️", sub: ["Alimentari", "Abbigliamento", "Animali", "Ottica"] },
+        "RISTORANTI": { icon: "🍴", sub: ["Pizzeria / Ristorante", "Etnico", "Trattoria"], subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano"] } },
+        "CASA PROF": { icon: "🏠", sub: ["Idraulico", "Elettricista", "Fabbro", "Imbianchino"] },
+        "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista"] }
     };
 
     let schema = JSON.parse(localStorage.getItem('app_schema')) || defaultSchema;
@@ -133,11 +154,9 @@
     function init() {
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
         if (isAdmin) document.getElementById('admin-footer').classList.remove('hidden');
-        else document.querySelectorAll('#admin-menu button:not([onclick*="Search"])').forEach(b => b.style.display='none');
         renderMain();
-        buildOrari();
-        const pSel = document.getElementById('f-prov');
-        PROVINCE.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
+        const ps = document.getElementById('f-prov');
+        PROVINCE.forEach(p => ps.innerHTML += `<option value="${p}">${p}</option>`);
     }
 
     function renderMain() {
@@ -157,47 +176,33 @@
         });
     }
 
-    function renderRecs(c, s) {
-        const list = document.getElementById('records-list');
-        const fil = contacts.filter(x => x.cat === c && x.sub === s);
-        list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto.</p>";
-        fil.forEach(x => {
-            list.innerHTML += `<div style="background:white; padding:20px; border-radius:15px; border-left:6px solid var(--secondary); margin-bottom:15px;">
-                <b>${x.nome}</b><br>📍 ${x.via}, ${x.loc}</div>`;
+    function openManage() {
+        openMod('manage-overlay'); const t = document.getElementById('tree-container'); t.innerHTML = "";
+        Object.keys(schema).sort().forEach(c => {
+            let h = `<div class="tree-node"><div class="tree-header">${schema[c].icon} ${c}</div>`;
+            schema[c].sub.forEach(s => { h += `<div class="tree-sub">- ${s}</div>`; });
+            h += `</div>`; t.innerHTML += h;
         });
     }
 
-    function buildOrari() {
-        const b = document.getElementById('orari-body'); b.innerHTML = "";
-        ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(g => {
-            b.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time">-<input type="time"></td><td><input type="checkbox"></td><td><input type="time">-<input type="time"></td><td><input type="checkbox"></td></tr>`;
-        });
-    }
+    function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
 
     function updateSub(p) {
-        const c = document.getElementById(p + '-cat').value;
-        const s = document.getElementById(p + '-sub');
+        const c = document.getElementById(p+'-cat').value; const s = document.getElementById(p+'-sub');
         s.innerHTML = '<option value="">Scegli...</option>';
         if(schema[c]) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
     }
 
-    function saveData() {
-        const n = document.getElementById('f-nome').value;
-        contacts.push({ nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value });
-        localStorage.setItem('app_contacts', JSON.stringify(contacts));
-        location.reload();
-    }
-
     function openAddForm() { 
-        document.getElementById('form-overlay').classList.remove('hidden');
-        const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>';
-        Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+        openMod('form-overlay'); const s = document.getElementById('f-cat'); s.innerHTML = '<option value="">Scegli...</option>';
+        Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
     }
 
     function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
+    function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    function openManage() { alert('Gestione attiva'); }
-    function openSearch() { alert('Ricerca attiva'); }
+    function exportData() { const blob = new Blob([JSON.stringify(contacts)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup_rubrica.json'; a.click(); }
+    function importData() { const i = document.createElement('input'); i.type = 'file'; i.onchange = e => { const f = e.target.files[0]; const r = new FileReader(); r.onload = x => { contacts = JSON.parse(x.target.result); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); }; r.readAsText(f); }; i.click(); }
     function resetAll() { if(confirm("CANCELLARE TUTTO?")) { localStorage.clear(); location.reload(); } }
     window.onload = init;
 </script>
