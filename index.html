@@ -202,16 +202,59 @@
         const sc = document.getElementById('sub-buttons-container'); 
         sc.innerHTML = "";
 
-        // Qui disegna i bottoni delle Sottocategorie (Livello 2)
         schema[c].sub.sort().forEach(s => {
-            sc.innerHTML += `<button class="btn-top" style="background:#eee; color:#333" onclick="renderRecs('${c}','${s}')">${s}</button>`;
+            // Creo un contenitore per la sottocategoria e i suoi figli
+            const group = document.createElement('div');
+            group.style.marginBottom = "10px";
             
-            // AGGIUNTA CHIRURGICA: Se questa sottocategoria ha dei sottolivelli (Livello 3), disegna anche quelli!
+            // Bottone Sottocategoria (Livello 2)
+            const btn = document.createElement('button');
+            btn.className = "btn-top";
+            btn.style.background = "#eee";
+            btn.style.color = "#333";
+            btn.innerText = s;
+            
+            // Se ha figli, questo bottone serve ad aprire il menu
+            btn.onclick = () => {
+                renderRecs(c, s); // Mostra i risultati generali
+                const subPanel = document.getElementById('panel-' + s.replace(/\s+/g, ''));
+                if (subPanel) {
+                    // Chiudo tutti gli altri pannelli aperti per pulizia
+                    document.querySelectorAll('.sub-ss-panel').forEach(p => {
+                        if (p !== subPanel) p.classList.add('hidden');
+                    });
+                    // Apro/Chiudo quello cliccato
+                    subPanel.classList.toggle('hidden');
+                }
+            };
+            
+            group.appendChild(btn);
+
+            // Pannello Sottosottocategorie (Livello 3) - Nascondo all'inizio
             if (schema[c].subSub && schema[c].subSub[s]) {
+                const subPanel = document.createElement('div');
+                subPanel.id = 'panel-' + s.replace(/\s+/g, '');
+                subPanel.className = "sub-ss-panel hidden"; // Nascondo subito
+                subPanel.style.paddingLeft = "20px";
+                subPanel.style.marginTop = "5px";
+                subPanel.style.display = "flex";
+                subPanel.style.flexWrap = "wrap";
+                subPanel.style.gap = "5px";
+
                 schema[c].subSub[s].sort().forEach(ss => {
-                    sc.innerHTML += `<button class="btn-top" style="background:#ddd; color:#555; font-size:0.8em; margin-left:15px;" onclick="renderRecs('${c}','${s}','${ss}')">↳ ${ss}</button>`;
+                    const ssBtn = document.createElement('button');
+                    ssBtn.className = "btn-top";
+                    ssBtn.style.background = "#ddd";
+                    ssBtn.style.color = "#555";
+                    ssBtn.style.fontSize = "0.85em";
+                    ssBtn.innerText = ss;
+                    ssBtn.onclick = () => renderRecs(c, s, ss);
+                    subPanel.appendChild(ssBtn);
                 });
+                group.appendChild(subPanel);
             }
+            
+            sc.appendChild(group);
         });
     }
 
