@@ -199,9 +199,19 @@
         document.getElementById('view-main').classList.add('hidden');
         document.getElementById('view-detail').classList.remove('hidden');
         document.getElementById('title-detail').innerText = c;
-        const sc = document.getElementById('sub-buttons-container'); sc.innerHTML = "";
+        const sc = document.getElementById('sub-buttons-container'); 
+        sc.innerHTML = "";
+
+        // Qui disegna i bottoni delle Sottocategorie (Livello 2)
         schema[c].sub.sort().forEach(s => {
             sc.innerHTML += `<button class="btn-top" style="background:#eee; color:#333" onclick="renderRecs('${c}','${s}')">${s}</button>`;
+            
+            // AGGIUNTA CHIRURGICA: Se questa sottocategoria ha dei sottolivelli (Livello 3), disegna anche quelli!
+            if (schema[c].subSub && schema[c].subSub[s]) {
+                schema[c].subSub[s].sort().forEach(ss => {
+                    sc.innerHTML += `<button class="btn-top" style="background:#ddd; color:#555; font-size:0.8em; margin-left:15px;" onclick="renderRecs('${c}','${s}','${ss}')">↳ ${ss}</button>`;
+                });
+            }
         });
     }
 
