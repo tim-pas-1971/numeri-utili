@@ -357,7 +357,48 @@
     function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
     function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
     
-    window.onload = init;
+   window.onload = init;
+
+    // --- NUOVI COMANDI PER I TASTI ---
+    function exportData() {
+        const dataStr = JSON.stringify(contacts);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+        const a = document.createElement('a');
+        a.setAttribute('href', dataUri);
+        a.setAttribute('download', 'rubrica_tiziana.json');
+        a.click();
+    }
+
+    function importData() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = e => {
+            const reader = new FileReader();
+            reader.onload = x => {
+                contacts = JSON.parse(x.target.result);
+                localStorage.setItem('app_contacts', JSON.stringify(contacts));
+                alert("Dati caricati!");
+                location.reload();
+            };
+            reader.readAsText(e.target.files[0]);
+        };
+        input.click();
+    }
+
+    function resetAll() {
+        if (confirm("Vuoi cancellare tutto?")) {
+            localStorage.removeItem('app_contacts');
+            location.reload();
+        }
+    }
 </script>
+
+<div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; align-items: center; background: white;">
+    <button class="btn-top" style="background:#555" onclick="alert('API KEY: Sistema Pronto')">API KEY</button>
+    <button class="btn-top" style="background:#555" onclick="exportData()">ESPORTA</button>
+    <button class="btn-top" style="background:#555" onclick="importData()">IMPORTA</button>
+    <button class="btn-top" style="background:#d9534f; margin-left: auto; border: 2px solid darkred; font-weight: bold;" onclick="resetAll()">RESET SCHEDE</button>
+</div>
+
 </body>
 </html>
