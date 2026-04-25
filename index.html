@@ -5,31 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Numeri Utili - Tiziana Pascali</title>
     <style>
-        :root { --primary: #003366; --secondary: #28a745; --bg: #f0f4f8; --accent: #d9534f; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; min-height: 100vh; }
+        :root { --primary: #003366; --secondary: #28a745; --bg: #f4f7f9; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
         
+        /* Layout Sidebar */
         #app-wrapper { display: flex; width: 100%; transition: 0.4s; }
         #main-content { flex: 1; transition: 0.4s; padding-right: 15px; }
         #app-wrapper.sidebar-open #main-content { flex: 0 0 66.6%; }
-        #sidebar { position: fixed; right: -33.3%; top: 0; width: 33.3%; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: 0.4s; z-index: 3000; visibility: hidden; }
+        #sidebar { position: fixed; right: -33.3%; top: 0; width: 33.3%; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.4s; z-index: 3000; visibility: hidden; }
         #app-wrapper.sidebar-open #sidebar { right: 0; visibility: visible; }
 
-        header { background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; border-top: 5px solid var(--primary); }
-        .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
-        .card-cat { background: white; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border-bottom: 4px solid var(--primary); display: flex; flex-direction: column; align-items: center; height: 110px; justify-content: center; transition: 0.2s; }
-        .card-cat i { font-size: 40px; display: block; margin-bottom: 5px; font-style: normal; }
-        .card-cat b { font-size: 11px; text-transform: uppercase; color: var(--primary); line-height: 1.1; }
+        /* Header */
+        header { background: var(--white); padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 25px; border-top: 6px solid var(--primary); }
+        .header-left h1 { margin: 0; font-size: 24px; color: var(--primary); cursor: pointer; }
+        
+        /* Griglia Categorie (Icona sopra, testo sotto - Spaziosa) */
+        .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+        .card-cat { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.04); transition: 0.3s; border-bottom: 4px solid var(--primary); min-height: 130px; display: flex; flex-direction: column; justify-content: center; }
+        .card-cat:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .card-cat i { font-size: 50px; display: block; margin-bottom: 10px; font-style: normal; }
+        .card-cat b { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); }
 
-        .btn-top { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 5px; }
-        .contact-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid var(--secondary); margin-bottom: 15px; }
-        .contact-btns { display: flex; gap: 5px; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; flex-wrap: wrap; }
-        .btn-action { font-size: 0.75em; padding: 5px 8px; border-radius: 4px; border: none; cursor: pointer; background: #f0f0f0; }
+        .btn-top { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-left: 8px; transition: 0.2s; }
+        .btn-top:hover { opacity: 0.9; }
 
-        .tree-node { margin-bottom: 10px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
-        .tree-header { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px; border-radius: 5px; }
-        .tree-sub { margin-left: 20px; border-left: 1px dashed #bbb; padding-left: 15px; margin-top: 5px; }
-        .tree-btns button { border: none; background: #eee; cursor: pointer; margin-left: 4px; padding: 3px 6px; border-radius: 3px; }
+        /* Stile Schede (Modali come da Immagine 0bd5d3) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,51,102,0.6); display: flex; justify-content: center; align-items: center; z-index: 4000; backdrop-filter: blur(3px); }
+        .form-card { background: var(--white); padding: 30px; border-radius: 20px; width: 95%; max-width: 850px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid #eee; }
+        
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+        label { font-weight: 600; font-size: 0.9em; color: #555; margin-bottom: 5px; }
+        input, select, textarea { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fafafa; transition: 0.2s; }
+        input:focus { border-color: var(--primary); outline: none; background: #fff; }
+        
+        /* Tabelle Orari */
+        .timetable { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid #eee; }
+        .timetable th { background: #f8f9fa; padding: 10px; font-size: 0.8em; color: #777; }
+        .timetable td { padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: center; }
+        
         .hidden { display: none !important; }
+        
+        /* Tree View Gestione */
+        .tree-node { margin-bottom: 12px; padding: 15px; background: #fdfdfd; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .tree-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.1em; color: var(--primary); }
+        .tree-sub { margin-left: 20px; border-left: 2px dashed #ddd; padding-left: 15px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -38,8 +58,8 @@
     <div id="main-content">
         <header>
             <div class="header-left">
-                <h1 onclick="location.reload()" style="cursor:pointer">📂 Numeri Utili</h1>
-                <div style="color:var(--accent); font-weight:bold; font-size:14px;">Rubrica di Tiziana Pascali</div>
+                <h1 onclick="location.reload()">📂 Numeri Utili</h1>
+                <div style="color:var(--accent); font-weight:bold; font-size:14px; margin-top:5px;">Rubrica Personale di Tiziana Pascali</div>
             </div>
             <div id="admin-menu">
                 <button class="btn-top" onclick="openManage()">GESTISCI</button>
@@ -51,22 +71,16 @@
 
         <div id="view-main" class="grid-main"></div>
         <div id="view-detail" class="hidden">
-            <button class="btn-top" onclick="location.reload()">⬅️ Home</button>
-            <h2 id="title-detail" style="color:var(--primary)"></h2>
-            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:8px; margin:20px 0;"></div>
-            <div id="records-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px;"></div>
-        </div>
-
-        <div id="admin-footer" class="footer-admin hidden" style="margin-top:30px; display:flex; gap:10px; border-top:1px solid #ccc; padding-top:20px;">
-            <button class="btn-top" style="background:#555">ESPORTA</button>
-            <button class="btn-top" style="background:#555">IMPORTA</button>
-            <button class="btn-top" style="background:var(--accent); margin-left:auto;" onclick="resetAll()">RESET SCHEDE</button>
+            <button class="btn-top" onclick="location.reload()">⬅️ Torna alla Home</button>
+            <h2 id="title-detail" style="margin: 20px 0; color: var(--primary);"></h2>
+            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:25px;"></div>
+            <div id="records-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:20px;"></div>
         </div>
     </div>
 
     <div id="sidebar">
         <div style="padding:15px; background:var(--primary); color:white; display:flex; justify-content:space-between; align-items:center;">
-            <b>Google</b><button onclick="toggleGoogle()" style="color:white; background:none; border:none; cursor:pointer;">X</button>
+            <b>Google Search</b><button onclick="toggleGoogle()" style="color:white; background:none; border:none; cursor:pointer; font-size:20px;">X</button>
         </div>
         <iframe id="g-frame" src="about:blank" style="width:100%; height:calc(100% - 50px); border:none;"></iframe>
     </div>
@@ -74,63 +88,71 @@
 
 <div id="form-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2 style="color:var(--secondary); margin-top:0;">🆕 Aggiungi Contatto</h2>
-        <div class="form-row">
-            <div class="form-group"><label>Categoria</label><select id="f-cat" onchange="updateSub('f')"></select></div>
-            <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub('f')"></select></div>
-            <div id="f-ss-group" class="form-group hidden"><label>Livello 3</label><select id="f-ss"></select></div>
-        </div>
-        <div class="form-group"><label>Nome Attività</label><input type="text" id="f-nome"></div>
+        <h2 style="color:var(--secondary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">🆕 Nuova Scheda Nominativo</h2>
         
-        <div id="f-ristorante-extra" class="hidden" style="background:#f0f7f1; padding:15px; border-radius:10px; margin-bottom:15px;">
-            <div class="form-row">
-                <div class="form-group"><label>Tipo Cucina</label><input type="text" id="f-cucina"></div>
-                <div class="form-group"><label>Costo</label><select id="f-costo"><option>€</option><option>€€</option><option>€€€</option></select></div>
-                <div class="form-group"><label>Giudizio</label><input type="text" id="f-voto" placeholder="es. 4/5"></div>
-            </div>
-        </div>
-
         <div class="form-row">
-            <div class="form-group"><label>Tel.</label><input type="text" id="f-tel"></div>
-            <div class="form-group"><label>Cell.</label><input type="text" id="f-cell"></div>
+            <div class="form-group"><label>Categoria Principale</label><select id="f-cat" onchange="updateSub('f')"></select></div>
+            <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub('f')"></select></div>
+            <div id="f-ss-group" class="form-group hidden"><label>Livello 3 (es. Etnico)</label><select id="f-ss"></select></div>
+        </div>
+        
+        <div class="form-group"><label>Nome Attività / Persona</label><input type="text" id="f-nome" placeholder="Inserisci nome..."></div>
+        
+        <div class="form-row">
+            <div class="form-group"><label>Telefono Fisso</label><input type="text" id="f-tel"></div>
+            <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
             <div class="form-group"><label>Km (da Pregnana)</label><input type="text" id="f-km"></div>
         </div>
+
         <div class="form-row">
-            <div class="form-group" style="flex:2"><label>Indirizzo</label><input type="text" id="f-via"></div>
-            <div class="form-group"><label>Località</label><input type="text" id="f-loc"></div>
+            <div class="form-group" style="flex:2"><label>Indirizzo (Via e Civico)</label><input type="text" id="f-via"></div>
+            <div class="form-group"><label>Città</label><input type="text" id="f-loc"></div>
             <div class="form-group"><label>Prov.</label><select id="f-prov"></select></div>
         </div>
-        <div class="form-group"><label>URL Foto (per anteprima)</label><input type="text" id="f-foto" placeholder="http://..."></div>
-        <div class="form-group"><label>Note</label><textarea id="f-note" rows="2"></textarea></div>
 
-        <div style="text-align:right; margin-top:20px;">
-            <button class="btn-top" onclick="closeMod('form-overlay')" style="background:#666">Annulla</button>
-            <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA</button>
+        <div class="form-row">
+            <div class="form-group"><label>Sito Web</label><input type="text" id="f-web" placeholder="https://..."></div>
+            <div class="form-group"><label>Email</label><input type="email" id="f-mail"></div>
+        </div>
+
+        <div class="form-group"><label>URL Immagine Foto (Anteprima)</label><input type="text" id="f-foto" placeholder="Incolla link immagine..."></div>
+
+        <label style="margin-top:20px; display:block;">Orari di Apertura (Spunta 'Ch.' per chiusura)</label>
+        <table class="timetable">
+            <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
+            <tbody id="orari-body"></tbody>
+        </table>
+
+        <div class="form-group" style="margin-top:15px;"><label>Note e Dettagli</label><textarea id="f-note" rows="3"></textarea></div>
+
+        <div style="text-align:right; margin-top:25px; border-top: 1px solid #eee; padding-top: 20px;">
+            <button class="btn-top" onclick="closeMod('form-overlay')" style="background:#999">Annulla</button>
+            <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA SCHEDA</button>
         </div>
     </div>
 </div>
 
 <div id="manage-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h2>⚙️ Gestione Struttura</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0;">⚙️ Gestione Struttura</h2>
             <button class="btn-top" style="background:var(--secondary)" onclick="addMainCat()">Nuova Sezione [+]</button>
         </div>
         <div id="tree-container"></div>
-        <button class="btn-top" onclick="closeMod('manage-overlay')" style="margin-top:20px; width:100%">Esci</button>
+        <button class="btn-top" onclick="closeMod('manage-overlay')" style="width:100%; margin-top:20px; background:#666;">Chiudi</button>
     </div>
 </div>
 
 <div id="search-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2>🔎 Ricerca Avanzata</h2>
-        <div class="form-group"><label>Cerca Testo</label><input type="text" id="s-testo" placeholder="Nome, città, note..."></div>
-        <div class="form-row" style="margin-top:10px;">
+        <h2 style="margin-top:0;">🔎 Ricerca Avanzata</h2>
+        <div class="form-group"><label>Cerca per Nome, Località o Note</label><input type="text" id="s-testo" placeholder="Cosa cerchi?"></div>
+        <div class="form-row" style="margin-top:15px;">
             <div class="form-group"><label>Categoria</label><select id="s-cat" onchange="updateSub('s')"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="s-sub" onchange="updateSubSub('s')"></select></div>
             <div id="s-ss-group" class="form-group hidden"><label>Livello 3</label><select id="s-ss"></select></div>
         </div>
-        <button class="btn-top" onclick="closeMod('search-overlay')" style="margin-top:20px; width:100%">Esci</button>
+        <button class="btn-top" onclick="closeMod('search-overlay')" style="width:100%; margin-top:20px; background:var(--primary);">Esci</button>
     </div>
 </div>
 
@@ -141,13 +163,13 @@
         "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
         "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"] },
         "BRICOLAGE": { icon: "🛠️", sub: ["Ferramenta", "Legnami", "Colorificio"] },
-        "CASA (PROF.)": { icon: "🏠", sub: ["Elettricista", "Idraulico", "Muratore", "Tapparellista", "Fabbro", "Imbianchino", "Antennista", "Caldaista", "Serramentista"] },
+        "CASA (PROF.)": { icon: "🏠", sub: ["Elettricista", "Idraulico", "Muratore", "Tapparellista", "Fabbro", "Imbianchino", "Antennista", "Caldaista"] },
         "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato", "Centro Commerciale"] },
         "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Estetista", "Solarium", "Unghie"] },
         "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista", "Manutenzione Verde"] },
         "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali", "Ottica", "Casalinghi"] },
-        "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico Mutua", "Medico Specialista", "Ospedale", "Veterinario", "Dentista"] },
-        "RISTORANTI": { icon: "🍴", sub: ["Agriturismo", "Etnico", "Pizzeria / Ristorante Classico", "Trattoria", "Fast Food"], subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano", "Greco", "Indiano"] } }
+        "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico Mutua", "Medico Specialista", "Ospedale", "Veterinario"] },
+        "RISTORANTI": { icon: "🍴", sub: ["Pizzeria / Ristorante Classico", "Etnico", "Trattoria", "Agriturismo"], subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano", "Greco", "Indiano"] } }
     };
 
     let schema = JSON.parse(localStorage.getItem('app_schema')) || defaultSchema;
@@ -155,11 +177,11 @@
 
     function init() {
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
-        if (isAdmin) document.getElementById('admin-footer').classList.remove('hidden');
-        else document.querySelectorAll('#admin-menu button:not([onclick*="Search"])').forEach(b => b.style.display='none');
+        if (!isAdmin) document.querySelectorAll('#admin-menu button:not([onclick*="Search"])').forEach(b => b.style.display='none');
         renderMain();
-        const pSel = document.getElementById('f-prov');
-        PROVINCE.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
+        buildOrari();
+        const ps = document.getElementById('f-prov');
+        PROVINCE.forEach(p => ps.innerHTML += `<option value="${p}">${p}</option>`);
     }
 
     function renderMain() {
@@ -182,53 +204,60 @@
     function renderRecs(c, s) {
         const list = document.getElementById('records-list');
         const fil = contacts.filter(x => x.cat === c && x.sub === s);
-        list.innerHTML = fil.length ? "" : "<p>Nessun contatto salvato.</p>";
-        fil.forEach((x, idx) => {
+        list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato in questa categoria.</p>";
+        fil.forEach(x => {
             const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
-            list.innerHTML += `<div class="contact-card">
-                ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:5px; margin-bottom:10px;">` : ''}
-                <b>${x.nome}</b><br>📞 ${x.tel || x.cell}<br>📍 ${x.via}, ${x.loc}<br>
-                ${x.cucina ? `<small>🍴 ${x.cucina} | ${x.costo} | ⭐ ${x.voto}</small><br>` : ''}
-                <div class="contact-btns">
-                    <button class="btn-action" onclick="window.open('${mapUrl}')">🗺️ Mappa</button>
-                    <button class="btn-action" onclick="alert('Funzione: Modifica')">✏️</button>
-                    <button class="btn-action" onclick="alert('Funzione: Sposta')">📦</button>
-                    <button class="btn-action" onclick="duplicateContact(${contacts.indexOf(x)})">📑</button>
-                    <button class="btn-action" style="color:red" onclick="deleteContact(${contacts.indexOf(x)})">❌</button>
+            list.innerHTML += `<div style="background:white; padding:20px; border-radius:15px; border-left:6px solid var(--secondary); box-shadow:0 4px 10px rgba(0,0,0,0.05)">
+                ${x.foto ? `<img src="${x.foto}" style="width:100%; height:140px; object-fit:cover; border-radius:10px; margin-bottom:15px;">` : ''}
+                <b style="font-size:1.2em; color:var(--primary)">${x.nome}</b><br>
+                <div style="margin-top:10px; line-height:1.6">
+                    📞 ${x.tel || '-'} | 📱 ${x.cell || '-'}<br>
+                    📍 ${x.via}, ${x.loc}<br>
+                    📏 Distanza: ${x.km || '-'} Km
+                </div>
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    <button class="btn-top" style="padding:6px 12px; font-size:0.8em; background:#4285F4" onclick="window.open('${mapUrl}')">MAPPA</button>
+                    <button class="btn-top" style="padding:6px 12px; font-size:0.8em; background:var(--accent)" onclick="deleteContact(${contacts.indexOf(x)})">ELIMINA</button>
                 </div>
             </div>`;
         });
     }
 
+    function buildOrari() {
+        const b = document.getElementById('orari-body'); b.innerHTML = "";
+        ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(g => {
+            b.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time">-<input type="time"></td><td><input type="checkbox"></td><td><input type="time">-<input type="time"></td><td><input type="checkbox"></td></tr>`;
+        });
+    }
+
     function updateSub(p) {
-        const cat = document.getElementById(p + '-cat').value;
-        const sub = document.getElementById(p + '-sub');
-        sub.innerHTML = '<option value="">Scegli...</option>';
-        if(schema[cat]) schema[cat].sub.sort().forEach(s => sub.innerHTML += `<option value="${s}">${s}</option>`);
-        if(p==='f') document.getElementById('f-ristorante-extra').classList.toggle('hidden', cat !== 'RISTORANTI');
+        const c = document.getElementById(p + '-cat').value;
+        const s = document.getElementById(p + '-sub');
+        s.innerHTML = '<option value="">Scegli...</option>';
+        if(schema[c]) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
         updateSubSub(p);
     }
 
     function updateSubSub(p) {
-        const cat = document.getElementById(p + '-cat').value;
+        const c = document.getElementById(p + '-cat').value;
         const sub = document.getElementById(p + '-sub').value;
-        const group = document.getElementById(p + '-ss-group');
+        const g = document.getElementById(p + '-ss-group');
         const ss = document.getElementById(p + '-ss');
-        if(schema[cat]?.subSub?.[sub]) {
-            group.classList.remove('hidden');
+        if(schema[c]?.subSub?.[sub]) {
+            g.classList.remove('hidden');
             ss.innerHTML = '<option value="">Scegli Livello 3...</option>';
-            schema[cat].subSub[sub].sort().forEach(x => ss.innerHTML += `<option value="${x}">${x}</option>`);
-        } else { group.classList.add('hidden'); }
+            schema[c].subSub[sub].sort().forEach(x => ss.innerHTML += `<option value="${x}">${x}</option>`);
+        } else g.classList.add('hidden');
     }
 
     function openManage() {
         openMod('manage-overlay'); const t = document.getElementById('tree-container'); t.innerHTML = "";
         Object.keys(schema).sort().forEach(c => {
-            let h = `<div class="tree-node"><div class="tree-header"><span>${schema[c].icon} ${c}</span><span class="tree-btns"><button onclick="renameCat('${c}')">✏️</button><button onclick="addSub('${c}')">[+] Sub</button><button onclick="delCat('${c}')">❌</button></span></div>`;
+            let h = `<div class="tree-node"><div class="tree-header"><span>${schema[c].icon} ${c}</span><span><button onclick="addSub('${c}')">[+] Sub</button><button onclick="delCat('${c}')">❌</button></span></div>`;
             schema[c].sub.sort().forEach(s => {
                 h += `<div class="tree-sub"><div style="display:flex; justify-content:space-between;"><span>- ${s}</span><span class="tree-btns"><button onclick="addSS('${c}','${s}')">[+] SS</button><button onclick="delSub('${c}','${s}')">❌</button></span></div>`;
                 if(schema[c].subSub?.[s]) schema[c].subSub[s].forEach(ss => {
-                    h += `<div style="margin-left:20px; font-size:0.9em; color:#666;">-- ${ss} <button style="border:none; background:none; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button></div>`;
+                    h += `<div style="margin-left:20px; font-size:0.9em; color:#888;">-- ${ss} <button style="border:none; background:none; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button></div>`;
                 });
                 h += `</div>`;
             });
@@ -236,50 +265,41 @@
         });
     }
 
-    function addMainCat() { 
-        const n = prompt("Nome Sezione:"); 
-        const i = prompt("Emoji Icona:", "📁");
-        if(n) { schema[n] = {icon:i, sub:[]}; saveSchema(); } 
-    }
-    function addSub(c) { const n = prompt("Nuova Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
-    function addSS(c, s) { 
-        const n = prompt("Nuovo Livello 3:"); 
-        if(n) { if(!schema[c].subSub) schema[c].subSub = {}; if(!schema[c].subSub[s]) schema[c].subSub[s] = []; schema[c].subSub[s].push(n); saveSchema(); } 
-    }
-    function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
-    function delSub(c, s) { if(confirm("Eliminare?")) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); } }
-    function renameCat(c) { const n = prompt("Rinomina in:", c); if(n) { schema[n] = schema[c]; delete schema[c]; saveSchema(); } }
-    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
-    
     function saveData() {
         const n = document.getElementById('f-nome').value;
-        if(!n) return alert("Inserisci il nome");
+        if(!n) return alert("Inserisci il nome!");
         contacts.push({
-            nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value, ss: document.getElementById('f-ss').value,
-            tel: document.getElementById('f-tel').value, cell: document.getElementById('f-cell').value,
-            via: document.getElementById('f-via').value, loc: document.getElementById('f-loc').value, prov: document.getElementById('f-prov').value,
-            km: document.getElementById('f-km').value, web: document.getElementById('f-web').value,
-            foto: document.getElementById('f-foto').value, note: document.getElementById('f-note').value,
-            cucina: document.getElementById('f-cucina').value, costo: document.getElementById('f-costo').value, voto: document.getElementById('f-voto').value
+            nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value,
+            via: document.getElementById('f-via').value, loc: document.getElementById('f-loc').value,
+            km: document.getElementById('f-km').value, foto: document.getElementById('f-foto').value,
+            tel: document.getElementById('f-tel').value, cell: document.getElementById('f-cell').value
         });
         localStorage.setItem('app_contacts', JSON.stringify(contacts));
         location.reload();
     }
 
-    function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
-    function duplicateContact(i) { contacts.push({...contacts[i]}); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); }
     function openAddForm() { 
         openMod('form-overlay'); const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>';
         Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
     }
+
     function openSearch() { 
         openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>';
         Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
     }
-    function toggleGoogle() { const w = document.getElementById('app-wrapper'); w.classList.toggle('sidebar-open'); if(w.classList.contains('sidebar-open')) document.getElementById('g-frame').src = "https://www.google.com/search?igu=1"; }
+
+    function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji Icona:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
+    function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
+    function addSS(c,s) { const n = prompt("Livello 3:"); if(n) { if(!schema[c].subSub) schema[c].subSub={}; if(!schema[c].subSub[s]) schema[c].subSub[s]=[]; schema[c].subSub[s].push(n); saveSchema(); } }
+    function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
+    function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
+    function delSS(c,s,ss) { schema[c].subSub[s] = schema[c].subSub[s].filter(x => x!==ss); saveSchema(); }
+    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
     function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    function resetAll() { if(confirm("RESET TOTALE?")) { localStorage.clear(); location.reload(); } }
+    function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
+    function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
+    
     window.onload = init;
 </script>
 </body>
