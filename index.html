@@ -6,43 +6,30 @@
     <title>Numeri Utili - Tiziana Pascali</title>
     <style>
         :root { --primary: #003366; --secondary: #28a745; --bg: #f0f4f8; --accent: #d9534f; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; min-height: 100vh; }
         
-        #app-wrapper { display: flex; transition: 0.4s; flex: 1; width: 100%; }
-        #main-content { flex: 1; transition: 0.4s; padding-right: 20px; min-width: 0; }
+        #app-wrapper { display: flex; width: 100%; transition: 0.4s; }
+        #main-content { flex: 1; transition: 0.4s; padding-right: 15px; }
         #app-wrapper.sidebar-open #main-content { flex: 0 0 66.6%; }
         #sidebar { position: fixed; right: -33.3%; top: 0; width: 33.3%; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: 0.4s; z-index: 3000; visibility: hidden; }
         #app-wrapper.sidebar-open #sidebar { right: 0; visibility: visible; }
 
         header { background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; border-top: 5px solid var(--primary); }
         .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
-        .card-cat { background: white; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-bottom: 4px solid var(--primary); display: flex; flex-direction: column; align-items: center; height: 110px; justify-content: center; transition: 0.2s; }
+        .card-cat { background: white; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border-bottom: 4px solid var(--primary); display: flex; flex-direction: column; align-items: center; height: 110px; justify-content: center; transition: 0.2s; }
         .card-cat i { font-size: 40px; display: block; margin-bottom: 5px; font-style: normal; }
-        .card-cat b { font-size: 11px; text-transform: uppercase; color: var(--primary); }
+        .card-cat b { font-size: 11px; text-transform: uppercase; color: var(--primary); line-height: 1.1; }
 
         .btn-top { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 5px; }
-        .footer-admin { margin-top: auto; padding: 20px 0; border-top: 2px solid #ddd; display: flex; gap: 10px; }
-        .btn-tech { background: #555; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-reset { background: var(--accent) !important; margin-left: auto; }
+        .contact-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid var(--secondary); margin-bottom: 15px; }
+        .contact-btns { display: flex; gap: 5px; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; flex-wrap: wrap; }
+        .btn-action { font-size: 0.75em; padding: 5px 8px; border-radius: 4px; border: none; cursor: pointer; background: #f0f0f0; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 4000; }
-        .form-card { background: white; padding: 25px; border-radius: 15px; width: 95%; max-width: 850px; max-height: 90vh; overflow-y: auto; }
-        .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-        .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
-        label { font-weight: bold; font-size: 0.9em; color: var(--primary); }
-        input, select, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; }
-        
-        .timetable { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
-        .timetable td { padding: 4px; border-bottom: 1px solid #eee; text-align: center; }
-        .hidden { display: none !important; }
-
-        /* Gestione Albero (Bello e funzionale) */
         .tree-node { margin-bottom: 10px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
-        .tree-header { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px; border-radius: 5px; font-weight: bold; }
+        .tree-header { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px; border-radius: 5px; }
         .tree-sub { margin-left: 20px; border-left: 1px dashed #bbb; padding-left: 15px; margin-top: 5px; }
-        .tree-ss { margin-left: 20px; border-left: 1px dotted #ccc; padding-left: 10px; font-size: 0.9em; color: #666; }
-        .tree-btns button { border: none; background: #eee; cursor: pointer; margin-left: 4px; padding: 3px 6px; border-radius: 3px; font-size: 0.85em; }
-        .btn-plus { color: var(--secondary); font-weight: bold; }
+        .tree-btns button { border: none; background: #eee; cursor: pointer; margin-left: 4px; padding: 3px 6px; border-radius: 3px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -52,8 +39,7 @@
         <header>
             <div class="header-left">
                 <h1 onclick="location.reload()" style="cursor:pointer">📂 Numeri Utili</h1>
-                <div style="color:var(--accent); font-weight:bold; font-size:14px;">Rubrica Personale di Tiziana Pascali</div>
-                <small>📍 Via Cascina Comune, 24 – Pregnana Milanese (MI)</small>
+                <div style="color:var(--accent); font-weight:bold; font-size:14px;">Rubrica di Tiziana Pascali</div>
             </div>
             <div id="admin-menu">
                 <button class="btn-top" onclick="openManage()">GESTISCI</button>
@@ -65,23 +51,22 @@
 
         <div id="view-main" class="grid-main"></div>
         <div id="view-detail" class="hidden">
-            <button class="btn-top" onclick="location.reload()" style="margin-bottom:20px;">⬅️ Torna Home</button>
+            <button class="btn-top" onclick="location.reload()">⬅️ Home</button>
             <h2 id="title-detail" style="color:var(--primary)"></h2>
-            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;"></div>
-            <div id="records-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px;"></div>
+            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:8px; margin:20px 0;"></div>
+            <div id="records-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px;"></div>
         </div>
 
-        <div id="admin-footer" class="footer-admin hidden">
-            <button class="btn-tech">API KEY</button>
-            <button class="btn-tech">ESPORTA</button>
-            <button class="btn-tech">IMPORTA</button>
-            <button class="btn-tech btn-reset" onclick="resetAll()">RESET SCHEDE</button>
+        <div id="admin-footer" class="footer-admin hidden" style="margin-top:30px; display:flex; gap:10px; border-top:1px solid #ccc; padding-top:20px;">
+            <button class="btn-top" style="background:#555">ESPORTA</button>
+            <button class="btn-top" style="background:#555">IMPORTA</button>
+            <button class="btn-top" style="background:var(--accent); margin-left:auto;" onclick="resetAll()">RESET SCHEDE</button>
         </div>
     </div>
 
     <div id="sidebar">
         <div style="padding:15px; background:var(--primary); color:white; display:flex; justify-content:space-between; align-items:center;">
-            <b>Google Search</b><button onclick="toggleGoogle()" style="color:white; background:none; border:none; cursor:pointer; font-size:20px;">X</button>
+            <b>Google</b><button onclick="toggleGoogle()" style="color:white; background:none; border:none; cursor:pointer;">X</button>
         </div>
         <iframe id="g-frame" src="about:blank" style="width:100%; height:calc(100% - 50px); border:none;"></iframe>
     </div>
@@ -89,13 +74,22 @@
 
 <div id="form-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2 style="color:var(--secondary); margin-top:0;">🆕 Nuova Scheda Nominativo</h2>
+        <h2 style="color:var(--secondary); margin-top:0;">🆕 Aggiungi Contatto</h2>
         <div class="form-row">
             <div class="form-group"><label>Categoria</label><select id="f-cat" onchange="updateSub('f')"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub('f')"></select></div>
-            <div id="f-ss-group" class="form-group hidden"><label>Livello 3 (es. Etnico)</label><select id="f-ss"></select></div>
+            <div id="f-ss-group" class="form-group hidden"><label>Livello 3</label><select id="f-ss"></select></div>
         </div>
-        <div class="form-group"><label>Nome Attività / Nominativo</label><input type="text" id="f-nome"></div>
+        <div class="form-group"><label>Nome Attività</label><input type="text" id="f-nome"></div>
+        
+        <div id="f-ristorante-extra" class="hidden" style="background:#f0f7f1; padding:15px; border-radius:10px; margin-bottom:15px;">
+            <div class="form-row">
+                <div class="form-group"><label>Tipo Cucina</label><input type="text" id="f-cucina"></div>
+                <div class="form-group"><label>Costo</label><select id="f-costo"><option>€</option><option>€€</option><option>€€€</option></select></div>
+                <div class="form-group"><label>Giudizio</label><input type="text" id="f-voto" placeholder="es. 4/5"></div>
+            </div>
+        </div>
+
         <div class="form-row">
             <div class="form-group"><label>Tel.</label><input type="text" id="f-tel"></div>
             <div class="form-group"><label>Cell.</label><input type="text" id="f-cell"></div>
@@ -106,17 +100,9 @@
             <div class="form-group"><label>Località</label><input type="text" id="f-loc"></div>
             <div class="form-group"><label>Prov.</label><select id="f-prov"></select></div>
         </div>
-        <div class="form-row">
-            <div class="form-group"><label>Email</label><input type="text" id="f-email"></div>
-            <div class="form-group" style="flex:2"><label>Sito Web</label><input type="text" id="f-web"></div>
-        </div>
         <div class="form-group"><label>URL Foto (per anteprima)</label><input type="text" id="f-foto" placeholder="http://..."></div>
-        
-        <table class="timetable">
-            <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
-            <tbody id="orari-body"></tbody>
-        </table>
-        <div class="form-group" style="margin-top:10px;"><label>Note</label><textarea id="f-note" rows="2"></textarea></div>
+        <div class="form-group"><label>Note</label><textarea id="f-note" rows="2"></textarea></div>
+
         <div style="text-align:right; margin-top:20px;">
             <button class="btn-top" onclick="closeMod('form-overlay')" style="background:#666">Annulla</button>
             <button class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA</button>
@@ -127,11 +113,11 @@
 <div id="manage-overlay" class="modal-overlay hidden">
     <div class="form-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h2>⚙️ Gestione Categorie</h2>
-            <button class="btn-top" style="background:var(--secondary)" onclick="addMainCat()">Aggiungi Sezione [+]</button>
+            <h2>⚙️ Gestione Struttura</h2>
+            <button class="btn-top" style="background:var(--secondary)" onclick="addMainCat()">Nuova Sezione [+]</button>
         </div>
-        <div id="tree-container" class="tree-container"></div>
-        <button class="btn-top" onclick="closeMod('manage-overlay')" style="margin-top:20px; width:100%">Chiudi</button>
+        <div id="tree-container"></div>
+        <button class="btn-top" onclick="closeMod('manage-overlay')" style="margin-top:20px; width:100%">Esci</button>
     </div>
 </div>
 
@@ -141,27 +127,27 @@
         <div class="form-group"><label>Cerca Testo</label><input type="text" id="s-testo" placeholder="Nome, città, note..."></div>
         <div class="form-row" style="margin-top:10px;">
             <div class="form-group"><label>Categoria</label><select id="s-cat" onchange="updateSub('s')"></select></div>
-            <div class="form-group"><label>Sottocategoria</label><select id="s-sub"></select></div>
+            <div class="form-group"><label>Sottocategoria</label><select id="s-sub" onchange="updateSubSub('s')"></select></div>
+            <div id="s-ss-group" class="form-group hidden"><label>Livello 3</label><select id="s-ss"></select></div>
         </div>
         <button class="btn-top" onclick="closeMod('search-overlay')" style="margin-top:20px; width:100%">Esci</button>
     </div>
 </div>
 
 <script>
-    const PROVINCE = ["AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BS","BZ","CA","CB","CE","CH","CL","CN","CO","CR","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LC","LE","LI","LO","LT","LU","MB","MC","ME","MI","MN","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PV","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SO","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VA","VB","VC","VE","VI","VR","VT","VV"];
+    const PROVINCE = ["MI","BG","BS","CO","CR","LC","LO","MB","MN","PV","SO","VA","AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BZ","CA","CB","CE","CH","CL","CN","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LE","LI","LT","LU","MC","ME","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VB","VC","VE","VI","VR","VT","VV"];
     
-    // SCHEMA ORIGINALE E COMPLETO
     const defaultSchema = {
         "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
         "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"] },
-        "BRICOLAGE": { icon: "🛠️", sub: ["Ferramenta"] },
-        "CASA (PROF.)": { icon: "🏠", sub: ["Elettricista", "Idraulico", "Muratore", "Imbianchino"] },
+        "BRICOLAGE": { icon: "🛠️", sub: ["Ferramenta", "Legnami", "Colorificio"] },
+        "CASA (PROF.)": { icon: "🏠", sub: ["Elettricista", "Idraulico", "Muratore", "Tapparellista", "Fabbro", "Imbianchino", "Antennista", "Caldaista", "Serramentista"] },
         "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato", "Centro Commerciale"] },
-        "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Estetista", "Solarium"] },
-        "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista"] },
-        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali", "Ottica"] },
-        "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico", "Ospedale", "Veterinario"] },
-        "RISTORANTI": { icon: "🍴", sub: ["Etnico", "Pizzeria", "Trattoria", "Agriturismo"], subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano"] } }
+        "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Estetista", "Solarium", "Unghie"] },
+        "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista", "Manutenzione Verde"] },
+        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali", "Ottica", "Casalinghi"] },
+        "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico Mutua", "Medico Specialista", "Ospedale", "Veterinario", "Dentista"] },
+        "RISTORANTI": { icon: "🍴", sub: ["Agriturismo", "Etnico", "Pizzeria / Ristorante Classico", "Trattoria", "Fast Food"], subSub: { "Etnico": ["Cinese", "Giapponese", "Messicano", "Greco", "Indiano"] } }
     };
 
     let schema = JSON.parse(localStorage.getItem('app_schema')) || defaultSchema;
@@ -172,7 +158,6 @@
         if (isAdmin) document.getElementById('admin-footer').classList.remove('hidden');
         else document.querySelectorAll('#admin-menu button:not([onclick*="Search"])').forEach(b => b.style.display='none');
         renderMain();
-        buildOrari();
         const pSel = document.getElementById('f-prov');
         PROVINCE.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
     }
@@ -198,29 +183,40 @@
         const list = document.getElementById('records-list');
         const fil = contacts.filter(x => x.cat === c && x.sub === s);
         list.innerHTML = fil.length ? "" : "<p>Nessun contatto salvato.</p>";
-        fil.forEach(x => {
-            list.innerHTML += `<div style="background:white; padding:15px; border-radius:10px; border-left:5px solid var(--secondary); box-shadow:0 2px 5px rgba(0,0,0,0.1)">
+        fil.forEach((x, idx) => {
+            const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
+            list.innerHTML += `<div class="contact-card">
                 ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:5px; margin-bottom:10px;">` : ''}
-                <b>${x.nome}</b><br>📞 ${x.tel || x.cell}<br>📍 ${x.via}, ${x.loc}<br><small>Km: ${x.km || '-'}</small></div>`;
+                <b>${x.nome}</b><br>📞 ${x.tel || x.cell}<br>📍 ${x.via}, ${x.loc}<br>
+                ${x.cucina ? `<small>🍴 ${x.cucina} | ${x.costo} | ⭐ ${x.voto}</small><br>` : ''}
+                <div class="contact-btns">
+                    <button class="btn-action" onclick="window.open('${mapUrl}')">🗺️ Mappa</button>
+                    <button class="btn-action" onclick="alert('Funzione: Modifica')">✏️</button>
+                    <button class="btn-action" onclick="alert('Funzione: Sposta')">📦</button>
+                    <button class="btn-action" onclick="duplicateContact(${contacts.indexOf(x)})">📑</button>
+                    <button class="btn-action" style="color:red" onclick="deleteContact(${contacts.indexOf(x)})">❌</button>
+                </div>
+            </div>`;
         });
     }
 
-    function updateSub(prefix) {
-        const cat = document.getElementById(prefix + '-cat').value;
-        const sub = document.getElementById(prefix + '-sub');
+    function updateSub(p) {
+        const cat = document.getElementById(p + '-cat').value;
+        const sub = document.getElementById(p + '-sub');
         sub.innerHTML = '<option value="">Scegli...</option>';
         if(schema[cat]) schema[cat].sub.sort().forEach(s => sub.innerHTML += `<option value="${s}">${s}</option>`);
-        if(prefix === 'f') updateSubSub('f');
+        if(p==='f') document.getElementById('f-ristorante-extra').classList.toggle('hidden', cat !== 'RISTORANTI');
+        updateSubSub(p);
     }
 
-    function updateSubSub(prefix) {
-        const cat = document.getElementById(prefix + '-cat').value;
-        const sub = document.getElementById(prefix + '-sub').value;
-        const group = document.getElementById(prefix + '-ss-group');
-        const ss = document.getElementById(prefix + '-ss');
+    function updateSubSub(p) {
+        const cat = document.getElementById(p + '-cat').value;
+        const sub = document.getElementById(p + '-sub').value;
+        const group = document.getElementById(p + '-ss-group');
+        const ss = document.getElementById(p + '-ss');
         if(schema[cat]?.subSub?.[sub]) {
             group.classList.remove('hidden');
-            ss.innerHTML = '<option value="">Scegli...</option>';
+            ss.innerHTML = '<option value="">Scegli Livello 3...</option>';
             schema[cat].subSub[sub].sort().forEach(x => ss.innerHTML += `<option value="${x}">${x}</option>`);
         } else { group.classList.add('hidden'); }
     }
@@ -228,67 +224,62 @@
     function openManage() {
         openMod('manage-overlay'); const t = document.getElementById('tree-container'); t.innerHTML = "";
         Object.keys(schema).sort().forEach(c => {
-            let h = `<div class="tree-node"><div class="tree-header"><span>${schema[c].icon} ${c}</span><span class="tree-btns"><button class="btn-plus" onclick="addSub('${c}')">[+] Sub</button><button onclick="delCat('${c}')">❌</button></span></div>`;
+            let h = `<div class="tree-node"><div class="tree-header"><span>${schema[c].icon} ${c}</span><span class="tree-btns"><button onclick="renameCat('${c}')">✏️</button><button onclick="addSub('${c}')">[+] Sub</button><button onclick="delCat('${c}')">❌</button></span></div>`;
             schema[c].sub.sort().forEach(s => {
-                h += `<div class="tree-sub"><div style="display:flex; justify-content:space-between;"><span>- ${s}</span><span class="tree-btns"><button class="btn-plus" onclick="addSS('${c}','${s}')">[+] SS</button><button onclick="delSub('${c}','${s}')">❌</button></span></div>`;
-                if(schema[c].subSub?.[s]) {
-                    schema[c].subSub[s].forEach(ss => {
-                        h += `<div class="tree-ss">-- ${ss} <button style="border:none; background:none; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button></div>`;
-                    });
-                }
+                h += `<div class="tree-sub"><div style="display:flex; justify-content:space-between;"><span>- ${s}</span><span class="tree-btns"><button onclick="addSS('${c}','${s}')">[+] SS</button><button onclick="delSub('${c}','${s}')">❌</button></span></div>`;
+                if(schema[c].subSub?.[s]) schema[c].subSub[s].forEach(ss => {
+                    h += `<div style="margin-left:20px; font-size:0.9em; color:#666;">-- ${ss} <button style="border:none; background:none; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button></div>`;
+                });
                 h += `</div>`;
             });
             h += `</div>`; t.innerHTML += h;
         });
     }
 
-    function buildOrari() {
-        const b = document.getElementById('orari-body'); b.innerHTML = "";
-        ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(g => {
-            b.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time">-<input type="time"></td><td><input type="checkbox"></td><td><input type="time">-<input type="time"></td><td><input type="checkbox"></td></tr>`;
-        });
+    function addMainCat() { 
+        const n = prompt("Nome Sezione:"); 
+        const i = prompt("Emoji Icona:", "📁");
+        if(n) { schema[n] = {icon:i, sub:[]}; saveSchema(); } 
     }
-
-    function openSearch() { 
-        openMod('search-overlay'); 
-        const s = document.getElementById('s-cat'); 
-        s.innerHTML = '<option value="">Tutte</option>'; 
-        Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); 
+    function addSub(c) { const n = prompt("Nuova Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
+    function addSS(c, s) { 
+        const n = prompt("Nuovo Livello 3:"); 
+        if(n) { if(!schema[c].subSub) schema[c].subSub = {}; if(!schema[c].subSub[s]) schema[c].subSub[s] = []; schema[c].subSub[s].push(n); saveSchema(); } 
     }
-
-    function openAddForm() { 
-        openMod('form-overlay'); 
-        const sel = document.getElementById('f-cat'); 
-        sel.innerHTML = '<option value="">Scegli...</option>'; 
-        Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
-    }
-
+    function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
+    function delSub(c, s) { if(confirm("Eliminare?")) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); } }
+    function renameCat(c) { const n = prompt("Rinomina in:", c); if(n) { schema[n] = schema[c]; delete schema[c]; saveSchema(); } }
+    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
+    
     function saveData() {
         const n = document.getElementById('f-nome').value;
         if(!n) return alert("Inserisci il nome");
         contacts.push({
-            nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value,
+            nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value, ss: document.getElementById('f-ss').value,
             tel: document.getElementById('f-tel').value, cell: document.getElementById('f-cell').value,
-            km: document.getElementById('f-km').value, via: document.getElementById('f-via').value,
-            loc: document.getElementById('f-loc').value, prov: document.getElementById('f-prov').value,
-            foto: document.getElementById('f-foto').value
+            via: document.getElementById('f-via').value, loc: document.getElementById('f-loc').value, prov: document.getElementById('f-prov').value,
+            km: document.getElementById('f-km').value, web: document.getElementById('f-web').value,
+            foto: document.getElementById('f-foto').value, note: document.getElementById('f-note').value,
+            cucina: document.getElementById('f-cucina').value, costo: document.getElementById('f-costo').value, voto: document.getElementById('f-voto').value
         });
         localStorage.setItem('app_contacts', JSON.stringify(contacts));
         location.reload();
     }
 
-    function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { schema[n] = {icon:"📁", sub:[]}; saveSchema(); } }
-    function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
-    function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
-    function delSub(c, s) { if(confirm("Eliminare?")) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); } }
-    function addSS(c, s) { const n = prompt("Livello 3:"); if(n) { if(!schema[c].subSub) schema[c].subSub = {}; if(!schema[c].subSub[s]) schema[c].subSub[s] = []; schema[c].subSub[s].push(n); saveSchema(); } }
-    function delSS(c, s, ss) { if(confirm("Eliminare?")) { schema[c].subSub[s] = schema[c].subSub[s].filter(x => x!==ss); saveSchema(); } }
-    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
+    function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
+    function duplicateContact(i) { contacts.push({...contacts[i]}); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); }
+    function openAddForm() { 
+        openMod('form-overlay'); const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>';
+        Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+    }
+    function openSearch() { 
+        openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>';
+        Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+    }
+    function toggleGoogle() { const w = document.getElementById('app-wrapper'); w.classList.toggle('sidebar-open'); if(w.classList.contains('sidebar-open')) document.getElementById('g-frame').src = "https://www.google.com/search?igu=1"; }
     function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    function toggleGoogle() { const w = document.getElementById('app-wrapper'); w.classList.toggle('sidebar-open'); if(w.classList.contains('sidebar-open')) document.getElementById('g-frame').src = "https://www.google.com/search?igu=1"; }
     function resetAll() { if(confirm("RESET TOTALE?")) { localStorage.clear(); location.reload(); } }
-    
     window.onload = init;
 </script>
 </body>
