@@ -504,23 +504,23 @@
         Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
     }
 
-    function openSearch() { 
-        openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>';
-        Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+    function openSearch() {
+        // 1. Mostriamo il contenitore della ricerca
+        openMod('search-overlay'); 
+        
+        // 2. Troviamo il punto dove mettere i menu a tendina
+        const s = document.getElementById('s-cat'); 
+        s.innerHTML = '<option value="">Tutte le Categorie</option>';
+        
+        // 3. Carichiamo le categorie dallo schema
+        Object.keys(schema).sort().forEach(c => {
+            s.innerHTML += `<option value="${c}">${c}</option>`;
+        });
+
+        // 4. Reset del menu sottocategorie (per sicurezza)
+        const sub = document.getElementById('s-sub');
+        if(sub) sub.innerHTML = '<option value="">Tutte le Sottocategorie</option>';
     }
-
-    function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji Icona:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
-    function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
-    function addSS(c,s) { const n = prompt("Livello 3:"); if(n) { if(!schema[c].subSub) schema[c].subSub={}; if(!schema[c].subSub[s]) schema[c].subSub[s]=[]; schema[c].subSub[s].push(n); saveSchema(); } }
-    function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
-    function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
-    function delSS(c,s,ss) { schema[c].subSub[s] = schema[c].subSub[s].filter(x => x!==ss); saveSchema(); }
-    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
-    function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
-    function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
-
 // --- MOTORI TASTI FUNZIONE ---
 
     // 🚚 SPOSTA: Cambia categoria al volo
