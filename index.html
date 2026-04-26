@@ -377,50 +377,53 @@
 
     function openAddForm() { buildOrari(); openMod('form-overlay'); document.getElementById('form-title').innerText = "Nuova Scheda"; document.getElementById('save-btn-container').style.display = "block"; document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked=false; }); const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>'; Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); }
     function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
-    function openManage() { openMod('manage-overlay'); renderManage(); }
-    delCat {
+    function openManage() {
+        openMod('manage-overlay');
         const t = document.getElementById('tree-container');
+        if (!t) return;
         t.innerHTML = "";
         
         Object.keys(schema).sort().forEach(c => {
             let h = `
             <div class="tree-node">
-                <div class="tree-header">
-                    <span>${schema[c].icon} ${c} 
+                <div class="tree-header" style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:5px;">
+                    <span>${schema[c].icon} <b>${c}</b> 
                         <button style="border:none; background:none; cursor:pointer;" onclick="renameCat('${c}')">✏️</button>
                     </span>
                     <span>
-                        <button class="btn-top" style="padding:5px 10px; font-size:12px;" onclick="addSub('${c}')">[+] Sub</button>
+                        <button class="btn-top" style="padding:5px 10px; font-size:12px; background:var(--secondary);" onclick="addSub('${c}')">[+] Sub</button>
                         <button class="btn-top" style="padding:5px 10px; font-size:12px; background:#d9534f;" onclick="delCat('${c}')">❌</button>
                     </span>
                 </div>`;
             
-            schema[c].sub.sort().forEach(s => {
-                h += `
-                <div class="tree-sub">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>- ${s} 
-                            <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSub('${c}','${s}')">✏️</button>
-                        </span>
-                        <span>
-                            <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#5bc0de;" onclick="addSS('${c}','${s}')">[+] SS</button>
-                            <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#f0ad4e;" onclick="delSub('${c}','${s}')">❌</button>
-                        </span>
-                    </div>`;
-                
-                if(schema[c].subSub && schema[c].subSub[s]) {
-                    schema[c].subSub[s].sort().forEach(ss => {
-                        h += `
-                        <div style="margin-left:20px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
-                            <span>-- ${ss} 
-                                <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSS('${c}','${s}','${ss}')">✏️</button>
+            if (schema[c].sub) {
+                schema[c].sub.sort().forEach(s => {
+                    h += `
+                    <div class="tree-sub" style="margin-left:20px; padding:5px; border-left:2px solid #ddd;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>- ${s} 
+                                <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSub('${c}','${s}')">✏️</button>
                             </span>
-                            <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
+                            <span>
+                                <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#5bc0de;" onclick="addSS('${c}','${s}')">[+] SS</button>
+                                <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#f0ad4e;" onclick="delSub('${c}','${s}')">❌</button>
+                            </span>
                         </div>`;
-                    });
-                }
-                h += `</div>`;
-            });
+                    
+                    if(schema[c].subSub && schema[c].subSub[s]) {
+                        schema[c].subSub[s].sort().forEach(ss => {
+                            h += `
+                            <div style="margin-left:25px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
+                                <span>-- ${ss} 
+                                    <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSS('${c}','${s}','${ss}')">✏️</button>
+                                </span>
+                                <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
+                            </div>`;
+                        });
+                    }
+                    h += `</div>`;
+                });
+            }
             h += `</div>`;
             t.innerHTML += h;
         });
