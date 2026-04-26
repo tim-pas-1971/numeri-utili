@@ -378,7 +378,50 @@
     function openAddForm() { buildOrari(); openMod('form-overlay'); document.getElementById('form-title').innerText = "Nuova Scheda"; document.getElementById('save-btn-container').style.display = "block"; document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked=false; }); const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>'; Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); }
     function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
     function openManage() { openMod('manage-overlay'); renderManage(); }
-    function renderManage() { const t = document.getElementById('tree-container'); t.innerHTML = ""; Object.keys(schema).sort().forEach(c => { let h = `<div class="tree-node"><div class="tree-header"><span>${schema[c].icon} ${c}</span><span><button onclick="addSub('${c}')">[+]</button><button onclick="delCat('${c}')">❌</button></span></div>`; schema[c].sub.sort().forEach(s => { h += `<div class="tree-sub"><span>- ${s}</span> <button onclick="delSub('${c}','${s}')">❌</button></div>`; }); h += `</div>`; t.innerHTML += h; }); }
+    function renderManage() {
+        const t = document.getElementById('tree-container');
+        t.innerHTML = "";
+        
+        Object.keys(schema).sort().forEach(c => {
+            // Riga della Sezione Principale (es. AUTO)
+            let h = `
+            <div class="tree-node">
+                <div class="tree-header">
+                    <span>${schema[c].icon} ${c}</span>
+                    <span>
+                        <button class="btn-top" style="padding:5px 10px; font-size:12px;" onclick="addSub('${c}')">[+] Sub</button>
+                        <button class="btn-top" style="padding:5px 10px; font-size:12px; background:#d9534f;" onclick="delCat('${c}')">❌</button>
+                    </span>
+                </div>`;
+            
+            // Ciclo per le Sottocategorie (Livello 2)
+            schema[c].sub.sort().forEach(s => {
+                h += `
+                <div class="tree-sub">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>- ${s}</span>
+                        <span>
+                            <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#5bc0de;" onclick="addSS('${c}','${s}')">[+] SS</button>
+                            <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#f0ad4e;" onclick="delSub('${c}','${s}')">❌</button>
+                        </span>
+                    </div>`;
+                
+                // Ciclo per il Livello 3 (es. Cinese, Giapponese)
+                if(schema[c].subSub && schema[c].subSub[s]) {
+                    schema[c].subSub[s].sort().forEach(ss => {
+                        h += `
+                        <div style="margin-left:20px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
+                            <span>-- ${ss}</span>
+                            <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
+                        </div>`;
+                    });
+                }
+                h += `</div>`;
+            });
+            h += `</div>`;
+            t.innerHTML += h;
+        });
+    }
     function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
     function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
     function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
