@@ -268,9 +268,11 @@
                 <b style="font-size:1.2em; color:#003366">${x.nome}</b><br>
                 <div style="margin-top:5px; font-size:14px;">📍 ${x.via}, ${x.loc}<br>📞 ${x.tel || '-'} | 📱 ${x.cell || '-'}</div>
                 <div style="margin-top:10px; display:flex; gap:5px;" onclick="event.stopPropagation()">
-                    <button onclick="window.open('${mapUrl}')">🗺️</button>
-                    <button onclick="editContact(${index})">📝</button>
-                    <button onclick="deleteContact(${index})">🗑️</button>
+                    <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
+                    <button onclick="editContact(${index})" title="Modifica">📝</button>
+                    <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
+                    <button onclick="moveContact(${index})" title="Sposta">📦</button>
+                    <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
                 </div>
             </div>`;
         });
@@ -508,6 +510,29 @@
     function exportData() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); a.download = 'rubrica.json'; a.click(); }
     function importData() { const i = document.createElement('input'); i.type = 'file'; i.onchange = e => { const r = new FileReader(); r.onload = x => { contacts = JSON.parse(x.target.result); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); }; r.readAsText(e.target.files[0]); }; i.click(); }
     function resetAll() { if (confirm("Cancellare tutto?")) { localStorage.removeItem('app_contacts'); location.reload(); } }
+    // FUNZIONE PER DUPLICARE IL NOMINATIVO
+function duplicateContact(index) {
+    const copia = JSON.parse(JSON.stringify(contacts[index]));
+    copia.nome += " (Copia)";
+    contacts.push(copia);
+    localStorage.setItem('app_contacts', JSON.stringify(contacts));
+    openCat(copia.cat);
+    alert("Nominativo duplicato!");
+}
+
+// FUNZIONE PER SPOSTARE TRA SOTTOCATEGORIE
+function moveContact(index) {
+    const c = contacts[index];
+    const nuovaSub = prompt("Sposta in quale Sottocategoria?", c.sub);
+    if (nuovaSub === null) return;
+    const nuovaSS = prompt("Sposta in quale Sotto-Sottocategoria? (lascia vuoto se non serve)", c.ss);
+    if (nuovaSS === null) return;
+    c.sub = nuovaSub;
+    c.ss = nuovaSS;
+    localStorage.setItem('app_contacts', JSON.stringify(contacts));
+    openCat(c.cat);
+    alert("Spostamento completato!");
+}
     window.onload = init;
 </script>
 
