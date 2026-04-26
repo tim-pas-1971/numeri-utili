@@ -382,21 +382,9 @@
     }
 
     function buildOrari() {
-        const b = document.getElementById('orari-body');
-        if (!b) return; // Sicurezza: se la tabella non c'è, non fa nulla
-        
-        b.innerHTML = "";
-        const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-
-        giorni.forEach(g => {
-            b.innerHTML += `
-            <tr>
-                <td><b>${g}</b></td>
-                <td><input type="time" class="m1"> - <input type="time" class="m2"></td>
-                <td><input type="checkbox" class="ch1"></td>
-                <td><input type="time" class="p1"> - <input type="time" class="p2"></td>
-                <td><input type="checkbox" class="ch2"></td>
-            </tr>`;
+        const b = document.getElementById('orari-body'); b.innerHTML = "";
+        ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(g => {
+            b.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time">-<input type="time"></td><td><input type="checkbox"></td><td><input type="time">-<input type="time"></td><td><input type="checkbox"></td></tr>`;
         });
     }
 
@@ -437,9 +425,9 @@
 
     function saveData() {
         const n = document.getElementById('f-nome').value;
-        if(!n) return alert("Inserisci almeno il nome!");
+        if(!n) return alert("Inserisci il nome!");
         
-        const nuovoContatto = {
+        contacts.push({
             nome: n, 
             cat: document.getElementById('f-cat').value, 
             sub: document.getElementById('f-sub').value,
@@ -449,37 +437,11 @@
             km: document.getElementById('f-km').value, 
             foto: document.getElementById('f-foto').value,
             tel: document.getElementById('f-tel').value, 
-            cell: document.getElementById('f-cell').value,
-            // Qui usiamo i nomi esatti del tuo HTML
-            sito: document.getElementById('f-sito').value,
-            email: document.getElementById('f-email').value,
-            cucina: document.getElementById('f-cucina').value,
-            costo: document.getElementById('f-costo').value,
-            giudizio: document.getElementById('f-giudizio').value,
-            orari: recuperaOrariDallaTabella() 
-        };
+            cell: document.getElementById('f-cell').value
+        });
         
-        contacts.push(nuovoContatto);
         localStorage.setItem('app_contacts', JSON.stringify(contacts));
         location.reload();
-    }
-
-    function recuperaOrariDallaTabella() {
-        const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-        const datiOrari = {};
-        const rows = document.querySelectorAll('#orari-body tr');
-        
-        rows.forEach((row, index) => {
-            datiOrari[giorni[index]] = {
-                m1: row.querySelector('.m1').value,
-                m2: row.querySelector('.m2').value,
-                ch1: row.querySelector('.ch1').checked,
-                p1: row.querySelector('.p1').value,
-                p2: row.querySelector('.p2').value,
-                ch2: row.querySelector('.ch2').checked
-            };
-        });
-        return datiOrari;
     }
 
     function openAddForm() { 
@@ -504,23 +466,23 @@
         Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
     }
 
-    function openSearch() {
-        // 1. Mostriamo il contenitore della ricerca
-        openMod('search-overlay'); 
-        
-        // 2. Troviamo il punto dove mettere i menu a tendina
-        const s = document.getElementById('s-cat'); 
-        s.innerHTML = '<option value="">Tutte le Categorie</option>';
-        
-        // 3. Carichiamo le categorie dallo schema
-        Object.keys(schema).sort().forEach(c => {
-            s.innerHTML += `<option value="${c}">${c}</option>`;
-        });
-
-        // 4. Reset del menu sottocategorie (per sicurezza)
-        const sub = document.getElementById('s-sub');
-        if(sub) sub.innerHTML = '<option value="">Tutte le Sottocategorie</option>';
+    function openSearch() { 
+        openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>';
+        Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
     }
+
+    function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji Icona:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
+    function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
+    function addSS(c,s) { const n = prompt("Livello 3:"); if(n) { if(!schema[c].subSub) schema[c].subSub={}; if(!schema[c].subSub[s]) schema[c].subSub[s]=[]; schema[c].subSub[s].push(n); saveSchema(); } }
+    function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
+    function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
+    function delSS(c,s,ss) { schema[c].subSub[s] = schema[c].subSub[s].filter(x => x!==ss); saveSchema(); }
+    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
+    function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
+    function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
+    function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
+
 // --- MOTORI TASTI FUNZIONE ---
 
     // 🚚 SPOSTA: Cambia categoria al volo
@@ -528,56 +490,39 @@
         const x = contacts[i];
         if(!x) return;
 
+        // Apriamo il modulo che già esiste
         openAddForm(); 
+        
+        // Cambiamo il titolo per far capire che siamo in sola lettura
         document.getElementById('form-title').innerText = "🔍 Visualizzazione: " + x.nome;
         
+        // Nascondiamo il tasto SALVA per evitare pasticci
         const saveBtn = document.querySelector('button[onclick="saveData()"]');
         if(saveBtn) saveBtn.style.display = "none";
 
-        // Funzione rapida per riempire i campi
-        const riempi = (id, val) => { if(document.getElementById(id)) document.getElementById(id).value = val || ''; };
-
-        riempi('f-nome', x.nome);
-        riempi('f-cat', x.cat);
+        // Riempiamo i campi con i dati
+        document.getElementById('f-nome').value = x.nome || '';
+        document.getElementById('f-cat').value = x.cat || '';
         updateSub('f'); 
-        riempi('f-sub', x.sub);
-        if(x.ss) { updateSubSub('f'); riempi('f-ss', x.ss); }
-
-        riempi('f-tel', x.tel);
-        riempi('f-cell', x.cell);
-        riempi('f-km', x.km);
-        riempi('f-via', x.via);
-        riempi('f-loc', x.loc);
-        riempi('f-foto', x.foto);
+        document.getElementById('f-sub').value = x.sub || '';
         
-        // DATI SPECIALI
-        riempi('f-sito', x.sito);
-        riempi('f-email', x.email);
-        riempi('f-cucina', x.cucina);
-        riempi('f-costo', x.costo);
-        riempi('f-giudizio', x.giudizio);
-
-        // RIPRISTINO ORARI
-        if(x.orari) {
-            const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-            const rows = document.querySelectorAll('#orari-body tr');
-            rows.forEach((row, idx) => {
-                const g = giorni[idx];
-                if(x.orari[g]) {
-                    row.querySelector('.m1').value = x.orari[g].m1 || '';
-                    row.querySelector('.m2').value = x.orari[g].m2 || '';
-                    row.querySelector('.ch1').checked = x.orari[g].ch1 || false;
-                    row.querySelector('.p1').value = x.orari[g].p1 || '';
-                    row.querySelector('.p2').value = x.orari[g].p2 || '';
-                    row.querySelector('.ch2').checked = x.orari[g].ch2 || false;
-                }
-            });
+        if(x.ss) {
+            updateSubSub('f');
+            document.getElementById('f-ss').value = x.ss;
         }
 
-        // Blocca tutto in sola lettura
+        document.getElementById('f-tel').value = x.tel || '';
+        document.getElementById('f-cell').value = x.cell || '';
+        document.getElementById('f-km').value = x.km || '';
+        document.getElementById('f-via').value = x.via || '';
+        document.getElementById('f-loc').value = x.loc || '';
+        document.getElementById('f-foto').value = x.foto || '';
+
+        // Rendiamo tutti i campi "Sola Lettura"
         document.querySelectorAll('#form-overlay input, #form-overlay select').forEach(el => {
+            el.readOnly = true;
             el.disabled = true;
-            el.style.background = "#f5f5f5";
+            el.style.background = "#f9f9f9"; // Grigino per far capire che non si tocca
         });
     }
     function moveContact(i) {
@@ -681,27 +626,6 @@
             location.reload();
         }
     }
-function openMod(id) {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('hidden');
-    }
-
-    function closeMod(id) {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-    }
-
-    function toggleGoogle() {
-        const wrapper = document.getElementById('app-wrapper');
-        const frame = document.getElementById('g-frame');
-        if (wrapper) {
-            wrapper.classList.toggle('sidebar-open');
-            if (wrapper.classList.contains('sidebar-open') && frame) {
-                frame.src = "https://www.google.com/search?igu=1";
-            }
-        }
-    }
-    
 </script>
 
 <div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; align-items: center; background: white;">
