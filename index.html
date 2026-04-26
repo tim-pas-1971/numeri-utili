@@ -520,18 +520,19 @@ function duplicateContact(index) {
     alert("Nominativo duplicato!");
 }
 
-// FUNZIONE PER SPOSTARE TRA SOTTOCATEGORIE
+// NUOVA FUNZIONE SPOSTA CON TENDINE
 function moveContact(index) {
-    const c = contacts[index];
-    const nuovaSub = prompt("Sposta in quale Sottocategoria?", c.sub);
-    if (nuovaSub === null) return;
-    const nuovaSS = prompt("Sposta in quale Sotto-Sottocategoria? (lascia vuoto se non serve)", c.ss);
-    if (nuovaSS === null) return;
-    c.sub = nuovaSub;
-    c.ss = nuovaSS;
-    localStorage.setItem('app_contacts', JSON.stringify(contacts));
-    openCat(c.cat);
-    alert("Spostamento completato!");
+    const x = contacts[index];
+    // Riapriamo la scheda in modalità modifica, ma puntiamo subito alle categorie
+    editContact(index); 
+    
+    // Cambiamo il titolo per far capire all'utente cosa sta facendo
+    document.getElementById('form-title').innerText = "📦 Sposta / Ricolloca: " + x.nome;
+    
+    // Portiamo il focus sulla selezione della categoria
+    document.getElementById('f-cat').focus();
+    
+    alert("Usa le tendine per cambiare Categoria o Sottocategoria, poi clicca su SALVA.");
 }
     window.onload = init;
 </script>
