@@ -378,40 +378,43 @@
     function openAddForm() { buildOrari(); openMod('form-overlay'); document.getElementById('form-title').innerText = "Nuova Scheda"; document.getElementById('save-btn-container').style.display = "block"; document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked=false; }); const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>'; Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); }
     function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
     function openManage() { openMod('manage-overlay'); renderManage(); }
-    function renderManage() {
+    delCat {
         const t = document.getElementById('tree-container');
         t.innerHTML = "";
         
         Object.keys(schema).sort().forEach(c => {
-            // Riga della Sezione Principale (es. AUTO)
             let h = `
             <div class="tree-node">
                 <div class="tree-header">
-                    <span>${schema[c].icon} ${c}</span>
+                    <span>${schema[c].icon} ${c} 
+                        <button style="border:none; background:none; cursor:pointer;" onclick="renameCat('${c}')">✏️</button>
+                    </span>
                     <span>
                         <button class="btn-top" style="padding:5px 10px; font-size:12px;" onclick="addSub('${c}')">[+] Sub</button>
                         <button class="btn-top" style="padding:5px 10px; font-size:12px; background:#d9534f;" onclick="delCat('${c}')">❌</button>
                     </span>
                 </div>`;
             
-            // Ciclo per le Sottocategorie (Livello 2)
             schema[c].sub.sort().forEach(s => {
                 h += `
                 <div class="tree-sub">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>- ${s}</span>
+                        <span>- ${s} 
+                            <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSub('${c}','${s}')">✏️</button>
+                        </span>
                         <span>
                             <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#5bc0de;" onclick="addSS('${c}','${s}')">[+] SS</button>
                             <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#f0ad4e;" onclick="delSub('${c}','${s}')">❌</button>
                         </span>
                     </div>`;
                 
-                // Ciclo per il Livello 3 (es. Cinese, Giapponese)
                 if(schema[c].subSub && schema[c].subSub[s]) {
                     schema[c].subSub[s].sort().forEach(ss => {
                         h += `
                         <div style="margin-left:20px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
-                            <span>-- ${ss}</span>
+                            <span>-- ${ss} 
+                                <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSS('${c}','${s}','${ss}')">✏️</button>
+                            </span>
                             <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
                         </div>`;
                     });
@@ -424,6 +427,46 @@
     }
     function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
     function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
+    function renameCat(vecchioNome) {
+        const nuovoNome = prompt("Rinomina Sezione:", vecchioNome);
+        if (nuovoNome && nuovoNome !== vecchioNome) {
+            schema[nuovoNome] = schema[vecchioNome];
+            delete schema[vecchioNome];
+            // Aggiorna anche i contatti esistenti per non perderli!
+            contacts.forEach(c => { if(c.cat === vecchioNome) c.cat = nuovoNome; });
+            localStorage.setItem('app_contacts', JSON.stringify(contacts));
+            saveSchema();
+        }
+    }
+
+    function renameSub(c, vecchioSub) {
+        const nuovoSub = prompt("Rinomina Sottocategoria:", vecchioSub);
+        if (nuovoSub && nuovoSub !== vecchioSub) {
+            const idx = schema[c].sub.indexOf(vecchioSub);
+            if (idx !== -1) schema[c].sub[idx] = nuovoSub;
+            // Sposta anche le eventuali sottosottocategorie
+            if (schema[c].subSub && schema[c].subSub[vecchioSub]) {
+                schema[c].subSub[nuovoSub] = schema[c].subSub[vecchioSub];
+                delete schema[c].subSub[vecchioSub];
+            }
+            // Aggiorna contatti
+            contacts.forEach(con => { if(con.cat === c && con.sub === vecchioSub) con.sub = nuovoSub; });
+            localStorage.setItem('app_contacts', JSON.stringify(contacts));
+            saveSchema();
+        }
+    }
+
+    function renameSS(c, s, vecchioSS) {
+        const nuovoSS = prompt("Rinomina Livello 3:", vecchioSS);
+        if (nuovoSS && nuovoSS !== vecchioSS) {
+            const idx = schema[c].subSub[s].indexOf(vecchioSS);
+            if (idx !== -1) schema[c].subSub[s][idx] = nuovoSS;
+            // Aggiorna contatti
+            contacts.forEach(con => { if(con.cat === c && con.sub === s && con.ss === vecchioSS) con.ss = nuovoSS; });
+            localStorage.setItem('app_contacts', JSON.stringify(contacts));
+            saveSchema();
+        }
+    }
     function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
     function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
     function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
