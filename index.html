@@ -437,9 +437,9 @@
 
     function saveData() {
         const n = document.getElementById('f-nome').value;
-        if(!n) return alert("Inserisci il nome!");
+        if(!n) return alert("Inserisci almeno il nome!");
         
-        contacts.push({
+        const nuovoContatto = {
             nome: n, 
             cat: document.getElementById('f-cat').value, 
             sub: document.getElementById('f-sub').value,
@@ -449,11 +449,37 @@
             km: document.getElementById('f-km').value, 
             foto: document.getElementById('f-foto').value,
             tel: document.getElementById('f-tel').value, 
-            cell: document.getElementById('f-cell').value
-        });
+            cell: document.getElementById('f-cell').value,
+            // Qui usiamo i nomi esatti del tuo HTML
+            sito: document.getElementById('f-sito').value,
+            email: document.getElementById('f-email').value,
+            cucina: document.getElementById('f-cucina').value,
+            costo: document.getElementById('f-costo').value,
+            giudizio: document.getElementById('f-giudizio').value,
+            orari: recuperaOrariDallaTabella() 
+        };
         
+        contacts.push(nuovoContatto);
         localStorage.setItem('app_contacts', JSON.stringify(contacts));
         location.reload();
+    }
+
+    function recuperaOrariDallaTabella() {
+        const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+        const datiOrari = {};
+        const rows = document.querySelectorAll('#orari-body tr');
+        
+        rows.forEach((row, index) => {
+            datiOrari[giorni[index]] = {
+                m1: row.querySelector('.m1').value,
+                m2: row.querySelector('.m2').value,
+                ch1: row.querySelector('.ch1').checked,
+                p1: row.querySelector('.p1').value,
+                p2: row.querySelector('.p2').value,
+                ch2: row.querySelector('.ch2').checked
+            };
+        });
+        return datiOrari;
     }
 
     function openAddForm() { 
@@ -505,31 +531,39 @@
         openAddForm(); 
         document.getElementById('form-title').innerText = "🔍 Visualizzazione: " + x.nome;
         
-        // Nascondiamo il tasto salva
         const saveBtn = document.querySelector('button[onclick="saveData()"]');
         if(saveBtn) saveBtn.style.display = "none";
 
-        // --- RIEMPIMENTO CAMPI BASE ---
-        document.getElementById('f-nome').value = x.nome || '';
-        document.getElementById('f-cat').value = x.cat || '';
-        updateSub('f'); 
-        document.getElementById('f-sub').value = x.sub || '';
-        
-        document.getElementById('f-tel').value = x.tel || '';
-        document.getElementById('f-cell').value = x.cell || '';
-        document.getElementById('f-km').value = x.km || '';
-        document.getElementById('f-via').value = x.via || '';
-        document.getElementById('f-loc').value = x.loc || '';
-        document.getElementById('f-foto').value = x.foto || '';
+        // Funzione rapida per riempire i campi
+        const riempi = (id, val) => { if(document.getElementById(id)) document.getElementById(id).value = val || ''; };
 
-        // --- RIEMPIMENTO ORARI (Fondamentale!) ---
-        if (x.orari) {
-            const rows = document.querySelectorAll('#orari-body tr');
+        riempi('f-nome', x.nome);
+        riempi('f-cat', x.cat);
+        updateSub('f'); 
+        riempi('f-sub', x.sub);
+        if(x.ss) { updateSubSub('f'); riempi('f-ss', x.ss); }
+
+        riempi('f-tel', x.tel);
+        riempi('f-cell', x.cell);
+        riempi('f-km', x.km);
+        riempi('f-via', x.via);
+        riempi('f-loc', x.loc);
+        riempi('f-foto', x.foto);
+        
+        // DATI SPECIALI
+        riempi('f-sito', x.sito);
+        riempi('f-email', x.email);
+        riempi('f-cucina', x.cucina);
+        riempi('f-costo', x.costo);
+        riempi('f-giudizio', x.giudizio);
+
+        // RIPRISTINO ORARI
+        if(x.orari) {
             const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-            
+            const rows = document.querySelectorAll('#orari-body tr');
             rows.forEach((row, idx) => {
                 const g = giorni[idx];
-                if (x.orari[g]) {
+                if(x.orari[g]) {
                     row.querySelector('.m1').value = x.orari[g].m1 || '';
                     row.querySelector('.m2').value = x.orari[g].m2 || '';
                     row.querySelector('.ch1').checked = x.orari[g].ch1 || false;
@@ -542,9 +576,8 @@
 
         // Blocca tutto in sola lettura
         document.querySelectorAll('#form-overlay input, #form-overlay select').forEach(el => {
-            el.readOnly = true;
             el.disabled = true;
-            el.style.background = "#f9f9f9";
+            el.style.background = "#f5f5f5";
         });
     }
     function moveContact(i) {
