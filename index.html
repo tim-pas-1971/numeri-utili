@@ -681,6 +681,27 @@
             location.reload();
         }
     }
+function openMod(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('hidden');
+    }
+
+    function closeMod(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    }
+
+    function toggleGoogle() {
+        const wrapper = document.getElementById('app-wrapper');
+        const frame = document.getElementById('g-frame');
+        if (wrapper) {
+            wrapper.classList.toggle('sidebar-open');
+            if (wrapper.classList.contains('sidebar-open') && frame) {
+                frame.src = "https://www.google.com/search?igu=1";
+            }
+        }
+    }
+    
 </script>
 
 <div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; align-items: center; background: white;">
