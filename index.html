@@ -613,6 +613,33 @@ function moveContact(index) {
             </div>`;
     });
 }
+    function addSS(cat, sub) {
+    const ssName = prompt(`Aggiungi Sotto-Sottosezione per "${sub}":`);
+    if (ssName) {
+        // Se la struttura per le SS non esiste ancora in questa categoria, la creiamo
+        if (!schema[cat].ss) schema[cat].ss = {}; 
+        // Se non esiste la lista per questa sottocategoria specifica, la creiamo
+        if (!schema[cat].ss[sub]) schema[cat].ss[sub] = []; 
+        
+        // Aggiungiamo il nome se non è già presente
+        if (!schema[cat].ss[sub].includes(ssName)) {
+            schema[cat].ss[sub].push(ssName);
+            saveSchema(); // Salva le modifiche
+            renderSchemaEditor(); // Aggiorna la vista della gestione
+        } else {
+            alert("Questa Sotto-Sottosezione esiste già!");
+        }
+    }
+}
+
+// Aggiungiamo anche la funzione per eliminare le SS, così il lavoro è completo
+function deleteSubSub(cat, sub, ss) {
+    if (confirm(`Eliminare la Sotto-Sottosezione "${ss}"?`)) {
+        schema[cat].ss[sub] = schema[cat].ss[sub].filter(item => item !== ss);
+        saveSchema();
+        renderSchemaEditor();
+    }
+}
 </script>
 
 <div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white;">
