@@ -255,15 +255,27 @@
     }
 
     function renderRecs(c, s, ss) {
-        const list = document.getElementById('records-list');
-        const fil = contacts.filter(x => { const m = x.cat === c && x.sub === s; return ss ? (m && x.ss === ss) : m; });
-        list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato.</p>";
-        fil.forEach(x => {
-            const index = contacts.indexOf(x);
-            const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
-            list.innerHTML += `
+    const list = document.getElementById('records-list');
+    const fil = contacts.filter(x => { 
+        const m = x.cat === c && x.sub === s; 
+        return ss ? (m && x.ss === ss) : m; 
+    });
+
+    list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato.</p>";
+
+    fil.forEach(x => {
+        const index = contacts.indexOf(x);
+        const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
+        
+        // Costruiamo il nuovo percorso: Sottocategoria > Sotto-Sottocategoria
+        const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
+        
+        list.innerHTML += `
             <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; cursor:pointer;" onclick="showFullDetails(${index})">
-                <div style="font-size:0.75em; color:#888; text-transform:uppercase;">${x.cat} > ${x.sub}</div>
+                <div style="display:flex; justify-content:space-between; font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">
+                    <span>${percorsoInfo}</span>
+                    <span style="color:#d9534f; font-weight:bold;">🚗 ${x.km || '0'} KM</span>
+                </div>
                 ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin:10px 0;">` : ''}
                 <b style="font-size:1.2em; color:#003366">${x.nome}</b><br>
                 <div style="margin-top:5px; font-size:14px;">📍 ${x.via}, ${x.loc}<br>📞 ${x.tel || '-'} | 📱 ${x.cell || '-'}</div>
@@ -274,8 +286,8 @@
                     <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
                 </div>
             </div>`;
-        });
-    }
+    });
+}
 
     function buildOrari() {
         const b = document.getElementById('orari-body'); b.innerHTML = "";
