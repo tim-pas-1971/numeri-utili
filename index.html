@@ -159,6 +159,7 @@
         <div class="form-row" style="margin-top:15px;">
             <div class="form-group"><label>Categoria</label><select id="s-cat" onchange="updateSub('s')"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="s-sub" onchange="updateSubSub('s')"></select></div>
+            <div id="s-ss-group" class="form-group hidden"><label>Livello 3</label><select id="s-ss"></select></div>
         </div>
         <div style="display:flex; gap:10px; margin-top:20px;">
             <button class="btn-top" onclick="closeMod('search-overlay')" style="flex:1; background:#999;">ESCI</button>
@@ -332,15 +333,24 @@
     }
 
     function updateSubSub(p) {
-        const c = document.getElementById(p + '-cat').value;
-        const sub = document.getElementById(p + '-sub').value;
-        const g = document.getElementById(p + '-ss-group');
-        const ss = document.getElementById(p + '-ss');
-        if(schema[c]?.subSub?.[sub]) {
-            g.classList.remove('hidden'); ss.innerHTML = '<option value="">Scegli...</option>';
-            schema[c].subSub[sub].sort().forEach(x => ss.innerHTML += `<option value="${x}">${x}</option>`);
-        } else if(g) g.classList.add('hidden');
+    const c = document.getElementById(p + '-cat').value;
+    const sub = document.getElementById(p + '-sub').value;
+    const g = document.getElementById(p + '-ss-group');
+    const ss = document.getElementById(p + '-ss');
+    
+    // Controlliamo se esistono sottosottocategorie (usando subSub)
+    if(schema[c] && schema[c].subSub && schema[c].subSub[sub]) {
+        g.classList.remove('hidden'); 
+        ss.innerHTML = '<option value="">Scegli...</option>';
+        schema[c].subSub[sub].sort().forEach(x => {
+            ss.innerHTML += `<option value="${x}">${x}</option>`;
+        });
+    } else {
+        // Se non ci sono, nascondiamo la tendina del Livello 3
+        if(g) g.classList.add('hidden');
+        if(ss) ss.innerHTML = ''; 
     }
+}
 
     function saveData() {
         const n = document.getElementById('f-nome').value;
@@ -418,22 +428,26 @@
     }
 
     function applySearch() {
-        const t = document.getElementById('s-testo').value.toLowerCase();
-        const c = document.getElementById('s-cat').value;
-        const s = document.getElementById('s-sub').value;
-        const res = contacts.filter(x => {
-            const mT = !t || x.nome.toLowerCase().includes(t) || x.loc.toLowerCase().includes(t) || (x.note && x.note.toLowerCase().includes(t));
-            const mC = !c || x.cat === c;
-            const mS = !s || x.sub === s;
-            return mT && mC && mS;
-        });
-        document.getElementById('view-main').classList.add('hidden');
-        document.getElementById('view-detail').classList.remove('hidden');
-        document.getElementById('title-detail').innerText = "Risultati Ricerca";
-        document.getElementById('sub-buttons-container').innerHTML = "";
-        renderRecsFromSearch(res);
-        closeMod('search-overlay');
-    }
+    const t = document.getElementById('s-testo').value.toLowerCase();
+    const c = document.getElementById('s-cat').value;
+    const s = document.getElementById('s-sub').value;
+    const ss = document.getElementById('s-ss') ? document.getElementById('s-ss').value : ''; // Prende il Livello 3
+
+    const res = contacts.filter(x => {
+        const mT = !t || x.nome.toLowerCase().includes(t) || x.loc.toLowerCase().includes(t) || (x.note && x.note.toLowerCase().includes(t));
+        const mC = !c || x.cat === c;
+        const mS = !s || x.sub === s;
+        const mSS = !ss || x.ss === ss; // Controlla se il Livello 3 corrisponde
+        return mT && mC && mS && mSS;
+    });
+
+    document.getElementById('view-main').classList.add('hidden');
+    document.getElementById('view-detail').classList.remove('hidden');
+    document.getElementById('title-detail').innerText = "Risultati Ricerca";
+    document.getElementById('sub-buttons-container').innerHTML = "";
+    renderRecsFromSearch(res);
+    closeMod('search-overlay');
+}
 
     function renderRecsFromSearch(arr) {
         const list = document.getElementById('records-list');
@@ -539,7 +553,11 @@
     }
     function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
     function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
-    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
+    function saveSchema() {
+    localStorage.setItem('app_schema', JSON.stringify(schema));
+    // Invece di ricaricare tutto, aggiorniamo solo la lista della gestione
+    openManage(); 
+}
     function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
     function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
