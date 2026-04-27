@@ -480,16 +480,14 @@
                         </div>`;
                     
                     if(schema[c].subSub && schema[c].subSub[s]) {
-                        schema[c].subSub[s].sort().forEach(ss => {
-                            h += `
-                            <div style="margin-left:25px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
-                                <span>-- ${ss} 
-                                    <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSS('${c}','${s}','${ss}')">✏️</button>
-                                </span>
-                                <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
-                            </div>`;
-                        });
-                    }
+    schema[c].subSub[s].sort().forEach(ss => {
+        h += `
+        <div style="margin-left:25px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
+            <span>-- ${ss} <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSS('${c}','${s}','${ss}')">✏️</button></span>
+            <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
+        </div>`;
+    });
+}
                     h += `</div>`;
                 });
             }
@@ -616,28 +614,25 @@ function moveContact(index) {
     function addSS(cat, sub) {
     const ssName = prompt(`Aggiungi Sotto-Sottosezione per "${sub}":`);
     if (ssName) {
-        // Se la struttura per le SS non esiste ancora in questa categoria, la creiamo
-        if (!schema[cat].ss) schema[cat].ss = {}; 
-        // Se non esiste la lista per questa sottocategoria specifica, la creiamo
-        if (!schema[cat].ss[sub]) schema[cat].ss[sub] = []; 
+        // Usiamo subSub per coerenza con il tuo codice esistente
+        if (!schema[cat].subSub) schema[cat].subSub = {}; 
+        if (!schema[cat].subSub[sub]) schema[cat].subSub[sub] = []; 
         
-        // Aggiungiamo il nome se non è già presente
-        if (!schema[cat].ss[sub].includes(ssName)) {
-            schema[cat].ss[sub].push(ssName);
-            saveSchema(); // Salva le modifiche
-            renderSchemaEditor(); // Aggiorna la vista della gestione
+        if (!schema[cat].subSub[sub].includes(ssName)) {
+            schema[cat].subSub[sub].push(ssName);
+            saveSchema();
         } else {
-            alert("Questa Sotto-Sottosezione esiste già!");
+            alert("Esiste già!");
         }
     }
 }
 
 // Aggiungiamo anche la funzione per eliminare le SS, così il lavoro è completo
-function deleteSubSub(cat, sub, ss) {
-    if (confirm(`Eliminare la Sotto-Sottosezione "${ss}"?`)) {
-        schema[cat].ss[sub] = schema[cat].ss[sub].filter(item => item !== ss);
-        saveSchema();
-        renderSchemaEditor();
+function delSS(c, s, ss) {
+    if(confirm(`Eliminare "${ss}"?`)) {
+        // Usiamo subSub come nel resto del tuo file
+        schema[c].subSub[s] = schema[c].subSub[s].filter(x => x !== ss);
+        saveSchema(); // Questa funzione nel tuo codice salva e fa il refresh
     }
 }
 </script>
