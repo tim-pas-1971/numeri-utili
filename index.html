@@ -7,33 +7,43 @@
     <style>
         :root { --primary: #003366; --secondary: #28a745; --bg: #f4f7f9; --white: #ffffff; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        
         #app-wrapper { display: flex; width: 100%; transition: 0.4s; overflow-x: hidden; }
         #main-content { flex: 1; transition: 0.4s; padding-right: 15px; }
         #app-wrapper.sidebar-open #main-content { margin-right: 450px; }
         #sidebar { position: fixed; right: -450px; top: 0; width: 450px; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.4s; z-index: 6000; visibility: hidden; display: flex; flex-direction: column; }
         #app-wrapper.sidebar-open #sidebar { right: 0; visibility: visible; }
+
         header { background: var(--white); padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 25px; border-top: 6px solid var(--primary); }
         .header-left h1 { margin: 0; font-size: 24px; color: var(--primary); cursor: pointer; }
+        
         .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
         .card-cat { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.04); transition: 0.3s; border-bottom: 4px solid var(--primary); min-height: 130px; display: flex; flex-direction: column; justify-content: center; }
         .card-cat:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .card-cat i { font-size: 50px; display: block; margin-bottom: 10px; font-style: normal; }
         .card-cat b { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); }
+
         .btn-top { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-left: 8px; transition: 0.2s; }
         .btn-top:hover { opacity: 0.9; }
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 5000; transition: 0.3s; }
         #app-wrapper.sidebar-open .modal-overlay { width: calc(100% - 450px); }
         .form-card { background: var(--white); padding: 30px; border-radius: 20px; width: 95%; max-width: 850px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid #eee; }
+        
         .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .form-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
         label { font-weight: 600; font-size: 0.9em; color: #555; margin-bottom: 5px; }
         input, select, textarea { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fafafa; transition: 0.2s; }
+        input:focus { border-color: var(--primary); outline: none; background: #fff; }
+        
         .timetable { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid #eee; }
         .timetable th { background: #f8f9fa; padding: 10px; font-size: 0.8em; color: #777; }
         .timetable td { padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: center; }
+        
         .hidden { display: none !important; }
-        .tree-node { margin-bottom: 12px; padding: 15px; background: #fdfdfd; border: 1px solid #eee; border-radius: 12px; }
-        .tree-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary); }
+        
+        .tree-node { margin-bottom: 12px; padding: 15px; background: #fdfdfd; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .tree-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.1em; color: var(--primary); }
         .tree-sub { margin-left: 20px; border-left: 2px dashed #ddd; padding-left: 15px; margin-top: 10px; }
     </style>
 </head>
@@ -41,16 +51,19 @@
 
 <div id="app-wrapper">
     <div id="main-content">
-        <header>
-            <div class="header-left">
-                <div style="font-size: 40px; cursor: pointer; float:left; margin-right:15px;" onclick="location.reload()">📂</div>
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: white; border-bottom: 2px solid #eee;">
+            <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-size: 40px; cursor: pointer;" onclick="location.reload()">📂</div>
                 <div style="display: flex; flex-direction: column;">
-                    <h1 onclick="location.reload()" style="margin: 0;">Numeri Utili</h1>
-                    <div style="color: red; font-style: italic; font-weight: bold; font-size: 1.1em;">Numeri Utili di Tiziana Pascali</div>
-                    <div style="color: #555; font-size: 0.9em; margin-top: 4px;">📍 Via Cascina Comune, 24 – Pregnana Milanese (MI)</div>
+                    <h1 onclick="location.reload()" style="margin: 0; color: #003366; font-size: 1.8em; font-family: sans-serif; cursor: pointer;">Numeri Utili</h1>
+                    <div style="color: red; font-style: italic; font-weight: bold; font-size: 1.1em; margin-top: 2px;">Numeri Utili di Tiziana Pascali</div>
+                    <div style="color: #555; font-size: 0.9em; margin-top: 4px; display: flex; align-items: center; gap: 5px;">
+                        📍 <span style="border-bottom: 1px dashed #ccc;">Via Cascina Comune, 24 – Pregnana Milanese (MI)</span>
+                    </div>
                 </div>
             </div>
-            <div id="admin-menu">
+
+            <div id="admin-menu" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
                 <button class="btn-top" onclick="openManage()">GESTISCI</button>
                 <button class="btn-top" onclick="openSearch()">RICERCA</button>
                 <button class="btn-top" onclick="openAddForm()" style="background:var(--secondary)">AGGIUNGI</button>
@@ -62,7 +75,7 @@
         <div id="view-detail" class="hidden">
             <button class="btn-top" onclick="location.reload()">⬅️ Torna alla Home</button>
             <h2 id="title-detail" style="margin: 20px 0; color: var(--primary);"></h2>
-            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:25px; flex-direction:column;"></div>
+            <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:25px;"></div>
             <div id="records-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:20px;"></div>
         </div>
     </div>
@@ -77,33 +90,53 @@
 
 <div id="form-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2 id="form-title" style="color:var(--secondary); margin-top:0;">🆕 Nuova Scheda</h2>
+        <h2 id="form-title" style="color:var(--secondary); margin-top:0; border-bottom: 2px solid #eee; padding-bottom: 10px;">🆕 Nuova Scheda Nominativo</h2>
+        
         <div class="form-row">
-            <div class="form-group"><label>Categoria</label><select id="f-cat" onchange="updateSub('f')"></select></div>
+            <div class="form-group"><label>Categoria Principale</label><select id="f-cat" onchange="updateSub('f')"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="f-sub" onchange="updateSubSub('f')"></select></div>
             <div id="f-ss-group" class="form-group hidden"><label>Livello 3</label><select id="f-ss"></select></div>
         </div>
-        <div class="form-group"><label>Nome</label><input type="text" id="f-nome"></div>
+        
+        <div class="form-group"><label>Nome Attività / Persona</label><input type="text" id="f-nome" placeholder="Inserisci nome..."></div>
+        
         <div class="form-row">
-            <div class="form-group"><label>Tel. Fisso</label><input type="text" id="f-tel"></div>
+            <div class="form-group"><label>Telefono Fisso</label><input type="text" id="f-tel"></div>
             <div class="form-group"><label>Cellulare</label><input type="text" id="f-cell"></div>
-            <div class="form-group"><label>Km</label><input type="number" id="f-km"></div>
+            <div class="form-group"><label>Km (da Pregnana)</label><input type="number" id="f-km" placeholder="Es: 15"></div>
         </div>
+
         <div class="form-row">
-            <div class="form-group" style="flex:2"><label>Indirizzo</label><input type="text" id="f-via"></div>
+            <div class="form-group" style="flex:2"><label>Indirizzo (Via e Civico)</label><input type="text" id="f-via"></div>
             <div class="form-group"><label>Città</label><input type="text" id="f-loc"></div>
             <div class="form-group"><label>Prov.</label><select id="f-prov"></select></div>
         </div>
-        <div class="form-group"><label>URL Foto</label><input type="text" id="f-foto" onchange="document.getElementById('img-preview').src=this.value">
-        <img id="img-preview" src="" style="width:100%; max-height:100px; object-fit:cover; margin-top:5px; border-radius:5px;"></div>
-        <div class="form-group"><label>Note</label><textarea id="f-note" rows="3"></textarea></div>
+
+        <div class="form-row">
+            <div class="form-group"><label style="font-weight:bold; color:#003366;">Sito Web</label><input type="text" id="f-sito" placeholder="https://..."></div>
+            <div class="form-group"><label style="font-weight:bold; color:#003366;">Email</label><input type="email" id="f-email" placeholder="esempio@mail.com"></div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 15px; background: #eef6ff; padding: 15px; border-radius: 10px; border: 1px solid #d1e3f8;">
+            <div style="flex: 1;"><label style="display:block; font-size:12px; font-weight:bold; color:#003366; margin-bottom:5px;">Cucina</label><input type="text" id="f-cucina" placeholder="Bio, Pesce..." style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;"></div>
+            <div style="flex: 1;"><label style="display:block; font-size:12px; font-weight:bold; color:#003366; margin-bottom:5px;">Costo</label><select id="f-costo" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;"><option value="">Scegli...</option><option value="€">€</option><option value="€€">€€</option><option value="€€€">€€€</option></select></div>
+            <div style="flex: 1;"><label style="display:block; font-size:12px; font-weight:bold; color:#003366; margin-bottom:5px;">Giudizio</label><select id="f-giudizio" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;"><option value="">Scegli...</option><option value="Ottimo">Ottimo</option><option value="Gradevole">Gradevole</option><option value="Sufficiente">Sufficiente</option><option value="Scarso">Scarso</option></select></div>
+        </div>
+
+        <label style="margin-top:20px; display:block; font-weight:bold; color:#003366;">Orari di Apertura (Spunta 'Ch.' per chiusura)</label>
         <table class="timetable">
-            <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch.</th><th>Pomeriggio</th><th>Ch.</th></tr></thead>
+            <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
             <tbody id="orari-body"></tbody>
         </table>
-        <div style="text-align:right; margin-top:25px;">
+
+        <div class="form-group" style="margin-top:15px;"><label>URL Immagine Foto</label><input type="text" id="f-foto" onchange="document.getElementById('img-preview').src=this.value">
+        <img id="img-preview" src="" style="width:100%; max-height:100px; object-fit:cover; margin-top:5px; border-radius:5px;"></div>
+
+        <div class="form-group"><label>Note e Dettagli</label><textarea id="f-note" rows="3"></textarea></div>
+
+        <div style="text-align:right; margin-top:25px; border-top: 1px solid #eee; padding-top: 20px;">
             <button class="btn-top" onclick="closeMod('form-overlay')" style="background:#999">Annulla</button>
-            <button id="save-btn-container" class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA</button>
+            <button id="save-btn-container" class="btn-top" onclick="saveData()" style="background:var(--secondary)">SALVA SCHEDA</button>
         </div>
     </div>
 </div>
@@ -111,7 +144,7 @@
 <div id="manage-overlay" class="modal-overlay hidden">
     <div class="form-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2>⚙️ Gestione Struttura</h2>
+            <h2 style="margin:0;">⚙️ Gestione Struttura</h2>
             <button class="btn-top" style="background:var(--secondary)" onclick="addMainCat()">Nuova Sezione [+]</button>
         </div>
         <div id="tree-container"></div>
@@ -121,32 +154,59 @@
 
 <div id="search-overlay" class="modal-overlay hidden">
     <div class="form-card">
-        <h2>🔎 Ricerca</h2>
-        <input type="text" id="s-testo" placeholder="Nome, città..." style="width:100%; margin-bottom:15px;">
-        <div class="form-row">
+        <h2 style="margin-top:0;">🔎 Ricerca Avanzata</h2>
+        <div class="form-group"><label>Cosa cerchi?</label><input type="text" id="s-testo" placeholder="Nome, città o note..."></div>
+        <div class="form-row" style="margin-top:15px;">
             <div class="form-group"><label>Categoria</label><select id="s-cat" onchange="updateSub('s')"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="s-sub" onchange="updateSubSub('s')"></select></div>
         </div>
-        <button class="btn-top" onclick="applySearch()" style="width:100%; margin-top:20px;">CERCA ORA</button>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn-top" onclick="closeMod('search-overlay')" style="flex:1; background:#999;">ESCI</button>
+            <button class="btn-top" onclick="applySearch()" style="flex:1; background:var(--primary);">CERCA ORA</button>
+        </div>
     </div>
 </div>
 
 <script>
     const PROVINCE = ["MI","BG","BS","CO","CR","LC","LO","MB","MN","PV","SO","VA","AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BZ","CA","CB","CE","CH","CL","CN","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LE","LI","LT","LU","MC","ME","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VB","VC","VE","VI","VR","VT","VV"];
+    
     const defaultSchema = {
         "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
-        "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo"], subSub: { "Etnico": ["Cinese", "Giapponese"] } }
+        "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"] },
+        "BRICOLAGE": { icon: "🛠️", sub: ["Ferramenta", "Legnami", "Colorificio"] },
+        "CASA (PROF.)": { icon: "🏠", sub: ["Amministrazione", "Antennista", "Elettricista", "Fabbro", "Falegname", "Idraulico", "Imbianchino", "Muratore", "Pavimentista / Piastrellista", "Tecnico Caldaia", "Tecnico Pc"] },
+        "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato", "Centro Commerciale"] },
+        "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Estetista", "Solarium", "Unghie"] },
+        "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista", "Manutenzione Verde"] },
+        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali", "Ottica", "Casalinghi"] },
+        "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico Mutua", "Medico Specialista", "Ospedale", "Veterinario"] },
+        "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"], subSub: { "Etnico": ["Cinese", "Giapponese", "Asia", "Africa", "EstEuropa", "Altro"] } }
     };
 
     let schema = JSON.parse(localStorage.getItem('app_schema')) || defaultSchema;
     let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
 
     function init() {
+        // 1. Controllo permessi Admin
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
-        if (!isAdmin) document.querySelectorAll('#admin-menu button:not([onclick*="Search"])').forEach(b => b.style.display='none');
+        if (!isAdmin) {
+            document.querySelectorAll('#admin-menu button:not([onclick*="Search"])')
+                    .forEach(b => b.style.display='none');
+        }
+
+        // 2. Disegna le categorie nella Home
         renderMain();
+
+        // 3. Carica la lista delle Province nella tendina (una volta sola!)
         const ps = document.getElementById('f-prov');
-        if(ps) { ps.innerHTML = '<option value="">Prov.</option>'; PROVINCE.forEach(p => ps.innerHTML += `<option value="${p}">${p}</option>`); }
+        if(ps) {
+            ps.innerHTML = '<option value="">Prov.</option>'; 
+            PROVINCE.forEach(p => {
+                ps.innerHTML += `<option value="${p}">${p}</option>`;
+            });
+        }
+
+        // 4. Costruisce la tabella degli orari
         buildOrari();
     }
 
@@ -158,77 +218,109 @@
     }
 
     function openCat(c) {
-        document.getElementById('view-main').classList.add('hidden');
-        document.getElementById('view-detail').classList.remove('hidden');
-        document.getElementById('title-detail').innerText = c;
-        const sc = document.getElementById('sub-buttons-container'); sc.innerHTML = "";
-        const row2 = document.createElement('div');
-        Object.assign(row2.style, { display: "flex", flexWrap: "wrap", gap: "4px", background: "#003366", padding: "10px", borderRadius: "8px" });
-        const row3 = document.createElement('div');
-        row3.id = "subsub-container"; row3.style.display = "none"; row3.style.marginTop = "5px";
+    document.getElementById('view-main').classList.add('hidden');
+    document.getElementById('view-detail').classList.remove('hidden');
+    document.getElementById('title-detail').innerText = c;
+    const sc = document.getElementById('sub-buttons-container'); sc.innerHTML = "";
+    
+    const row2 = document.createElement('div');
+    Object.assign(row2.style, { display: "flex", flexWrap: "wrap", gap: "4px", background: "#003366", padding: "10px", borderRadius: "8px", width: "100%", boxSizing: "border-box" });
+    
+    const row3 = document.createElement('div');
+    row3.id = "subsub-container"; row3.style.display = "none"; row3.style.width = "100%"; row3.style.marginTop = "5px";
 
-        const btnAll = document.createElement('button');
-        btnAll.innerText = "🌟 TUTTI";
-        Object.assign(btnAll.style, { border: "2px solid #fff", background: "#f39c12", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", borderRadius: "5px" });
-        btnAll.onclick = () => { renderAllFromCat(c); row3.style.display="none"; };
-        row2.appendChild(btnAll);
+    // --- AGGIUNTA TASTO "TUTTI" ---
+    const btnAll = document.createElement('button');
+    btnAll.innerText = "🌟 TUTTI";
+    btnAll.className = "nav-btn-l2";
+    // Lo stile ha un bordo bianco per risaltare
+    Object.assign(btnAll.style, { border: "2px solid #fff", background: "#f39c12", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+    
+    btnAll.onclick = () => {
+        document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
+        btnAll.style.background = "#f39c12"; // Colore arancione quando attivo
+        row3.style.display = "none"; // Nasconde le sottosottocategorie
+        renderAllFromCat(c); 
+    };
+    row2.appendChild(btnAll);
+    // ------------------------------
 
-        schema[c].sub.sort().forEach(s => {
-            const btn = document.createElement('button'); btn.innerText = s;
-            Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold" });
-            btn.onclick = () => { renderRecs(c, s); showSubSub(c, s, row3); };
-            row2.appendChild(btn);
-        });
-        sc.appendChild(row2); sc.appendChild(row3);
-        renderAllFromCat(c);
-    }
+    schema[c].sub.sort().forEach(s => {
+        const btn = document.createElement('button'); btn.innerText = s; btn.className = "nav-btn-l2";
+        Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+        btn.onclick = () => {
+            document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
+            btnAll.style.background = "transparent"; // Spegne l'arancione di "TUTTI"
+            btn.style.background = "#f0ad4e"; // Giallo classico per la sottocategoria
+            renderRecs(c, s); 
+            showSubSub(c, s, row3);
+        };
+        row2.appendChild(btn);
+    });
+    sc.appendChild(row2); sc.appendChild(row3);
+
+    // Lanciamo la visualizzazione "TUTTI" all'ingresso automatico
+    renderAllFromCat(c);
+}
 
     function showSubSub(c, s, container) {
         container.innerHTML = "";
-        if (!schema[c].subSub || !schema[c].subSub[s] || schema[c].subSub[s].length === 0) { container.style.display = "none"; return; }
+        if (!schema[c].subSub || !schema[c].subSub[s]) { container.style.display = "none"; return; }
         container.style.display = "flex"; container.style.flexWrap = "wrap"; container.style.gap = "8px"; container.style.background = "#e9ecef"; container.style.padding = "10px"; container.style.borderRadius = "8px";
         schema[c].subSub[s].sort().forEach(ss => {
-            const btn = document.createElement('button'); btn.innerText = ss;
-            Object.assign(btn.style, { border: "1px solid #28a745", background: "white", color: "#28a745", padding: "8px 15px", cursor: "pointer", borderRadius: "5px" });
-            btn.onclick = () => renderRecs(c, s, ss);
+            const btn = document.createElement('button'); btn.innerText = ss; btn.className = "nav-btn-l3";
+            Object.assign(btn.style, { border: "1px solid #1e7e34", background: "#28a745", color: "white", padding: "8px 15px", cursor: "pointer", borderRadius: "5px", fontSize: "0.85em", fontWeight: "600" });
+            btn.onclick = () => {
+                document.querySelectorAll('.nav-btn-l3').forEach(b => b.style.background = "#28a745");
+                btn.style.background = "#0b4d1a"; renderRecs(c, s, ss);
+            };
             container.appendChild(btn);
         });
     }
 
     function renderRecs(c, s, ss) {
-        const list = document.getElementById('records-list');
-        let fil = contacts.filter(x => { 
-            const m = x.cat === c && x.sub === s; 
-            return ss ? (m && x.ss === ss) : m; 
-        });
-        fil.sort((a,b) => (parseFloat(a.km)||0) - (parseFloat(b.km)||0));
-        list.innerHTML = fil.length ? "" : "<p>Nessun contatto.</p>";
-        fil.forEach(x => {
-            const index = contacts.indexOf(x);
-            const percorso = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
-            list.innerHTML += `
-                <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; position:relative;" onclick="showFullDetails(${index})">
-                    <div style="font-size:10px; color:#888;">${percorso}</div>
-                    <b>${x.nome}</b><br>
-                    <small>📍 ${x.via}, ${x.loc}</small><br>
-                    <small>📞 ${x.tel || '-'} | 📱 ${x.cell || '-'}</small>
-                    <div style="position:absolute; bottom:10px; right:10px; color:red; font-weight:bold;">🚗 ${x.km || 0} KM</div>
-                </div>`;
-        });
-    }
+    const list = document.getElementById('records-list');
+    const fil = contacts.filter(x => { 
+        const m = x.cat === c && x.sub === s; 
+        return ss ? (m && x.ss === ss) : m; 
+    });
 
-    function renderAllFromCat(c) {
-        const list = document.getElementById('records-list');
-        let fil = contacts.filter(x => x.cat === c);
-        fil.sort((a,b) => (parseFloat(a.km)||0) - (parseFloat(b.km)||0));
-        list.innerHTML = fil.length ? "" : "<p>Vuoto.</p>";
-        fil.forEach(x => {
-            const index = contacts.indexOf(x);
-            list.innerHTML += `<div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #28a745; position:relative;" onclick="showFullDetails(${index})">
-                <div style="font-size:10px; color:#888;">${x.sub} ${x.ss ? '> '+x.ss : ''}</div>
-                <b>${x.nome}</b><br><small>📍 ${x.via}</small>
-                <div style="position:absolute; bottom:10px; right:10px; color:red;">🚗 ${x.km || 0} KM</div>
+    list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato.</p>";
+
+    fil.forEach(x => {
+        const index = contacts.indexOf(x);
+        const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
+        
+        const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
+        
+        list.innerHTML += `
+            <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; cursor:pointer; position:relative;" onclick="showFullDetails(${index})">
+                <div style="font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">${percorsoInfo}</div>
+                
+                ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin:10px 0;">` : ''}
+                
+                <b style="font-size:1.2em; color:#003366">${x.nome}</b><br>
+                
+                <div style="margin-top:5px; font-size:14px;">📍 ${x.via}, ${x.loc}<br>📞 ${x.tel || '-'} | 📱 ${x.cell || '-'}</div>
+                
+                <div style="position:absolute; bottom:20px; right:20px; color:#d9534f; font-weight:bold; font-size:1.1em; display:flex; align-items:center; gap:5px;">
+                    🚗 ${x.km || '0'} KM
+                </div>
+
+                <div style="margin-top:10px; display:flex; gap:5px;" onclick="event.stopPropagation()">
+                    <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
+                    <button onclick="editContact(${index})" title="Modifica">📝</button>
+                    <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
+                    <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
+                </div>
             </div>`;
+    });
+}
+
+    function buildOrari() {
+        const b = document.getElementById('orari-body'); b.innerHTML = "";
+        ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(g => {
+            b.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time" class="m1">-<input type="time" class="m2"></td><td><input type="checkbox" class="ch1"></td><td><input type="time" class="p1">-<input type="time" class="p2"></td><td><input type="checkbox" class="ch2"></td></tr>`;
         });
     }
 
@@ -250,65 +342,304 @@
         } else if(g) g.classList.add('hidden');
     }
 
+    function saveData() {
+        const n = document.getElementById('f-nome').value;
+        if(!n) return alert("Inserisci il nome!");
+        
+        const nuovo = {
+            nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value,
+            ss: document.getElementById('f-ss') ? document.getElementById('f-ss').value : '',
+            via: document.getElementById('f-via').value, loc: document.getElementById('f-loc').value, 
+            prov: document.getElementById('f-prov').value, km: document.getElementById('f-km').value,
+            tel: document.getElementById('f-tel').value, cell: document.getElementById('f-cell').value, 
+            foto: document.getElementById('f-foto').value, sito: document.getElementById('f-sito').value, 
+            email: document.getElementById('f-email').value, cucina: document.getElementById('f-cucina').value, 
+            costo: document.getElementById('f-costo').value, giudizio: document.getElementById('f-giudizio').value,
+            note: document.getElementById('f-note').value, orari: {}
+        };
+
+        const rows = document.querySelectorAll('#orari-body tr');
+        const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+        rows.forEach((row, i) => {
+            nuovo.orari[giorni[i]] = { 
+                m1: row.querySelector('.m1').value, m2: row.querySelector('.m2').value, 
+                ch1: row.querySelector('.ch1').checked, p1: row.querySelector('.p1').value, 
+                p2: row.querySelector('.p2').value, ch2: row.querySelector('.ch2').checked 
+            };
+        });
+
+        // Salvataggio nel database locale
+        contacts.push(nuovo); 
+        localStorage.setItem('app_contacts', JSON.stringify(contacts)); 
+        
+        // --- LOGICA DI AGGIORNAMENTO SENZA REFRESH ---
+        closeMod('form-overlay'); // Chiude la finestra di inserimento
+
+        const categoriaCorrente = document.getElementById('title-detail').innerText;
+        const vistaDettaglioNascosta = document.getElementById('view-detail').classList.contains('hidden');
+
+        if (!vistaDettaglioNascosta && categoriaCorrente) {
+            // Se eravamo dentro una categoria, la rinfreschiamo subito
+            openCat(categoriaCorrente);
+        } else {
+            // Se eravamo in Home, aggiorniamo le icone
+            renderMain();
+        }
+        
+        alert("Scheda salvata con successo!");
+    }
+
+    function showFullDetails(i) {
+        const x = contacts[i]; if(!x) return;
+        openAddForm(); document.getElementById('form-title').innerText = "🔍 Scheda: " + x.nome;
+        document.getElementById('save-btn-container').style.display = "none";
+        document.getElementById('f-nome').value = x.nome;
+        document.getElementById('f-cat').value = x.cat; updateSub('f');
+        document.getElementById('f-sub').value = x.sub; if(x.ss){ updateSubSub('f'); document.getElementById('f-ss').value = x.ss; }
+        document.getElementById('f-tel').value = x.tel || ''; document.getElementById('f-cell').value = x.cell || ''; document.getElementById('f-via').value = x.via || '';
+        document.getElementById('f-loc').value = x.loc || ''; document.getElementById('f-km').value = x.km || ''; document.getElementById('f-foto').value = x.foto || '';
+        document.getElementById('f-prov').value = x.prov || '';
+        document.getElementById('f-sito').value = x.sito || ''; document.getElementById('f-email').value = x.email || '';
+        document.getElementById('f-cucina').value = x.cucina || ''; document.getElementById('f-costo').value = x.costo || ''; document.getElementById('f-giudizio').value = x.giudizio || '';
+        document.getElementById('f-note').value = x.note || '';
+        if(x.orari){
+            const rows = document.querySelectorAll('#orari-body tr'); const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+            rows.forEach((row, idx) => { const g = giorni[idx]; if(x.orari[g]){ row.querySelector('.m1').value = x.orari[g].m1; row.querySelector('.m2').value = x.orari[g].m2; row.querySelector('.ch1').checked = x.orari[g].ch1; row.querySelector('.p1').value = x.orari[g].p1; row.querySelector('.p2').value = x.orari[g].p2; row.querySelector('.ch2').checked = x.orari[g].ch2; }});
+        }
+        document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = true; el.style.background = "#f9f9f9"; });
+    }
+
+    function editContact(i) {
+        const x = contacts[i]; showFullDetails(i);
+        document.getElementById('form-title').innerText = "📝 Modifica: " + x.nome;
+        document.getElementById('save-btn-container').style.display = "block";
+        document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; });
+        contacts.splice(i, 1);
+    }
+
+    function applySearch() {
+        const t = document.getElementById('s-testo').value.toLowerCase();
+        const c = document.getElementById('s-cat').value;
+        const s = document.getElementById('s-sub').value;
+        const res = contacts.filter(x => {
+            const mT = !t || x.nome.toLowerCase().includes(t) || x.loc.toLowerCase().includes(t) || (x.note && x.note.toLowerCase().includes(t));
+            const mC = !c || x.cat === c;
+            const mS = !s || x.sub === s;
+            return mT && mC && mS;
+        });
+        document.getElementById('view-main').classList.add('hidden');
+        document.getElementById('view-detail').classList.remove('hidden');
+        document.getElementById('title-detail').innerText = "Risultati Ricerca";
+        document.getElementById('sub-buttons-container').innerHTML = "";
+        renderRecsFromSearch(res);
+        closeMod('search-overlay');
+    }
+
+    function renderRecsFromSearch(arr) {
+        const list = document.getElementById('records-list');
+        list.innerHTML = arr.length ? "" : "<p>Nessun risultato.</p>";
+        arr.forEach(x => {
+            const index = contacts.indexOf(x);
+            list.innerHTML += `<div style="background:white; padding:15px; border-radius:10px; border-left:5px solid green; margin-bottom:10px; cursor:pointer;" onclick="showFullDetails(${index})"><b>${x.nome}</b><br><small>${x.cat} > ${x.sub}</small></div>`;
+        });
+    }
+
+    function openAddForm() { buildOrari(); openMod('form-overlay'); document.getElementById('form-title').innerText = "Nuova Scheda"; document.getElementById('save-btn-container').style.display = "block"; document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked=false; }); const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>'; Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); }
+    function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
     function openManage() {
         openMod('manage-overlay');
-        const t = document.getElementById('tree-container'); t.innerHTML = "";
+        const t = document.getElementById('tree-container');
+        if (!t) return;
+        t.innerHTML = "";
+        
         Object.keys(schema).sort().forEach(c => {
-            let h = `<div class="tree-node"><div class="tree-header"><span>${schema[c].icon} ${c}</span>
-                <span><button onclick="addSub('${c}')">[+] Sub</button> <button onclick="delCat('${c}')">❌</button></span></div>`;
+            let h = `
+            <div class="tree-node">
+                <div class="tree-header" style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:5px;">
+                    <span>${schema[c].icon} <b>${c}</b> 
+                        <button style="border:none; background:none; cursor:pointer;" onclick="renameCat('${c}')">✏️</button>
+                    </span>
+                    <span>
+                        <button class="btn-top" style="padding:5px 10px; font-size:12px; background:var(--secondary);" onclick="addSub('${c}')">[+] Sub</button>
+                        <button class="btn-top" style="padding:5px 10px; font-size:12px; background:#d9534f;" onclick="delCat('${c}')">❌</button>
+                    </span>
+                </div>`;
+            
             if (schema[c].sub) {
                 schema[c].sub.sort().forEach(s => {
-                    h += `<div class="tree-sub"><span>- ${s}</span> 
-                        <button onclick="addSS('${c}','${s}')" style="background:#5bc0de; color:white; border:none; border-radius:3px; padding:2px 5px;">[+] SS</button>
-                        <button onclick="delSub('${c}','${s}')">❌</button>`;
+                    h += `
+                    <div class="tree-sub" style="margin-left:20px; padding:5px; border-left:2px solid #ddd;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>- ${s} 
+                                <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSub('${c}','${s}')">✏️</button>
+                            </span>
+                            <span>
+                                <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#5bc0de;" onclick="addSS('${c}','${s}')">[+] SS</button>
+                                <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#f0ad4e;" onclick="delSub('${c}','${s}')">❌</button>
+                            </span>
+                        </div>`;
+                    
                     if(schema[c].subSub && schema[c].subSub[s]) {
-                        schema[c].subSub[s].forEach(ss => {
-                            h += `<div style="margin-left:20px; font-size:12px;">-- ${ss} <button onclick="delSS('${c}','${s}','${ss}')" style="color:red; border:none; background:none;">x</button></div>`;
+                        schema[c].subSub[s].sort().forEach(ss => {
+                            h += `
+                            <div style="margin-left:25px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
+                                <span>-- ${ss} 
+                                    <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSS('${c}','${s}','${ss}')">✏️</button>
+                                </span>
+                                <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
+                            </div>`;
                         });
                     }
                     h += `</div>`;
                 });
             }
-            h += `</div>`; t.innerHTML += h;
+            h += `</div>`;
+            t.innerHTML += h;
         });
     }
-
-    function addSS(c, s) {
-        const n = prompt("Nome Livello 3:");
-        if(n) {
-            if(!schema[c].subSub) schema[c].subSub = {};
-            if(!schema[c].subSub[s]) schema[c].subSub[s] = [];
-            schema[c].subSub[s].push(n);
+    function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
+    function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
+    function renameCat(vecchioNome) {
+        const nuovoNome = prompt("Rinomina Sezione:", vecchioNome);
+        if (nuovoNome && nuovoNome !== vecchioNome) {
+            schema[nuovoNome] = schema[vecchioNome];
+            delete schema[vecchioNome];
+            // Aggiorna anche i contatti esistenti per non perderli!
+            contacts.forEach(c => { if(c.cat === vecchioNome) c.cat = nuovoNome; });
+            localStorage.setItem('app_contacts', JSON.stringify(contacts));
             saveSchema();
         }
     }
 
-    function delSS(c, s, ss) { if(confirm("Eliminare Livello 3?")) { schema[c].subSub[s] = schema[c].subSub[s].filter(x => x!==ss); saveSchema(); } }
-    function addMainCat() { const n = prompt("Sezione:"); if(n) { schema[n] = {icon:"📁", sub:[]}; saveSchema(); } }
-    function addSub(c) { const n = prompt("Sub:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
+    function renameSub(c, vecchioSub) {
+        const nuovoSub = prompt("Rinomina Sottocategoria:", vecchioSub);
+        if (nuovoSub && nuovoSub !== vecchioSub) {
+            const idx = schema[c].sub.indexOf(vecchioSub);
+            if (idx !== -1) schema[c].sub[idx] = nuovoSub;
+            // Sposta anche le eventuali sottosottocategorie
+            if (schema[c].subSub && schema[c].subSub[vecchioSub]) {
+                schema[c].subSub[nuovoSub] = schema[c].subSub[vecchioSub];
+                delete schema[c].subSub[vecchioSub];
+            }
+            // Aggiorna contatti
+            contacts.forEach(con => { if(con.cat === c && con.sub === vecchioSub) con.sub = nuovoSub; });
+            localStorage.setItem('app_contacts', JSON.stringify(contacts));
+            saveSchema();
+        }
+    }
+
+    function renameSS(c, s, vecchioSS) {
+        const nuovoSS = prompt("Rinomina Livello 3:", vecchioSS);
+        if (nuovoSS && nuovoSS !== vecchioSS) {
+            const idx = schema[c].subSub[s].indexOf(vecchioSS);
+            if (idx !== -1) schema[c].subSub[s][idx] = nuovoSS;
+            // Aggiorna contatti
+            contacts.forEach(con => { if(con.cat === c && con.sub === s && con.ss === vecchioSS) con.ss = nuovoSS; });
+            localStorage.setItem('app_contacts', JSON.stringify(contacts));
+            saveSchema();
+        }
+    }
     function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
     function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
-    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); openManage(); }
-    function saveData() {
-        const n = document.getElementById('f-nome').value; if(!n) return;
-        const nuovo = { nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value, ss: document.getElementById('f-ss')?.value || '', via: document.getElementById('f-via').value, loc: document.getElementById('f-loc').value, prov: document.getElementById('f-prov').value, km: document.getElementById('f-km').value, tel: document.getElementById('f-tel').value, cell: document.getElementById('f-cell').value, foto: document.getElementById('f-foto').value, note: document.getElementById('f-note').value };
-        contacts.push(nuovo); localStorage.setItem('app_contacts', JSON.stringify(contacts)); closeMod('form-overlay'); renderMain();
-    }
-    function openAddForm() { 
-        openMod('form-overlay'); 
-        const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>'; 
-        Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
-    }
-    function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
-    function applySearch() { /* ... logica esistente ... */ }
-    function buildOrari() { const b = document.getElementById('orari-body'); b.innerHTML = ""; ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(g => { b.innerHTML += `<tr><td>${g}</td><td><input type="time"></td><td><input type="checkbox"></td><td><input type="time"></td><td><input type="checkbox"></td></tr>`; }); }
+    function saveSchema() { localStorage.setItem('app_schema', JSON.stringify(schema)); location.reload(); }
     function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
+    function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
+    function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
     function exportData() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); a.download = 'rubrica.json'; a.click(); }
     function importData() { const i = document.createElement('input'); i.type = 'file'; i.onchange = e => { const r = new FileReader(); r.onload = x => { contacts = JSON.parse(x.target.result); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); }; r.readAsText(e.target.files[0]); }; i.click(); }
-    function resetAll() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
+    function resetAll() { if (confirm("Cancellare tutto?")) { localStorage.removeItem('app_contacts'); location.reload(); } }
+    // FUNZIONE PER DUPLICARE IL NOMINATIVO
+function duplicateContact(index) {
+    const copia = JSON.parse(JSON.stringify(contacts[index]));
+    copia.nome += " (Copia)";
+    contacts.push(copia);
+    localStorage.setItem('app_contacts', JSON.stringify(contacts));
+    openCat(copia.cat);
+    alert("Nominativo duplicato!");
+}
+
+// NUOVA FUNZIONE SPOSTA CON TENDINE
+function moveContact(index) {
+    const x = contacts[index];
+    // Riapriamo la scheda in modalità modifica, ma puntiamo subito alle categorie
+    editContact(index); 
+    
+    // Cambiamo il titolo per far capire all'utente cosa sta facendo
+    document.getElementById('form-title').innerText = "📦 Sposta / Ricolloca: " + x.nome;
+    
+    // Portiamo il focus sulla selezione della categoria
+    document.getElementById('f-cat').focus();
+    
+    alert("Usa le tendine per cambiare Categoria o Sottocategoria, poi clicca su SALVA.");
+}
     window.onload = init;
+    // --- NUOVA FUNZIONE PER IL TASTO ALL ---
+    function renderAllFromCat(categoria) {
+    const list = document.getElementById('records-list');
+    
+    // Filtriamo prendendo ogni contatto che appartiene alla categoria principale
+    let fil = contacts.filter(x => x.cat === categoria);
+
+    // Ordiniamo per KM (Crescente: dal più vicino al più lontano)
+    fil.sort((a, b) => (parseFloat(a.km) || 0) - (parseFloat(b.km) || 0));
+
+    list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato in questa sezione.</p>";
+
+    fil.forEach(x => {
+        const index = contacts.indexOf(x);
+        const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
+        
+        // Costruiamo il percorso completo per chiarezza (es. ETNICO > CINESE)
+        let infoPercorso = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
+        
+        list.innerHTML += `
+            <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #28a745; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; cursor:pointer; position:relative;" onclick="showFullDetails(${index})">
+                <div style="font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">${infoPercorso}</div>
+                ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin:10px 0;">` : ''}
+                <b style="font-size:1.2em; color:#003366">${x.nome}</b><br>
+                <div style="margin-top:5px; font-size:14px;">📍 ${x.via}, ${x.loc}<br>📞 ${x.tel || '-'} | 📱 ${x.cell || '-'}</div>
+                
+                <div style="position:absolute; bottom:20px; right:20px; color:#d9534f; font-weight:bold; font-size:1.1em; display:flex; align-items:center; gap:5px;">
+                    🚗 ${x.km || '0'} KM
+                </div>
+
+                <div style="margin-top:10px; display:flex; gap:5px;" onclick="event.stopPropagation()">
+                    <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
+                    <button onclick="editContact(${index})" title="Modifica">📝</button>
+                    <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
+                    <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
+                </div>
+            </div>`;
+    });
+}
+    function addSS(cat, sub) {
+    const ssName = prompt(`Aggiungi Sotto-Sottosezione per "${sub}":`);
+    if (ssName) {
+        // Se la struttura per le SS non esiste ancora in questa categoria, la creiamo
+        if (!schema[cat].ss) schema[cat].ss = {}; 
+        // Se non esiste la lista per questa sottocategoria specifica, la creiamo
+        if (!schema[cat].ss[sub]) schema[cat].ss[sub] = []; 
+        
+        // Aggiungiamo il nome se non è già presente
+        if (!schema[cat].ss[sub].includes(ssName)) {
+            schema[cat].ss[sub].push(ssName);
+            saveSchema(); // Salva le modifiche
+            renderSchemaEditor(); // Aggiorna la vista della gestione
+        } else {
+            alert("Questa Sotto-Sottosezione esiste già!");
+        }
+    }
+}
+
+// Aggiungiamo anche la funzione per eliminare le SS, così il lavoro è completo
+function deleteSubSub(cat, sub, ss) {
+    if (confirm(`Eliminare la Sotto-Sottosezione "${ss}"?`)) {
+        schema[cat].ss[sub] = schema[cat].ss[sub].filter(item => item !== ss);
+        saveSchema();
+        renderSchemaEditor();
+    }
+}
 </script>
 
 <div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white;">
