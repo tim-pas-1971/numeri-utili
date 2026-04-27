@@ -561,7 +561,22 @@
     function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
     function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
-    function deleteContact(i) { if(confirm("Eliminare?")) { contacts.splice(i,1); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); } }
+    function deleteContact(i) {
+    if(confirm("Eliminare definitivamente questo nominativo?")) {
+        // Memorizziamo la categoria in cui ci troviamo prima di cancellare
+        const catCorrente = contacts[i].cat;
+        
+        // Eliminiamo il contatto
+        contacts.splice(i, 1);
+        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        
+        // Invece di location.reload(), rinfreschiamo la categoria
+        // così rimani dove sei!
+        openCat(catCorrente);
+        
+        alert("Nominativo eliminato con successo.");
+    }
+}
     function exportData() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); a.download = 'rubrica.json'; a.click(); }
     function importData() { const i = document.createElement('input'); i.type = 'file'; i.onchange = e => { const r = new FileReader(); r.onload = x => { contacts = JSON.parse(x.target.result); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); }; r.readAsText(e.target.files[0]); }; i.click(); }
     function resetAll() { if (confirm("Cancellare tutto?")) { localStorage.removeItem('app_contacts'); location.reload(); } }
