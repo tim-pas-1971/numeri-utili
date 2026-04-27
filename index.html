@@ -218,26 +218,50 @@
     }
 
     function openCat(c) {
-        document.getElementById('view-main').classList.add('hidden');
-        document.getElementById('view-detail').classList.remove('hidden');
-        document.getElementById('title-detail').innerText = c;
-        const sc = document.getElementById('sub-buttons-container'); sc.innerHTML = "";
-        const row2 = document.createElement('div');
-        Object.assign(row2.style, { display: "flex", flexWrap: "wrap", gap: "4px", background: "#003366", padding: "10px", borderRadius: "8px", width: "100%", boxSizing: "border-box" });
-        const row3 = document.createElement('div');
-        row3.id = "subsub-container"; row3.style.display = "none"; row3.style.width = "100%"; row3.style.marginTop = "5px";
+    document.getElementById('view-main').classList.add('hidden');
+    document.getElementById('view-detail').classList.remove('hidden');
+    document.getElementById('title-detail').innerText = c;
+    const sc = document.getElementById('sub-buttons-container'); sc.innerHTML = "";
+    
+    const row2 = document.createElement('div');
+    Object.assign(row2.style, { display: "flex", flexWrap: "wrap", gap: "4px", background: "#003366", padding: "10px", borderRadius: "8px", width: "100%", boxSizing: "border-box" });
+    
+    const row3 = document.createElement('div');
+    row3.id = "subsub-container"; row3.style.display = "none"; row3.style.width = "100%"; row3.style.marginTop = "5px";
 
-        schema[c].sub.sort().forEach(s => {
-            const btn = document.createElement('button'); btn.innerText = s; btn.className = "nav-btn-l2";
-            Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
-            btn.onclick = () => {
-                document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
-                btn.style.background = "#f0ad4e"; renderRecs(c, s); showSubSub(c, s, row3);
-            };
-            row2.appendChild(btn);
-        });
-        sc.appendChild(row2); sc.appendChild(row3);
-    }
+    // --- AGGIUNTA TASTO "TUTTI" ---
+    const btnAll = document.createElement('button');
+    btnAll.innerText = "🌟 TUTTI";
+    btnAll.className = "nav-btn-l2";
+    // Lo stile ha un bordo bianco per risaltare
+    Object.assign(btnAll.style, { border: "2px solid #fff", background: "#f39c12", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+    
+    btnAll.onclick = () => {
+        document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
+        btnAll.style.background = "#f39c12"; // Colore arancione quando attivo
+        row3.style.display = "none"; // Nasconde le sottosottocategorie
+        renderAllFromCat(c); 
+    };
+    row2.appendChild(btnAll);
+    // ------------------------------
+
+    schema[c].sub.sort().forEach(s => {
+        const btn = document.createElement('button'); btn.innerText = s; btn.className = "nav-btn-l2";
+        Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+        btn.onclick = () => {
+            document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
+            btnAll.style.background = "transparent"; // Spegne l'arancione di "TUTTI"
+            btn.style.background = "#f0ad4e"; // Giallo classico per la sottocategoria
+            renderRecs(c, s); 
+            showSubSub(c, s, row3);
+        };
+        row2.appendChild(btn);
+    });
+    sc.appendChild(row2); sc.appendChild(row3);
+
+    // Lanciamo la visualizzazione "TUTTI" all'ingresso automatico
+    renderAllFromCat(c);
+}
 
     function showSubSub(c, s, container) {
         container.innerHTML = "";
