@@ -587,30 +587,27 @@
         const r = new FileReader();
         r.onload = x => {
             try {
-                const nuoviContatti = JSON.parse(x.target.result);
+                const contenuto = x.target.result;
+                // Debug: vediamo cosa ha letto (apparirà nella console se serve)
+                console.log("Contenuto letto:", contenuto);
+
+                const nuoviContatti = JSON.parse(contenuto);
                 
-                // Qui scatta la tua nuova libertà di scelta come ADMIN
-                const integra = confirm(
-                    "Scegli come importare i dati:\n\n" +
-                    "Premi OK per INTEGRARE: aggiunge i nuovi nominativi a quelli che hai già (senza cancellare nulla).\n\n" +
-                    "Premi ANNULLA per SOVRASCRIVERE: cancella i dati attuali e carica solo quelli del file."
-                );
+                // Se arriviamo qui, il file è un JSON valido
+                const integra = confirm("File letto correttamente! Vuoi INTEGRARE (OK) o SOVRASCRIVERE (Annulla)?");
 
                 if (integra) {
-                    // CONCAT unisce le due liste (quella attuale + quella del file)
                     contacts = contacts.concat(nuoviContatti);
-                    alert("Dati integrati con successo!");
                 } else {
-                    // Sostituzione totale (come faceva prima)
                     contacts = nuoviContatti;
-                    alert("Database sostituito con i dati del file.");
                 }
 
                 localStorage.setItem('app_contacts', JSON.stringify(contacts));
                 location.reload();
 
             } catch (err) {
-                alert("Errore: Il file non è un backup valido.");
+                // Questo messaggio ci dirà PERCHÉ fallisce
+                alert("Errore tecnico: " + err.message);
             }
         };
         r.readAsText(e.target.files[0]);
