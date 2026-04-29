@@ -590,17 +590,18 @@
                 let datiCaricati = JSON.parse(x.target.result);
                 let nuoviContatti;
 
-                // SCARTIAMO IL PACCHETTO SE NECESSARIO:
-                // Se il file viene dal desktop, i nomi sono dentro "contacts"
+                // --- GESTIONE DEL FORMATO (Il trucco è qui) ---
                 if (datiCaricati.contacts && Array.isArray(datiCaricati.contacts)) {
+                    // Formato Desktop: i nomi sono dentro l'etichetta "contacts"
                     nuoviContatti = datiCaricati.contacts;
                 } else if (Array.isArray(datiCaricati)) {
-                    // Se il file è già una lista semplice (versione web)
+                    // Formato Web: il file è già una lista semplice
                     nuoviContatti = datiCaricati;
                 } else {
                     throw new Error("Formato dati non riconosciuto");
                 }
                 
+                // --- SCELTA ADMIN ---
                 const integra = confirm(
                     "Scegli modalità d'importazione:\n\n" +
                     "OK -> INTEGRA (Aggiungi ai presenti)\n" +
