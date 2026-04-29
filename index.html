@@ -590,18 +590,18 @@
                 let datiCaricati = JSON.parse(x.target.result);
                 let nuoviContatti;
 
-                // --- GESTIONE DEL FORMATO (Il trucco è qui) ---
+                // --- GESTIONE DEL FORMATO ---
+                // Se il file ha la struttura del desktop (quella con "contacts": [...])
                 if (datiCaricati.contacts && Array.isArray(datiCaricati.contacts)) {
-                    // Formato Desktop: i nomi sono dentro l'etichetta "contacts"
                     nuoviContatti = datiCaricati.contacts;
                 } else if (Array.isArray(datiCaricati)) {
-                    // Formato Web: il file è già una lista semplice
+                    // Se il file è già una lista semplice
                     nuoviContatti = datiCaricati;
                 } else {
-                    throw new Error("Formato dati non riconosciuto");
+                    throw new Error("Struttura file non riconosciuta");
                 }
                 
-                // --- SCELTA ADMIN ---
+                // --- SCELTA OPERAZIONE ---
                 const integra = confirm(
                     "Scegli modalità d'importazione:\n\n" +
                     "OK -> INTEGRA (Aggiungi ai presenti)\n" +
@@ -609,12 +609,12 @@
                 );
 
                 if (integra) {
-                    // Ora nuoviContatti è sicuramente una lista, quindi concat funzionerà!
+                    // Adesso nuoviContatti è sicuramente una lista e il concat funzionerà
                     contacts = contacts.concat(nuoviContatti);
-                    alert("Integrazione riuscita!");
+                    alert("Dati integrati con successo!");
                 } else {
                     contacts = nuoviContatti;
-                    alert("Sovrascrittura riuscita!");
+                    alert("Database sostituito con successo!");
                 }
 
                 localStorage.setItem('app_contacts', JSON.stringify(contacts));
