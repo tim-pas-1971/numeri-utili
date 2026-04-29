@@ -588,27 +588,28 @@
         r.onload = x => {
             try {
                 let datiCaricati = JSON.parse(x.target.result);
-                let nuoviContatti;
+                let listaNuova = [];
 
-                // --- QUI RISOLVIAMO L'ERRORE DELLE TUE IMMAGINI ---
-                if (datiCaricati.contacts && Array.isArray(datiCaricati.contacts)) {
-                    // Se il file viene dal desktop (come il tuo), prendiamo i nomi da dentro "contacts"
-                    nuoviContatti = datiCaricati.contacts;
+                // --- ESTRAZIONE FORZATA DEI DATI ---
+                if (datiCaricati.contacts) {
+                    // Se è un oggetto singolo {id...}, lo mettiamo in una lista. 
+                    // Se è già una lista, la usiamo così com'è.
+                    listaNuova = Array.isArray(datiCaricati.contacts) ? datiCaricati.contacts : [datiCaricati.contacts];
                 } else if (Array.isArray(datiCaricati)) {
-                    // Se il file è già una lista semplice
-                    nuoviContatti = datiCaricati;
+                    listaNuova = datiCaricati;
                 } else {
-                    throw new Error("Formato non riconosciuto");
+                    listaNuova = [datiCaricati];
                 }
                 
                 const integra = confirm("Scegli: OK per AGGIUNGERE i dati, ANNULLA per SOSTITUIRE tutto.");
 
                 if (integra) {
-                    // Ora nuoviContatti è una lista pulita e il comando concat funzionerà!
-                    contacts = contacts.concat(nuoviContatti);
+                    // Ci assicuriamo che 'contacts' (quello dell'app) sia una lista
+                    if (!Array.isArray(contacts)) contacts = [];
+                    contacts = contacts.concat(listaNuova);
                     alert("Dati aggiunti con successo!");
                 } else {
-                    contacts = nuoviContatti;
+                    contacts = listaNuova;
                     alert("Database sostituito con successo!");
                 }
 
