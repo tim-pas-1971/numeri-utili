@@ -578,7 +578,45 @@
     }
 }
     function exportData() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); a.download = 'rubrica.json'; a.click(); }
-    function importData() { const i = document.createElement('input'); i.type = 'file'; i.onchange = e => { const r = new FileReader(); r.onload = x => { contacts = JSON.parse(x.target.result); localStorage.setItem('app_contacts', JSON.stringify(contacts)); location.reload(); }; r.readAsText(e.target.files[0]); }; i.click(); }
+    function importData() {
+    const i = document.createElement('input');
+    i.type = 'file';
+    i.accept = '.json'; 
+    
+    i.onchange = e => {
+        const r = new FileReader();
+        r.onload = x => {
+            try {
+                const nuoviContatti = JSON.parse(x.target.result);
+                
+                // Qui scatta la tua nuova libertà di scelta come ADMIN
+                const integra = confirm(
+                    "Scegli come importare i dati:\n\n" +
+                    "Premi OK per INTEGRARE: aggiunge i nuovi nominativi a quelli che hai già (senza cancellare nulla).\n\n" +
+                    "Premi ANNULLA per SOVRASCRIVERE: cancella i dati attuali e carica solo quelli del file."
+                );
+
+                if (integra) {
+                    // CONCAT unisce le due liste (quella attuale + quella del file)
+                    contacts = contacts.concat(nuoviContatti);
+                    alert("Dati integrati con successo!");
+                } else {
+                    // Sostituzione totale (come faceva prima)
+                    contacts = nuoviContatti;
+                    alert("Database sostituito con i dati del file.");
+                }
+
+                localStorage.setItem('app_contacts', JSON.stringify(contacts));
+                location.reload();
+
+            } catch (err) {
+                alert("Errore: Il file non è un backup valido.");
+            }
+        };
+        r.readAsText(e.target.files[0]);
+    };
+    i.click();
+}
     function resetAll() { if (confirm("Cancellare tutto?")) { localStorage.removeItem('app_contacts'); location.reload(); } }
     // FUNZIONE PER DUPLICARE IL NOMINATIVO
 function duplicateContact(index) {
