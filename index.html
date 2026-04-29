@@ -587,27 +587,40 @@
         const r = new FileReader();
         r.onload = x => {
             try {
-                const contenuto = x.target.result;
-                // Debug: vediamo cosa ha letto (apparirà nella console se serve)
-                console.log("Contenuto letto:", contenuto);
+                let datiCaricati = JSON.parse(x.target.result);
+                let nuoviContatti;
 
-                const nuoviContatti = JSON.parse(contenuto);
+                // SCARTIAMO IL PACCHETTO SE NECESSARIO:
+                // Se il file viene dal desktop, i nomi sono dentro "contacts"
+                if (datiCaricati.contacts && Array.isArray(datiCaricati.contacts)) {
+                    nuoviContatti = datiCaricati.contacts;
+                } else if (Array.isArray(datiCaricati)) {
+                    // Se il file è già una lista semplice (versione web)
+                    nuoviContatti = datiCaricati;
+                } else {
+                    throw new Error("Formato dati non riconosciuto");
+                }
                 
-                // Se arriviamo qui, il file è un JSON valido
-                const integra = confirm("File letto correttamente! Vuoi INTEGRARE (OK) o SOVRASCRIVERE (Annulla)?");
+                const integra = confirm(
+                    "Scegli modalità d'importazione:\n\n" +
+                    "OK -> INTEGRA (Aggiungi ai presenti)\n" +
+                    "ANNULLA -> SOVRASCRIVI (Sostituisci tutto)"
+                );
 
                 if (integra) {
+                    // Ora nuoviContatti è sicuramente una lista, quindi concat funzionerà!
                     contacts = contacts.concat(nuoviContatti);
+                    alert("Integrazione riuscita!");
                 } else {
                     contacts = nuoviContatti;
+                    alert("Sovrascrittura riuscita!");
                 }
 
                 localStorage.setItem('app_contacts', JSON.stringify(contacts));
                 location.reload();
 
             } catch (err) {
-                // Questo messaggio ci dirà PERCHÉ fallisce
-                alert("Errore tecnico: " + err.message);
+                alert("Errore nel leggere il file: " + err.message);
             }
         };
         r.readAsText(e.target.files[0]);
