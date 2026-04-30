@@ -123,6 +123,13 @@
             <div style="flex: 1;"><label style="display:block; font-size:12px; font-weight:bold; color:#003366; margin-bottom:5px;">Giudizio</label><select id="f-giudizio" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;"><option value="">Scegli...</option><option value="Ottimo">Ottimo</option><option value="Gradevole">Gradevole</option><option value="Sufficiente">Sufficiente</option><option value="Scarso">Scarso</option></select></div>
         </div>
 
+        <div class="form-group" style="background: #f0f8ff; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #cfe2ff;">
+            <label style="display: flex; align-items: center; cursor: pointer; gap: 10px; font-size: 14px; color: #004085; margin: 0;">
+                    <input type="checkbox" id="f-h24" style="width: 18px; height: 18px; cursor: pointer;"> 
+                    <strong>Aperto 24h su 24 (7gg su 7)</strong>
+            </label>
+        </div>
+        
         <label style="margin-top:20px; display:block; font-weight:bold; color:#003366;">Orari di Apertura (Spunta 'Ch.' per chiusura)</label>
         <table class="timetable">
             <thead><tr><th>Giorno</th><th>Mattina</th><th>Ch. M.</th><th>Pomeriggio</th><th>Ch. P.</th></tr></thead>
@@ -365,7 +372,9 @@
             foto: document.getElementById('f-foto').value, sito: document.getElementById('f-sito').value, 
             email: document.getElementById('f-email').value, cucina: document.getElementById('f-cucina').value, 
             costo: document.getElementById('f-costo').value, giudizio: document.getElementById('f-giudizio').value,
-            note: document.getElementById('f-note').value, orari: {}
+            note: document.getElementById('f-note').value,
+            h24: document.getElementById('f-h24').checked, // <--- AGGIUNGI QUESTA
+            orari: {}
         };
 
         const rows = document.querySelectorAll('#orari-body tr');
@@ -412,12 +421,39 @@
         document.getElementById('f-sito').value = x.sito || ''; document.getElementById('f-email').value = x.email || '';
         document.getElementById('f-cucina').value = x.cucina || ''; document.getElementById('f-costo').value = x.costo || ''; document.getElementById('f-giudizio').value = x.giudizio || '';
         document.getElementById('f-note').value = x.note || '';
-        if(x.orari){
-            const rows = document.querySelectorAll('#orari-body tr'); const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-            rows.forEach((row, idx) => { const g = giorni[idx]; if(x.orari[g]){ row.querySelector('.m1').value = x.orari[g].m1; row.querySelector('.m2').value = x.orari[g].m2; row.querySelector('.ch1').checked = x.orari[g].ch1; row.querySelector('.p1').value = x.orari[g].p1; row.querySelector('.p2').value = x.orari[g].p2; row.querySelector('.ch2').checked = x.orari[g].ch2; }});
-        }
-        document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = true; el.style.background = "#f9f9f9"; });
-    }
+        if (x.h24) {
+    // Se è H24, nascondiamo la tabella e mostriamo il banner
+    document.querySelector('.timetable').style.display = "none";
+    const banner = document.createElement('div');
+    banner.id = "h24-banner";
+    banner.innerHTML = `<div style="background:#e7f3ff; color:#007bff; padding:15px; border-radius:10px; text-align:center; font-weight:bold; border:2px solid #007bff; margin:10px 0;">🕒 APERTO 24h / 7gg</div>`;
+    document.getElementById('orari-body').parentElement.after(banner);
+    document.getElementById('f-h24').checked = true;
+} else {
+    // Se NON è H24, assicuriamoci che la tabella sia visibile e rimuoviamo eventuali banner precedenti
+    document.querySelector('.timetable').style.display = "table";
+    const oldBanner = document.getElementById('h24-banner');
+    if(oldBanner) oldBanner.remove();
+    document.getElementById('f-h24').checked = false;
+    
+    // Qui rimetto il tuo codice originale per caricare gli orari
+    function openAddForm() { 
+    buildOrari(); 
+    openMod('form-overlay'); 
+    document.getElementById('form-title').innerText = "Nuova Scheda"; 
+    document.getElementById('save-btn-container').style.display = "block"; 
+    document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { 
+        el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked = false; 
+    }); 
+    // Reset H24 e tabella
+    document.getElementById('f-h24').checked = false;
+    document.querySelector('.timetable').style.display = "table";
+    const oldB = document.getElementById('h24-banner'); if(oldB) oldB.remove();
+
+    const sel = document.getElementById('f-cat'); 
+    sel.innerHTML = '<option value="">Scegli...</option>'; 
+    Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
+}
 
     function editContact(i) {
         const x = contacts[i]; showFullDetails(i);
@@ -458,7 +494,26 @@
         });
     }
 
-    function openAddForm() { buildOrari(); openMod('form-overlay'); document.getElementById('form-title').innerText = "Nuova Scheda"; document.getElementById('save-btn-container').style.display = "block"; document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked=false; }); const sel = document.getElementById('f-cat'); sel.innerHTML = '<option value="">Scegli...</option>'; Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); }
+    function openAddForm() { 
+    buildOrari(); 
+    openMod('form-overlay'); 
+    document.getElementById('form-title').innerText = "Nuova Scheda"; 
+    document.getElementById('save-btn-container').style.display = "block"; 
+    
+    document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { 
+        el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked = false; 
+    }); 
+
+    // --- AGGIUNGI QUESTE RIGHE QUI SOTTO ---
+    document.getElementById('f-h24').checked = false;
+    document.querySelector('.timetable').style.display = "table";
+    const oldB = document.getElementById('h24-banner'); if(oldB) oldB.remove();
+    // ---------------------------------------
+
+    const sel = document.getElementById('f-cat'); 
+    sel.innerHTML = '<option value="">Scegli...</option>'; 
+    Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
+}
     function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
     function openManage() {
         openMod('manage-overlay');
@@ -713,6 +768,17 @@ function delSS(c, s, ss) {
         saveSchema(); // Questa funzione nel tuo codice salva e fa il refresh
     }
 }
+            // Questo codice serve a nascondere la tabella in tempo reale quando clicchi H24
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'f-h24') {
+        const table = document.querySelector('.timetable');
+        if (e.target.checked) {
+            table.style.display = "none";
+        } else {
+            table.style.display = "table";
+        }
+    }
+});
 </script>
 
 <div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white;">
