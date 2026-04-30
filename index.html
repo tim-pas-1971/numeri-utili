@@ -163,11 +163,38 @@
     <div class="form-card">
         <h2 style="margin-top:0;">🔎 Ricerca Avanzata</h2>
         <div class="form-group"><label>Cosa cerchi?</label><input type="text" id="s-testo" placeholder="Nome, città o note..."></div>
+        
         <div class="form-row" style="margin-top:15px;">
             <div class="form-group"><label>Categoria</label><select id="s-cat" onchange="updateSub('s')"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="s-sub" onchange="updateSubSub('s')"></select></div>
-            <div id="s-ss-group" class="form-group hidden"><label>Livello 3</label><select id="s-ss"></select></div>
         </div>
+
+        <!-- NUOVA RIGA FILTRI ORARI -->
+        <div class="form-row" style="margin-top:10px; background: #f0f7ff; padding: 10px; border-radius: 8px;">
+            <div class="form-group">
+                <label>Giorno</label>
+                <select id="s-giorno">
+                    <option value="">Qualsiasi giorno</option>
+                    <option value="Lun">Lunedì</option>
+                    <option value="Mar">Martedì</option>
+                    <option value="Mer">Mercoledì</option>
+                    <option value="Gio">Giovedì</option>
+                    <option value="Ven">Venerdì</option>
+                    <option value="Sab">Sabato</option>
+                    <option value="Dom">Domenica</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Fascia / Opzione</label>
+                <select id="s-fascia">
+                    <option value="">Qualsiasi ora</option>
+                    <option value="m">Mattina</option>
+                    <option value="p">Pomeriggio</option>
+                    <option value="h24">Solo H24 🕒</option>
+                </select>
+            </div>
+        </div>
+
         <div style="display:flex; gap:10px; margin-top:20px;">
             <button class="btn-top" onclick="closeMod('search-overlay')" style="flex:1; background:#999;">ESCI</button>
             <button class="btn-top" onclick="applySearch()" style="flex:1; background:var(--primary);">CERCA ORA</button>
@@ -493,14 +520,36 @@
     const t = document.getElementById('s-testo').value.toLowerCase();
     const c = document.getElementById('s-cat').value;
     const s = document.getElementById('s-sub').value;
-    const ss = document.getElementById('s-ss') ? document.getElementById('s-ss').value : ''; // Prende il Livello 3
+    const gSel = document.getElementById('s-giorno').value; // Giorno scelto
+    const fSel = document.getElementById('s-fascia').value; // Fascia scelta
 
     const res = contacts.filter(x => {
+        // Filtri base (testo, categoria, sottocategoria)
         const mT = !t || x.nome.toLowerCase().includes(t) || x.loc.toLowerCase().includes(t) || (x.note && x.note.toLowerCase().includes(t));
         const mC = !c || x.cat === c;
         const mS = !s || x.sub === s;
-        const mSS = !ss || x.ss === ss; // Controlla se il Livello 3 corrisponde
-        return mT && mC && mS && mSS;
+
+        // Filtro Orario/H24
+        let mO = true;
+        if (fSel === 'h24') {
+            mO = x.h24 === true;
+        } else if (gSel && fSel) {
+            // Se cerco un giorno e una fascia specifica
+            if (x.h24) { 
+                mO = true; // Se è H24 è sempre aperto
+            } else if (x.orari && x.orari[gSel]) {
+                const info = x.orari[gSel];
+                if (fSel === 'm') mO = !info.ch1 && info.m1 && info.m2; // Aperto mattina
+                if (fSel === 'p') mO = !info.ch2 && info.p1 && info.p2; // Aperto pomeriggio
+            } else {
+                mO = false;
+            }
+        } else if (gSel) {
+            // Se cerco solo il giorno (aperto almeno in una fascia)
+            mO = x.h24 || (x.orari && x.orari[gSel] && (!x.orari[gSel].ch1 || !x.orari[gSel].ch2));
+        }
+
+        return mT && mC && mS && mO;
     });
 
     document.getElementById('view-main').classList.add('hidden');
