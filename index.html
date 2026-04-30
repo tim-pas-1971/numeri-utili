@@ -569,32 +569,14 @@
     closeMod('search-overlay');
 }
 
-    function renderRecsFromSearch(list) {
-    const g = document.getElementById('view-detail-list');
-    g.innerHTML = "";
-
-    if (list.length === 0) {
-        g.innerHTML = "<p style='text-align:center; padding:20px;'>Nessun risultato trovato.</p>";
-        return;
+    function renderRecsFromSearch(arr) {
+        const list = document.getElementById('records-list');
+        list.innerHTML = arr.length ? "" : "<p>Nessun risultato.</p>";
+        arr.forEach(x => {
+            const index = contacts.indexOf(x);
+            list.innerHTML += `<div style="background:white; padding:15px; border-radius:10px; border-left:5px solid green; margin-bottom:10px; cursor:pointer;" onclick="showFullDetails(${index})"><b>${x.nome}</b><br><small>${x.cat} > ${x.sub}</small></div>`;
+        });
     }
-
-    list.forEach(x => {
-        // Troviamo l'indice originale confrontando nome e telefono
-        const originalIndex = contacts.findIndex(c => c.nome === x.nome && c.tel === x.tel);
-        
-        const div = document.createElement('div');
-        div.className = "item-det"; // La classe originale che usavi per le strisce bianche
-        
-        // Struttura semplice: Titolo e Categoria (quella che funzionava prima)
-        div.innerHTML = `
-            <div onclick="showFullDetails(${originalIndex})">
-                <b>${x.nome}</b><br>
-                <small>${x.cat} > ${x.sub} ${x.ss ? '> ' + x.ss : ''}</small>
-            </div>
-        `;
-        g.appendChild(div);
-    });
-}
 
     function openAddForm() { 
     buildOrari(); 
