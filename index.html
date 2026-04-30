@@ -409,34 +409,60 @@
     }
 
     function showFullDetails(i) {
-        const x = contacts[i]; if(!x) return;
-        openAddForm(); document.getElementById('form-title').innerText = "🔍 Scheda: " + x.nome;
-        document.getElementById('save-btn-container').style.display = "none";
-        document.getElementById('f-nome').value = x.nome;
-        document.getElementById('f-cat').value = x.cat; updateSub('f');
-        document.getElementById('f-sub').value = x.sub; if(x.ss){ updateSubSub('f'); document.getElementById('f-ss').value = x.ss; }
-        document.getElementById('f-tel').value = x.tel || ''; document.getElementById('f-cell').value = x.cell || ''; document.getElementById('f-via').value = x.via || '';
-        document.getElementById('f-loc').value = x.loc || ''; document.getElementById('f-km').value = x.km || ''; document.getElementById('f-foto').value = x.foto || '';
-        document.getElementById('f-prov').value = x.prov || '';
-        document.getElementById('f-sito').value = x.sito || ''; document.getElementById('f-email').value = x.email || '';
-        document.getElementById('f-cucina').value = x.cucina || ''; document.getElementById('f-costo').value = x.costo || ''; document.getElementById('f-giudizio').value = x.giudizio || '';
-        document.getElementById('f-note').value = x.note || '';
-        if (x.h24) {
-    // Se è H24, nascondiamo la tabella e mostriamo il banner
-    document.querySelector('.timetable').style.display = "none";
-    const banner = document.createElement('div');
-    banner.id = "h24-banner";
-    banner.innerHTML = `<div style="background:#e7f3ff; color:#007bff; padding:15px; border-radius:10px; text-align:center; font-weight:bold; border:2px solid #007bff; margin:10px 0;">🕒 APERTO 24h / 7gg</div>`;
-    document.getElementById('orari-body').parentElement.after(banner);
-    document.getElementById('f-h24').checked = true;
-} else {
-    // Se NON è H24, assicuriamoci che la tabella sia visibile e rimuoviamo eventuali banner precedenti
-    document.querySelector('.timetable').style.display = "table";
+    const x = contacts[i]; if(!x) return;
+    openAddForm(); 
+    document.getElementById('form-title').innerText = "🔍 Scheda: " + x.nome;
+    document.getElementById('save-btn-container').style.display = "none";
+    document.getElementById('f-nome').value = x.nome;
+    document.getElementById('f-cat').value = x.cat; updateSub('f');
+    document.getElementById('f-sub').value = x.sub; 
+    if(x.ss){ updateSubSub('f'); document.getElementById('f-ss').value = x.ss; }
+    document.getElementById('f-tel').value = x.tel || ''; 
+    document.getElementById('f-cell').value = x.cell || ''; 
+    document.getElementById('f-via').value = x.via || '';
+    document.getElementById('f-loc').value = x.loc || ''; 
+    document.getElementById('f-km').value = x.km || ''; 
+    document.getElementById('f-foto').value = x.foto || '';
+    document.getElementById('f-prov').value = x.prov || '';
+    document.getElementById('f-sito').value = x.sito || ''; 
+    document.getElementById('f-email').value = x.email || '';
+    document.getElementById('f-cucina').value = x.cucina || ''; 
+    document.getElementById('f-costo').value = x.costo || ''; 
+    document.getElementById('f-giudizio').value = x.giudizio || '';
+    document.getElementById('f-note').value = x.note || '';
+
+    // Gestione H24 e Orari
     const oldBanner = document.getElementById('h24-banner');
     if(oldBanner) oldBanner.remove();
-    document.getElementById('f-h24').checked = false;
-    
-    // Qui rimetto il tuo codice originale per caricare gli orari
+
+    if (x.h24) {
+        document.querySelector('.timetable').style.display = "none";
+        const banner = document.createElement('div');
+        banner.id = "h24-banner";
+        banner.innerHTML = `<div style="background:#e7f3ff; color:#007bff; padding:15px; border-radius:10px; text-align:center; font-weight:bold; border:2px solid #007bff; margin:10px 0;">🕒 APERTO 24h / 7gg</div>`;
+        document.querySelector('.timetable').after(banner);
+        document.getElementById('f-h24').checked = true;
+    } else {
+        document.querySelector('.timetable').style.display = "table";
+        document.getElementById('f-h24').checked = false;
+        if(x.orari){
+            const rows = document.querySelectorAll('#orari-body tr'); 
+            const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+            rows.forEach((row, idx) => { 
+                const g = giorni[idx]; 
+                if(x.orari[g]){ 
+                    row.querySelector('.m1').value = x.orari[g].m1; 
+                    row.querySelector('.m2').value = x.orari[g].m2; 
+                    row.querySelector('.ch1').checked = x.orari[g].ch1; 
+                    row.querySelector('.p1').value = x.orari[g].p1; 
+                    row.querySelector('.p2').value = x.orari[g].p2; 
+                    row.querySelector('.ch2').checked = x.orari[g].ch2; 
+                }
+            });
+        }
+    }
+    document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = true; el.style.background = "#f9f9f9"; });
+}
     function openAddForm() { 
     buildOrari(); 
     openMod('form-overlay'); 
