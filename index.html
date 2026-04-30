@@ -571,34 +571,40 @@
 
     function renderRecsFromSearch(list) {
     const g = document.getElementById('view-detail-list');
+    if (!g) return; // Sicurezza: se non trova l'elemento, non crasha
+    
     g.innerHTML = "";
+    
     if (list.length === 0) {
-        g.innerHTML = "<p style='text-align:center; padding:20px;'>Nessun risultato trovato.</p>";
+        g.innerHTML = "<p style='text-align:center; padding:20px; width:100%;'>Nessun risultato trovato.</p>";
         return;
     }
 
     list.forEach(x => {
-        // Troviamo l'indice originale per poter cliccare sulla scheda
-        const originalIndex = contacts.findIndex(c => c.nome === x.nome && c.tel === x.tel);
+        // Troviamo l'indice originale confrontando il nome (che è unico o quasi)
+        const originalIndex = contacts.findIndex(c => c.nome === x.nome);
         
-        // Creiamo la card con lo stile della seconda immagine
         const card = document.createElement('div');
         card.className = "card-rec";
+        // Se clicchi sulla card, apri i dettagli
         card.onclick = () => showFullDetails(originalIndex);
 
-        // Costruiamo il contenuto della scheda (Foto, Info, Distanza)
+        // Costruiamo il contenuto come lo volevi tu (stile Categorie ma senza tasti)
         card.innerHTML = `
-            <div style="font-size:10px; color:#888; margin-bottom:5px; text-transform:uppercase;">
-                ${x.sub} ${x.ss ? '> ' + x.ss : ''}
+            <div style="font-size:10px; color:#888; margin-bottom:5px; text-transform:uppercase; padding:0 5px;">
+                ${x.sub || ''} ${x.ss ? '> ' + x.ss : ''}
             </div>
-            <img src="${x.foto || 'https://via.placeholder.com/300x150?text=Nessuna+Foto'}" 
-                 style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
-            <h3 style="margin:0 0 5px 0; color:#003366; font-size:16px;">${x.nome}</h3>
-            <div style="font-size:12px; color:#555;">
+            <div style="width:100%; height:120px; overflow:hidden; border-radius:8px; margin-bottom:10px; background:#eee;">
+                <img src="${x.foto || 'https://via.placeholder.com/300x150?text=Nessuna+Foto'}" 
+                     style="width:100%; height:100%; object-fit:cover;"
+                     onerror="this.src='https://via.placeholder.com/300x150?text=Errore+Immagine'">
+            </div>
+            <h3 style="margin:5px 0; color:#003366; font-size:16px; padding:0 5px;">${x.nome}</h3>
+            <div style="font-size:12px; color:#555; padding:0 5px;">
                 <p style="margin:2px 0;">📍 ${x.via || '-'}, ${x.loc || '-'}</p>
                 <p style="margin:2px 0;">📞 ${x.tel || x.cell || '-'}</p>
             </div>
-            <div style="margin-top:10px; text-align:right; font-weight:bold; color:#d9534f; font-size:14px;">
+            <div style="margin-top:10px; text-align:right; font-weight:bold; color:#d9534f; font-size:14px; padding:0 5px;">
                 🚗 ${x.km ? x.km + ' KM' : '-'}
             </div>
         `;
