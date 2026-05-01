@@ -251,12 +251,26 @@
         buildOrari();
     }
 
-    function renderMain() {
-        const g = document.getElementById('view-main'); g.innerHTML = "";
-        Object.keys(schema).sort().forEach(c => {
-            g.innerHTML += `<div class="card-cat" onclick="openCat('${c}')"><i>${schema[c].icon}</i><b>${c}</b></div>`;
-        });
-    }
+function renderMain() {
+    const g = document.getElementById('view-main'); 
+    g.innerHTML = "";
+    
+    Object.keys(schema).sort().forEach(c => {
+        // Conta quante schede appartengono a questa categoria
+        // Assumendo che il tuo array di dati si chiami 'cards' e la categoria sia nel campo 'c'
+        const count = cards.filter(item => item.c === c).length;
+        
+        // Crea il badge solo se il numero è maggiore di 0
+        const badge = count > 0 ? `<span class="badge-count">${count}</span>` : "";
+        
+        g.innerHTML += `
+            <div class="card-cat" onclick="openCat('${c}')" style="position: relative;">
+                ${badge}
+                <i>${schema[c].icon}</i>
+                <b>${c}</b>
+            </div>`;
+    });
+}
 
     function openCat(c) {
     document.getElementById('view-main').classList.add('hidden');
