@@ -47,23 +47,25 @@
         .tree-sub { margin-left: 20px; border-left: 2px dashed #ddd; padding-left: 15px; margin-top: 10px; }
         .badge-count {
     position: absolute;
-    top: -5px;      /* Lo alziamo un po' per farlo uscire dal bordo */
-    right: -5px;    /* Lo spostiamo un po' a destra */
-    background-color: #2ecc71; /* Un bel verde brillante (Emerald) */
+    top: -8px;          /* Lo facciamo "galleggiare" sull'angolo */
+    right: -8px;
+    background-color: #218838; /* Questo è il Verde Foresta, cambialo in #e67e22 per l'Arancio */
     color: white;
     font-size: 12px;
     font-weight: bold;
-    padding: 5px;
-    min-width: 22px;
-    height: 22px;
+    
+    /* Dimensioni fisse per un cerchio perfetto */
+    width: 24px;
+    height: 24px;
+    
+    /* Centratura perfetta del numero */
     display: flex;
     justify-content: center;
     align-items: center;
     
-    /* Effetto Stella/Scoppio */
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border-radius: 50%; /* Cerchio assoluto */
+    border: 2px solid white; /* Un bordino bianco lo stacca dal quadratino sottostante */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Ombra più marcata per dargli profondità */
     z-index: 100;
     }
     </style>
