@@ -273,8 +273,8 @@ function renderMain() {
     
     Object.keys(schema).sort().forEach(c => {
         // Conta quante schede appartengono a questa categoria
-        // Assumendo che il tuo array di dati si chiami 'cards' e la categoria sia nel campo 'c'
-        const count = cards.filter(item => item.c === c).length;
+        // Assumendo che il tuo array di dati si chiami 'contacts' e la categoria sia nel campo 'c'
+        const count = contacts.filter(item => item.cat === c).length;
         
         // Crea il badge solo se il numero è maggiore di 0
         const badge = count > 0 ? `<span class="badge-count">${count}</span>` : "";
