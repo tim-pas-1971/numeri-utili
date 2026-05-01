@@ -212,15 +212,16 @@
     
     const defaultSchema = {
         "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
-        "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"] },
-        "BRICOLAGE": { icon: "🛠️", sub: ["Ferramenta", "Legnami", "Colorificio"] },
+        "BAR / TABACCHI": { icon: "☕", sub: ["Bar", "Bar / Tabacchi", "Tabaccheria"] },
+        "B&B / AFFITTACAMERE / ALBERGHI": { icon: "🛌", sub: ["B&B", "Affittacamere", "Alberghi"] },
+        "BRICOLAGE": { icon: "🛠️" },
         "CASA (PROF.)": { icon: "🏠", sub: ["Amministrazione", "Antennista", "Elettricista", "Fabbro", "Falegname", "Idraulico", "Imbianchino", "Muratore", "Pavimentista / Piastrellista", "Tecnico Caldaia", "Tecnico Pc"] },
         "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato", "Centro Commerciale"] },
         "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Estetista", "Solarium", "Unghie"] },
         "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista", "Manutenzione Verde"] },
         "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe", "Gioielleria", "Animali", "Ottica", "Casalinghi"] },
         "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico Mutua", "Medico Specialista", "Ospedale", "Veterinario"] },
-        "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"], subSub: { "Etnico": ["Cinese","Fusion", "Giapponese", "Asia", "Africa", "EstEuropa", "Altro"] } }
+        "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"], subSub: { "Ristorante Classico / Pizzeria": ["Carne", "Pesce", "Pizza"], "Etnico": ["Cinese", "Fusion", "Giapponese", "Asia", "Africa", "EstEuropa", "Altro"] } }
     };
 
     let schema = JSON.parse(localStorage.getItem('app_schema')) || defaultSchema;
