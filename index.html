@@ -608,13 +608,23 @@ function renderMain() {
 }
 
     function renderRecsFromSearch(arr) {
-        const list = document.getElementById('records-list');
-        list.innerHTML = arr.length ? "" : "<p>Nessun risultato.</p>";
-        arr.forEach(x => {
-            const index = contacts.indexOf(x);
-            list.innerHTML += `<div style="background:white; padding:15px; border-radius:10px; border-left:5px solid green; margin-bottom:10px; cursor:pointer;" onclick="showFullDetails(${index})"><b>${x.nome}</b><br><small>${x.cat} > ${x.sub}</small></div>`;
-        });
-    }
+    const list = document.getElementById('records-list');
+    list.innerHTML = arr.length ? "" : "<p>Nessun risultato.</p>";
+    arr.forEach(x => {
+        // Troviamo l'indice reale nel database dei contatti
+        const index = contacts.findIndex(c => c.nome === x.nome && c.tel === x.tel);
+        
+        list.innerHTML += `
+            <div style="background:white; padding:15px; border-radius:10px; border-left:5px solid #d9534f; margin-bottom:10px;">
+                <b style="color:#003366">${x.nome}</b><br>
+                <small style="color:#888">Categoria: ${x.cat || '⚠️ NON ASSEGNATA'}</small>
+                <div style="margin-top:10px; display:flex; gap:10px;">
+                    <button class="btn-top" style="background:#28a745; padding:5px 10px; font-size:12px;" onclick="editContact(${index})">📝 CORREGGI</button>
+                    <button class="btn-top" style="background:#d9534f; padding:5px 10px; font-size:12px;" onclick="deleteContact(${index})">🗑️ ELIMINA</button>
+                </div>
+            </div>`;
+    });
+}
 
     function openAddForm() { 
     buildOrari(); 
