@@ -358,10 +358,12 @@ function renderMain() {
 
     function renderRecs(c, s, ss) {
     const list = document.getElementById('records-list');
-    const fil = contacts.filter(x => { 
+    let fil = contacts.filter(x => { 
         const m = x.cat === c && x.sub === s; 
         return ss ? (m && x.ss === ss) : m; 
     });
+
+    fil.sort((a, b) => (parseFloat(a.km) || 0) - (parseFloat(b.km) || 0));
 
     list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato.</p>";
 
