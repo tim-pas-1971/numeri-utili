@@ -803,30 +803,51 @@ function printAllContacts() {
         <head>
             <title>Registro Completo - Numeri Utili</title>
             <style>
-                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; color: #000; background: #fff; line-height: 1.4; }
-                h1 { color: #003366; text-align: center; border-bottom: 3px double #003366; padding-bottom: 10px; margin-bottom: 20px; font-size: 22px; }
-                .cat-title { background: #003366; color: white; padding: 6px 12px; margin-top: 25px; font-size: 1.2em; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
-                .scheda-completa { border-bottom: 1px dashed #999; padding: 15px 5px; page-break-inside: avoid; }
-                .riga-principale { display: flex; justify-content: space-between; align-items: baseline; }
-                .nome { font-size: 1.2em; color: #003366; font-weight: bold; }
-                .percorso { font-size: 0.8em; color: #555; text-transform: uppercase; font-weight: 600; }
-                .km { font-weight: bold; color: #d9534f; font-size: 0.95em; }
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; color: #1e293b; background: #fff; line-height: 1.4; }
+                h1 { color: #1e3a8a; text-align: center; border-bottom: 3px double #1e3a8a; padding-bottom: 10px; margin-bottom: 25px; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
                 
-                .blocco-info { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 6px; font-size: 0.95em; }
-                .info-item { min-width: 200px; }
+                /* STILE MACRO SEZIONE (CATEGORIA) */
+                .cat-title { background: #1e3a8a; color: #ffffff; padding: 8px 15px; margin-top: 30px; font-size: 1.25em; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; border-radius: 4px; }
                 
-                .blocco-specifico { background: #f8f9fa; border-left: 3px solid #28a745; padding: 6px 10px; margin-top: 8px; font-size: 0.9em; display: flex; gap: 20px; }
+                .scheda-completa { border-bottom: 1px dashed #cbd5e1; padding: 18px 5px; page-break-inside: avoid; }
+                .riga-principale { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
                 
-                .sezione-orari { margin-top: 8px; font-size: 0.85em; background: #f1f5f9; padding: 6px 10px; border-radius: 4px; }
-                .orari-lista { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 3px; }
-                .giorno-ora { background: #fff; padding: 2px 6px; border: 1px solid #cbd5e1; border-radius: 3px; }
+                /* EVIDENZIAZIONE NOME ATTIVITÀ */
+                .nome { font-size: 1.3em; color: #2563eb; font-weight: bold; letter-spacing: 0.5px; }
                 
-                .note-stampa { font-style: italic; color: #444; margin-top: 6px; font-size: 0.9em; background: #fffde6; padding: 4px 8px; border-left: 3px solid #f1c40f; }
-                @media print { body { padding: 0; } .cat-title { background: #003366 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+                /* SOTTO-CATEGORIE PERCORSO */
+                .percorso { font-size: 0.8em; color: #475569; text-transform: uppercase; font-weight: 600; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; margin-left: 8px; border: 1px solid #e2e8f0; }
+                
+                /* BADGE KM DA PREGNANA */
+                .km { font-weight: bold; color: #c2410c; font-size: 0.9em; background: #ffedd5; padding: 4px 10px; border-radius: 20px; border: 1px solid #fed7aa; }
+                
+                .blocco-info { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 8px; font-size: 0.95em; }
+                .info-item { min-width: 220px; }
+                b { color: #334155; }
+                
+                .blocco-specifico { background: #f0fdf4; border-left: 4px solid #16a34a; padding: 6px 12px; margin-top: 10px; font-size: 0.9em; display: flex; gap: 20px; border-radius: 0 4px 4px 0; }
+                
+                .sezione-orari { margin-top: 10px; font-size: 0.85em; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #f1f5f9; }
+                .orari-lista { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+                .giorno-ora { background: #fff; padding: 3px 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+                
+                .note-stampa { font-style: italic; color: #334155; margin-top: 8px; font-size: 0.9em; background: #fefce8; padding: 6px 10px; border-left: 4px solid #eab308; border-radius: 0 4px 4px 0; }
+                
+                /* FORZATURA COLORI PER LA STAMPA CARTACEA/PDF */
+                @media print { 
+                    body { padding: 0; } 
+                    .cat-title { background: #1e3a8a !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } 
+                    .nome { color: #2563eb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .percorso { background: #f1f5f9 !important; color: #475569 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .km { background: #ffedd5 !important; color: #c2410c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .blocco-specifico { background: #f0fdf4 !important; border-left-color: #16a34a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .sezione-orari { background: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .note-stampa { background: #fefce8 !important; border-left-color: #eab308 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                }
             </style>
         </head>
         <body>
-            <h1>REGISTRO COMPLETO NOMINATIVI - Numeri Utili di Tiziana Pascali</h1>
+            <h1>REGISTRO COMPLETO NOMINATIVI - Numeri Utili</h1>
     `;
 
     let ultimaCategoria = "";
@@ -838,14 +859,14 @@ function printAllContacts() {
             contenutoHtml += `<div class="cat-title">${x.cat}</div>`;
         }
 
-        const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
+        const percorsoInfo = x.ss ? `${x.sub} &gt; ${x.ss}` : `${x.sub}`;
 
         contenutoHtml += `
             <div class="scheda-completa">
                 <div class="riga-principale">
                     <div>
                         <span class="nome">${x.nome}</span> 
-                        <span class="percorso">(${percorsoInfo})</span>
+                        <span class="percorso">${percorsoInfo}</span>
                     </div>
                     <div class="km">🚗 ${x.km || '0'} KM da Pregnana</div>
                 </div>
@@ -873,10 +894,10 @@ function printAllContacts() {
         // Sezione Orari di Apertura Completi
         contenutoHtml += `<div class="sezione-orari"><b>Orari di Apertura:</b> `;
         if (x.h24) {
-            contenutoHtml += `<span style="color:#007bff; font-weight:bold;">🕒 APERTO H24 - 7 GIORNI SU 7</span>`;
+            contenutoHtml += `<span style="color:#2563eb; font-weight:bold;">🕒 APERTO H24 - 7 GIORNI SU 7</span>`;
         } else if (x.orari) {
             let orariStringhe = [];
-            const giorniSettimana = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+            const giorniSettimana = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sat", "Dom"];
             
             giorniSettimana.forEach(g => {
                 const info = x.orari[g];
@@ -897,11 +918,14 @@ function printAllContacts() {
                         dettagliGiorno.push(`${info.p1}-${info.p2}`);
                     }
                     
+                    // Sostituzione testo giorno per la stampa estesa
+                    let giornoEsteso = g === "Sat" ? "Sab" : g;
+                    
                     // Se è tutto chiuso o non inserito
                     if (info.ch1 && info.ch2) {
-                        orariStringhe.push(`<span class="giorno-ora"><b>${g}:</b> Chiuso ❌</span>`);
+                        orariStringhe.push(`<span class="giorno-ora"><b>${giornoEsteso}:</b> Chiuso ❌</span>`);
                     } else if (dettagliGiorno.length > 0) {
-                        orariStringhe.push(`<span class="giorno-ora"><b>${g}:</b> ${dettagliGiorno.join(' / ')}</span>`);
+                        orariStringhe.push(`<span class="giorno-ora"><b>${giornoEsteso}:</b> ${dettagliGiorno.join(' / ')}</span>`);
                     }
                 }
             });
@@ -934,7 +958,6 @@ function printAllContacts() {
         finestraStampa.close();
     }, 500);
 }
-
 function renderAllFromCat(categoria) {
     const list = document.getElementById('records-list');
     let fil = contacts.filter(x => x.cat === categoria);
