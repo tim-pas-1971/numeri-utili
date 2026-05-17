@@ -790,6 +790,7 @@ function printAllContacts() {
         return alert("Nessun nominativo da stampare!");
     }
 
+    // Ordiniamo tutti i contatti prima per Categoria e poi per Nome
     const contattiOrdinati = [...contacts].sort((a, b) => {
         if (a.cat !== b.cat) return a.cat.localeCompare(b.cat);
         return a.nome.localeCompare(b.nome);
@@ -800,48 +801,130 @@ function printAllContacts() {
     let contenutoHtml = `
         <html>
         <head>
-            <title>Rubrica Completa - Numeri Utili</title>
+            <title>Registro Completo - Numeri Utili</title>
             <style>
-                body { font-family: sans-serif; padding: 20px; color: #333; }
-                h1 { color: #003366; text-align: center; border-bottom: 2px solid #003366; padding-bottom: 10px; }
-                .cat-title { background: #f4f7f9; padding: 8px; margin-top: 30px; border-left: 5px solid #003366; font-size: 1.3em; text-transform: uppercase; }
-                .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
-                .scheda { border: 1px solid #ccc; padding: 15px; border-radius: 8px; page-break-inside: avoid; background: white; }
-                .nome { font-size: 1.1em; color: #003366; font-weight: bold; }
-                .dettagli { font-size: 0.9em; margin-top: 5px; color: #555; }
-                @media print { body { padding: 0; } }
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; color: #000; background: #fff; line-height: 1.4; }
+                h1 { color: #003366; text-align: center; border-bottom: 3px double #003366; padding-bottom: 10px; margin-bottom: 20px; font-size: 22px; }
+                .cat-title { background: #003366; color: white; padding: 6px 12px; margin-top: 25px; font-size: 1.2em; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+                .scheda-completa { border-bottom: 1px dashed #999; padding: 15px 5px; page-break-inside: avoid; }
+                .riga-principale { display: flex; justify-content: space-between; align-items: baseline; }
+                .nome { font-size: 1.2em; color: #003366; font-weight: bold; }
+                .percorso { font-size: 0.8em; color: #555; text-transform: uppercase; font-weight: 600; }
+                .km { font-weight: bold; color: #d9534f; font-size: 0.95em; }
+                
+                .blocco-info { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 6px; font-size: 0.95em; }
+                .info-item { min-width: 200px; }
+                
+                .blocco-specifico { background: #f8f9fa; border-left: 3px solid #28a745; padding: 6px 10px; margin-top: 8px; font-size: 0.9em; display: flex; gap: 20px; }
+                
+                .sezione-orari { margin-top: 8px; font-size: 0.85em; background: #f1f5f9; padding: 6px 10px; border-radius: 4px; }
+                .orari-lista { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 3px; }
+                .giorno-ora { background: #fff; padding: 2px 6px; border: 1px solid #cbd5e1; border-radius: 3px; }
+                
+                .note-stampa { font-style: italic; color: #444; margin-top: 6px; font-size: 0.9em; background: #fffde6; padding: 4px 8px; border-left: 3px solid #f1c40f; }
+                @media print { body { padding: 0; } .cat-title { background: #003366 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
             </style>
         </head>
         <body>
-            <h1>Rubrica Completa - Numeri Utili di Tiziana Pascali</h1>
+            <h1>REGISTRO COMPLETO NOMINATIVI - Numeri Utili di Tiziana Pascali</h1>
     `;
 
     let ultimaCategoria = "";
     
-    contattiOrdinati.forEach((x, idx) => {
+    contattiOrdinati.forEach((x) => {
+        // Gestione macro-categoria divisoria
         if (x.cat !== ultimaCategoria) {
-            if (ultimaCategoria !== "") contenutoHtml += `</div>`; 
             ultimaCategoria = x.cat;
-            contenutoHtml += `<div class="cat-title">${x.cat}</div><div class="grid">`;
+            contenutoHtml += `<div class="cat-title">${x.cat}</div>`;
         }
 
         const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
 
         contenutoHtml += `
-            <div class="scheda">
-                <div style="font-size:0.75em; color:#888; text-transform:uppercase;">${percorsoInfo}</div>
-                <div class="nome">${x.nome}</div>
-                <div class="dettagli">
-                    📍 ${x.via || '-'}, ${x.loc || '-'}<br>
-                    📞 Fisso: ${x.tel || '-'} | 📱 Cell: ${x.cell || '-'}<br>
-                    🚗 Distanza: ${x.km || '0'} KM
-                    ${x.note ? `<br><span style="font-style:italic; color:#666;">📝 Note: ${x.note}</span>` : ''}
+            <div class="scheda-completa">
+                <div class="riga-principale">
+                    <div>
+                        <span class="nome">${x.nome}</span> 
+                        <span class="percorso">(${percorsoInfo})</span>
+                    </div>
+                    <div class="km">🚗 ${x.km || '0'} KM da Pregnana</div>
                 </div>
-            </div>
+                
+                <div class="blocco-info">
+                    <div class="info-item">📍 <b>Indirizzo:</b> ${x.via || '-'}, ${x.loc || '-'} ${x.prov ? `(${x.prov})` : ''}</div>
+                    ${x.tel ? `<div class="info-item">📞 <b>Fisso:</b> ${x.tel}</div>` : ''}
+                    ${x.cell ? `<div class="info-item">📱 <b>Cellulare:</b> ${x.cell}</div>` : ''}
+                    ${x.email ? `<div class="info-item">📧 <b>Email:</b> ${x.email}</div>` : ''}
+                    ${x.sito ? `<div class="info-item">🌐 <b>Sito Web:</b> ${x.sito}</div>` : ''}
+                </div>
         `;
+
+        // Dati specifici (Cucina, Costo, Giudizio) - Utili per Ristoranti/Bar
+        if (x.cucina || x.costo || x.giudizio) {
+            contenutoHtml += `
+                <div class="blocco-specifico">
+                    ${x.cucina ? `<div><b>Tipo Cucina:</b> ${x.cucina}</div>` : ''}
+                    ${x.costo ? `<div><b>Fascia Costo:</b> ${x.costo}</div>` : ''}
+                    ${x.giudizio ? `<div><b>Giudizio Personale:</b> ⭐ ${x.giudizio}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // Sezione Orari di Apertura Completi
+        contenutoHtml += `<div class="sezione-orari"><b>Orari di Apertura:</b> `;
+        if (x.h24) {
+            contenutoHtml += `<span style="color:#007bff; font-weight:bold;">🕒 APERTO H24 - 7 GIORNI SU 7</span>`;
+        } else if (x.orari) {
+            let orariStringhe = [];
+            const giorniSettimana = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+            
+            giorniSettimana.forEach(g => {
+                const info = x.orari[g];
+                if (info) {
+                    let dettagliGiorno = [];
+                    
+                    // Controlla mattina
+                    if (info.ch1) {
+                        dettagliGiorno.push("Chiuso Mattina");
+                    } else if (info.m1 && info.m2) {
+                        dettagliGiorno.push(`${info.m1}-${info.m2}`);
+                    }
+                    
+                    // Controlla pomeriggio
+                    if (info.ch2) {
+                        dettagliGiorno.push("Chiuso Pomeriggio");
+                    } else if (info.p1 && info.p2) {
+                        dettagliGiorno.push(`${info.p1}-${info.p2}`);
+                    }
+                    
+                    // Se è tutto chiuso o non inserito
+                    if (info.ch1 && info.ch2) {
+                        orariStringhe.push(`<span class="giorno-ora"><b>${g}:</b> Chiuso ❌</span>`);
+                    } else if (dettagliGiorno.length > 0) {
+                        orariStringhe.push(`<span class="giorno-ora"><b>${g}:</b> ${dettagliGiorno.join(' / ')}</span>`);
+                    }
+                }
+            });
+            
+            if (orariStringhe.length > 0) {
+                contenutoHtml += `<div class="orari-lista">${orariStringhe.join('')}</div>`;
+            } else {
+                contenutoHtml += `<span>Non specificati</span>`;
+            }
+        } else {
+            contenutoHtml += `<span>Non specificati</span>`;
+        }
+        contenutoHtml += `</div>`;
+
+        // Note testuali estese
+        if (x.note && x.note.trim() !== "") {
+            contenutoHtml += `<div class="note-stampa"><b>Note e Dettagli:</b> ${x.note}</div>`;
+        }
+
+        contenutoHtml += `</div>`; // Chiude scheda-completa
     });
 
-    contenutoHtml += `</div></body></html>`;
+    contenutoHtml += `</body></html>`;
 
     finestraStampa.document.write(contenutoHtml);
     finestraStampa.document.close();
