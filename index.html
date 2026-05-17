@@ -45,29 +45,44 @@
         .tree-node { margin-bottom: 12px; padding: 15px; background: #fdfdfd; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .tree-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.1em; color: var(--primary); }
         .tree-sub { margin-left: 20px; border-left: 2px dashed #ddd; padding-left: 15px; margin-top: 10px; }
+        
         .badge-count {
-    position: absolute;
-    top: -8px;          /* Lo facciamo "galleggiare" sull'angolo */
-    right: -8px;
-    background-color: #d9534f; /* Questo è il Rosso Corallo, cambialo in #218838 per il Verde Foresta o #e67e22 per l'Arancio */
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    
-    /* Dimensioni fisse per un cerchio perfetto */
-    width: 24px;
-    height: 24px;
-    
-    /* Centratura perfetta del numero */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    border-radius: 50%; /* Cerchio assoluto */
-    border: 2px solid white; /* Un bordino bianco lo stacca dal quadratino sottostante */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Ombra più marcata per dargli profondità */
-    z-index: 100;
-    }
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #d9534f;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        /* ==========================================
+           AGGIUNTO: REGOLE PER LA STAMPA DEGLI ELENCHI
+           ========================================== */
+        @media print {
+            header, #admin-menu, .btn-top, button, #sidebar, #admin-footer, #sub-buttons-container {
+                display: none !important;
+            }
+            body { background: white !important; color: black !important; padding: 0 !important; }
+            #view-detail { class: visible !important; }
+            #records-list { display: block !important; }
+            #records-list div {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                margin-bottom: 15px !important;
+                page-break-inside: avoid;
+            }
+            #records-list button { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -97,6 +112,8 @@
         <div id="view-main" class="grid-main"></div>
         <div id="view-detail" class="hidden">
             <button class="btn-top" onclick="location.reload()">⬅️ Torna alla Home</button>
+            <button class="btn-top" onclick="window.print()" style="background:#555;">🖨️ Stampa questo Elenco</button>
+            
             <h2 id="title-detail" style="margin: 20px 0; color: var(--primary);"></h2>
             <div id="sub-buttons-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:25px;"></div>
             <div id="records-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:20px;"></div>
@@ -187,7 +204,6 @@
         <h2 style="margin-top:0;">🔎 Ricerca Avanzata</h2>
         <div class="form-group"><label>Cosa cerchi?</label><input type="text" id="s-testo" placeholder="Nome, città o note..."></div>
         
-        <!-- PRIMA RIGA: CATEGORIE -->
         <div class="form-row" style="margin-top:15px;">
             <div class="form-group"><label>Categoria</label><select id="s-cat" onchange="updateSub('s')"></select></div>
             <div class="form-group"><label>Sottocategoria</label><select id="s-sub" onchange="updateSubSub('s')"></select></div>
@@ -195,9 +211,8 @@
                 <label>Livello 3</label>
                 <select id="s-ss"></select>
             </div>
-        </div> <!-- La chiusura della riga deve stare QUI -->
+        </div>
 
-        <!-- SECONDA RIGA: FILTRI ORARI (AZZURRA) -->
         <div class="form-row" style="margin-top:10px; background: #f0f7ff; padding: 10px; border-radius: 8px;">
             <div class="form-group">
                 <label>Giorno</label>
@@ -251,17 +266,14 @@
     let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
 
     function init() {
-        // 1. Controllo permessi Admin
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
         if (!isAdmin) {
             document.querySelectorAll('#admin-menu button:not([onclick*="Search"])')
                     .forEach(b => b.style.display='none');
         }
 
-        // 2. Disegna le categorie nella Home
         renderMain();
 
-        // 3. Carica la lista delle Province nella tendina (una volta sola!)
         const ps = document.getElementById('f-prov');
         if(ps) {
             ps.innerHTML = '<option value="">Prov.</option>'; 
@@ -270,7 +282,6 @@
             });
         }
 
-        // 4. Costruisce la tabella degli orari
         buildOrari();
     }
 
@@ -279,11 +290,7 @@ function renderMain() {
     g.innerHTML = "";
     
     Object.keys(schema).sort().forEach(c => {
-        // Conta quante schede appartengono a questa categoria
-        // Assumendo che il tuo array di dati si chiami 'contacts' e la categoria sia nel campo 'c'
         const count = contacts.filter(item => item.cat === c).length;
-        
-        // Crea il badge solo se il numero è maggiore di 0
         const badge = count > 0 ? `<span class="badge-count">${count}</span>` : "";
         
         g.innerHTML += `
@@ -295,7 +302,7 @@ function renderMain() {
     });
 }
 
-    function openCat(c) {
+function openCat(c) {
     document.getElementById('view-main').classList.add('hidden');
     document.getElementById('view-detail').classList.remove('hidden');
     document.getElementById('title-detail').innerText = c;
@@ -307,29 +314,26 @@ function renderMain() {
     const row3 = document.createElement('div');
     row3.id = "subsub-container"; row3.style.display = "none"; row3.style.width = "100%"; row3.style.marginTop = "5px";
 
-    // --- AGGIUNTA TASTO "TUTTI" ---
     const btnAll = document.createElement('button');
     btnAll.innerText = "🌟 TUTTI";
     btnAll.className = "nav-btn-l2";
-    // Lo stile ha un bordo bianco per risaltare
     Object.assign(btnAll.style, { border: "2px solid #fff", background: "#f39c12", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
     
     btnAll.onclick = () => {
         document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
-        btnAll.style.background = "#f39c12"; // Colore arancione quando attivo
-        row3.style.display = "none"; // Nasconde le sottosottocategorie
+        btnAll.style.background = "#f39c12";
+        row3.style.display = "none";
         renderAllFromCat(c); 
     };
     row2.appendChild(btnAll);
-    // ------------------------------
 
     schema[c].sub.sort().forEach(s => {
         const btn = document.createElement('button'); btn.innerText = s; btn.className = "nav-btn-l2";
         Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
         btn.onclick = () => {
             document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
-            btnAll.style.background = "transparent"; // Spegne l'arancione di "TUTTI"
-            btn.style.background = "#f0ad4e"; // Giallo classico per la sottocategoria
+            btnAll.style.background = "transparent";
+            btn.style.background = "#f0ad4e";
             renderRecs(c, s); 
             showSubSub(c, s, row3);
         };
@@ -337,26 +341,25 @@ function renderMain() {
     });
     sc.appendChild(row2); sc.appendChild(row3);
 
-    // Lanciamo la visualizzazione "TUTTI" all'ingresso automatico
     renderAllFromCat(c);
 }
 
-    function showSubSub(c, s, container) {
-        container.innerHTML = "";
-        if (!schema[c].subSub || !schema[c].subSub[s]) { container.style.display = "none"; return; }
-        container.style.display = "flex"; container.style.flexWrap = "wrap"; container.style.gap = "8px"; container.style.background = "#e9ecef"; container.style.padding = "10px"; container.style.borderRadius = "8px";
-        schema[c].subSub[s].sort().forEach(ss => {
-            const btn = document.createElement('button'); btn.innerText = ss; btn.className = "nav-btn-l3";
-            Object.assign(btn.style, { border: "1px solid #1e7e34", background: "#28a745", color: "white", padding: "8px 15px", cursor: "pointer", borderRadius: "5px", fontSize: "0.85em", fontWeight: "600" });
-            btn.onclick = () => {
-                document.querySelectorAll('.nav-btn-l3').forEach(b => b.style.background = "#28a745");
-                btn.style.background = "#0b4d1a"; renderRecs(c, s, ss);
-            };
-            container.appendChild(btn);
-        });
-    }
+function showSubSub(c, s, container) {
+    container.innerHTML = "";
+    if (!schema[c].subSub || !schema[c].subSub[s]) { container.style.display = "none"; return; }
+    container.style.display = "flex"; container.style.flexWrap = "wrap"; container.style.gap = "8px"; container.style.background = "#e9ecef"; container.style.padding = "10px"; container.style.borderRadius = "8px";
+    schema[c].subSub[s].sort().forEach(ss => {
+        const btn = document.createElement('button'); btn.innerText = ss; btn.className = "nav-btn-l3";
+        Object.assign(btn.style, { border: "1px solid #1e7e34", background: "#28a745", color: "white", padding: "8px 15px", cursor: "pointer", borderRadius: "5px", fontSize: "0.85em", fontWeight: "600" });
+        btn.onclick = () => {
+            document.querySelectorAll('.nav-btn-l3').forEach(b => b.style.background = "#28a745");
+            btn.style.background = "#0b4d1a"; renderRecs(c, s, ss);
+        };
+        container.appendChild(btn);
+    });
+}
 
-    function renderRecs(c, s, ss) {
+function renderRecs(c, s, ss) {
     const list = document.getElementById('records-list');
     let fil = contacts.filter(x => { 
         const m = x.cat === c && x.sub === s; 
@@ -370,23 +373,17 @@ function renderMain() {
     fil.forEach(x => {
         const index = contacts.indexOf(x);
         const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
-        
         const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
         
         list.innerHTML += `
             <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; cursor:pointer; position:relative;" onclick="showFullDetails(${index})">
                 <div style="font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">${percorsoInfo}</div>
-                
                 ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin:10px 0;">` : ''}
-                
                 <b style="font-size:1.2em; color:#003366">${x.nome}</b><br>
-                
                 <div style="margin-top:5px; font-size:14px;">📍 ${x.via}, ${x.loc}<br>📞 ${x.tel || '-'} | 📱 ${x.cell || '-'}</div>
-                
                 <div style="position:absolute; bottom:20px; right:20px; color:#d9534f; font-weight:bold; font-size:1.1em; display:flex; align-items:center; gap:5px;">
                     🚗 ${x.km || '0'} KM
                 </div>
-
                 <div style="margin-top:10px; display:flex; gap:5px;" onclick="event.stopPropagation()">
                     <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
                     <button onclick="editContact(${index})" title="Modifica">📝</button>
@@ -397,27 +394,26 @@ function renderMain() {
     });
 }
 
-    function buildOrari() {
-        const b = document.getElementById('orari-body'); b.innerHTML = "";
-        ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(g => {
-            b.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time" class="m1">-<input type="time" class="m2"></td><td><input type="checkbox" class="ch1"></td><td><input type="time" class="p1">-<input type="time" class="p2"></td><td><input type="checkbox" class="ch2"></td></tr>`;
-        });
-    }
+function buildOrari() {
+    const b = document.getElementById('orari-body'); b.innerHTML = "";
+    ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].forEach(g => {
+        b.innerHTML += `<tr><td><b>${g}</b></td><td><input type="time" class="m1">-<input type="time" class="m2"></td><td><input type="checkbox" class="ch1"></td><td><input type="time" class="p1">-<input type="time" class="p2"></td><td><input type="checkbox" class="ch2"></td></tr>`;
+    });
+}
 
-    function updateSub(p) {
-        const c = document.getElementById(p + '-cat').value;
-        const s = document.getElementById(p + '-sub'); s.innerHTML = '<option value="">Scegli...</option>';
-        if(schema[c]) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
-        updateSubSub(p);
-    }
+function updateSub(p) {
+    const c = document.getElementById(p + '-cat').value;
+    const s = document.getElementById(p + '-sub'); s.innerHTML = '<option value="">Scegli...</option>';
+    if(schema[c]) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
+    updateSubSub(p);
+}
 
-    function updateSubSub(p) {
+function updateSubSub(p) {
     const c = document.getElementById(p + '-cat').value;
     const sub = document.getElementById(p + '-sub').value;
     const g = document.getElementById(p + '-ss-group');
     const ss = document.getElementById(p + '-ss');
     
-    // Controlliamo se esistono sottosottocategorie (usando subSub)
     if(schema[c] && schema[c].subSub && schema[c].subSub[sub]) {
         g.classList.remove('hidden'); 
         ss.innerHTML = '<option value="">Scegli...</option>';
@@ -425,62 +421,57 @@ function renderMain() {
             ss.innerHTML += `<option value="${x}">${x}</option>`;
         });
     } else {
-        // Se non ci sono, nascondiamo la tendina del Livello 3
         if(g) g.classList.add('hidden');
         if(ss) ss.innerHTML = ''; 
     }
 }
 
-    function saveData() {
-        const n = document.getElementById('f-nome').value;
-        if(!n) return alert("Inserisci il nome!");
-        
-        const nuovo = {
-            nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value,
-            ss: document.getElementById('f-ss') ? document.getElementById('f-ss').value : '',
-            via: document.getElementById('f-via').value, loc: document.getElementById('f-loc').value, 
-            prov: document.getElementById('f-prov').value, km: document.getElementById('f-km').value,
-            tel: document.getElementById('f-tel').value, cell: document.getElementById('f-cell').value, 
-            foto: document.getElementById('f-foto').value, sito: document.getElementById('f-sito').value, 
-            email: document.getElementById('f-email').value, cucina: document.getElementById('f-cucina').value, 
-            costo: document.getElementById('f-costo').value, giudizio: document.getElementById('f-giudizio').value,
-            note: document.getElementById('f-note').value,
-            h24: document.getElementById('f-h24').checked, // <--- AGGIUNGI QUESTA
-            orari: {}
+function saveData() {
+    const n = document.getElementById('f-nome').value;
+    if(!n) return alert("Inserisci il nome!");
+    
+    const nuovo = {
+        nome: n, cat: document.getElementById('f-cat').value, sub: document.getElementById('f-sub').value,
+        ss: document.getElementById('f-ss') ? document.getElementById('f-ss').value : '',
+        via: document.getElementById('f-via').value, loc: document.getElementById('f-loc').value, 
+        prov: document.getElementById('f-prov').value, km: document.getElementById('f-km').value,
+        tel: document.getElementById('f-tel').value, cell: document.getElementById('f-cell').value, 
+        foto: document.getElementById('f-foto').value, sito: document.getElementById('f-sito').value, 
+        email: document.getElementById('f-email').value, cucina: document.getElementById('f-cucina').value, 
+        costo: document.getElementById('f-costo').value, giudizio: document.getElementById('f-giudizio').value,
+        note: document.getElementById('f-note').value,
+        h24: document.getElementById('f-h24').checked,
+        orari: {}
+    };
+
+    const rows = document.querySelectorAll('#orari-body tr');
+    const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+    rows.forEach((row, i) => {
+        nuovo.orari[giorni[i]] = { 
+            m1: row.querySelector('.m1').value, m2: row.querySelector('.m2').value, 
+            ch1: row.querySelector('.ch1').checked, p1: row.querySelector('.p1').value, 
+            p2: row.querySelector('.p2').value, ch2: row.querySelector('.ch2').checked 
         };
+    });
 
-        const rows = document.querySelectorAll('#orari-body tr');
-        const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-        rows.forEach((row, i) => {
-            nuovo.orari[giorni[i]] = { 
-                m1: row.querySelector('.m1').value, m2: row.querySelector('.m2').value, 
-                ch1: row.querySelector('.ch1').checked, p1: row.querySelector('.p1').value, 
-                p2: row.querySelector('.p2').value, ch2: row.querySelector('.ch2').checked 
-            };
-        });
+    contacts.push(nuovo); 
+    localStorage.setItem('app_contacts', JSON.stringify(contacts)); 
+    
+    closeMod('form-overlay'); 
 
-        // Salvataggio nel database locale
-        contacts.push(nuovo); 
-        localStorage.setItem('app_contacts', JSON.stringify(contacts)); 
-        
-        // --- LOGICA DI AGGIORNAMENTO SENZA REFRESH ---
-        closeMod('form-overlay'); // Chiude la finestra di inserimento
+    const categoriaCorrente = document.getElementById('title-detail').innerText;
+    const vistaDettaglioNascosta = document.getElementById('view-detail').classList.contains('hidden');
 
-        const categoriaCorrente = document.getElementById('title-detail').innerText;
-        const vistaDettaglioNascosta = document.getElementById('view-detail').classList.contains('hidden');
-
-        if (!vistaDettaglioNascosta && categoriaCorrente) {
-            // Se eravamo dentro una categoria, la rinfreschiamo subito
-            openCat(categoriaCorrente);
-        } else {
-            // Se eravamo in Home, aggiorniamo le icone
-            renderMain();
-        }
-        
-        alert("Scheda salvata con successo!");
+    if (!vistaDettaglioNascosta && categoriaCorrente) {
+        openCat(categoriaCorrente);
+    } else {
+        renderMain();
     }
+    
+    alert("Scheda salvata con successo!");
+}
 
-    function showFullDetails(i) {
+function showFullDetails(i) {
     const x = contacts[i]; if(!x) return;
     openAddForm(); 
     document.getElementById('form-title').innerText = "🔍 Scheda: " + x.nome;
@@ -503,7 +494,6 @@ function renderMain() {
     document.getElementById('f-giudizio').value = x.giudizio || '';
     document.getElementById('f-note').value = x.note || '';
 
-    // Gestione H24 e Orari
     const oldBanner = document.getElementById('h24-banner');
     if(oldBanner) oldBanner.remove();
 
@@ -535,7 +525,8 @@ function renderMain() {
     }
     document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = true; el.style.background = "#f9f9f9"; });
 }
-    function openAddForm() { 
+
+function openAddForm() { 
     buildOrari(); 
     openMod('form-overlay'); 
     document.getElementById('form-title').innerText = "Nuova Scheda"; 
@@ -543,7 +534,6 @@ function renderMain() {
     document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { 
         el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked = false; 
     }); 
-    // Reset H24 e tabella
     document.getElementById('f-h24').checked = false;
     document.querySelector('.timetable').style.display = "table";
     const oldB = document.getElementById('h24-banner'); if(oldB) oldB.remove();
@@ -553,16 +543,15 @@ function renderMain() {
     Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
 }
 
-    function editContact(i) {
-        const x = contacts[i]; showFullDetails(i);
-        document.getElementById('form-title').innerText = "📝 Modifica: " + x.nome;
-        document.getElementById('save-btn-container').style.display = "block";
-        document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; });
-        contacts.splice(i, 1);
-    }
+function editContact(i) {
+    const x = contacts[i]; showFullDetails(i);
+    document.getElementById('form-title').innerText = "📝 Modifica: " + x.nome;
+    document.getElementById('save-btn-container').style.display = "block";
+    document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; });
+    contacts.splice(i, 1);
+}
 
-    function applySearch() {
-    // 1. Recupero tutti i valori dai campi di ricerca
+function applySearch() {
     const t = document.getElementById('s-testo').value.toLowerCase();
     const c = document.getElementById('s-cat').value;
     const s = document.getElementById('s-sub').value;
@@ -571,36 +560,31 @@ function renderMain() {
     const fSel = document.getElementById('s-fascia').value;
 
     const res = contacts.filter(x => {
-        // 2. Filtri testuali e di categoria (incluso Livello 3)
         const mT = !t || x.nome.toLowerCase().includes(t) || x.loc.toLowerCase().includes(t) || (x.note && x.note.toLowerCase().includes(t));
         const mC = !c || x.cat === c;
         const mS = !s || x.sub === s;
         const mSS = !ss || x.ss === ss; 
 
-        // 3. Logica Filtro Orario / H24
         let mO = true;
         if (fSel === 'h24') {
             mO = x.h24 === true;
         } else if (gSel && fSel) {
             if (x.h24) { 
-                mO = true; // Se è H24, per la ricerca è sempre aperto
+                mO = true; 
             } else if (x.orari && x.orari[gSel]) {
                 const info = x.orari[gSel];
-                if (fSel === 'm') mO = !info.ch1 && info.m1 && info.m2; // Aperto mattina
-                if (fSel === 'p') mO = !info.ch2 && info.p1 && info.p2; // Aperto pomeriggio
+                if (fSel === 'm') mO = !info.ch1 && info.m1 && info.m2; 
+                if (fSel === 'p') mO = !info.ch2 && info.p1 && info.p2; 
             } else {
                 mO = false;
             }
         } else if (gSel) {
-            // Se cerco solo il giorno, deve essere aperto in almeno una fascia o H24
             mO = x.h24 || (x.orari && x.orari[gSel] && (!x.orari[gSel].ch1 || !x.orari[gSel].ch2));
         }
 
-        // 4. Il contatto deve passare TUTTI i filtri contemporaneamente
         return mT && mC && mS && mSS && mO;
     });
 
-    // 5. Visualizzazione dei risultati
     document.getElementById('view-main').classList.add('hidden');
     document.getElementById('view-detail').classList.remove('hidden');
     document.getElementById('title-detail').innerText = "Risultati Ricerca";
@@ -609,11 +593,10 @@ function renderMain() {
     closeMod('search-overlay');
 }
 
-    function renderRecsFromSearch(arr) {
+function renderRecsFromSearch(arr) {
     const list = document.getElementById('records-list');
     list.innerHTML = arr.length ? "" : "<p>Nessun risultato.</p>";
     arr.forEach(x => {
-        // Troviamo l'indice reale nel database dei contatti
         const index = contacts.findIndex(c => c.nome === x.nome && c.tel === x.tel);
         
         list.innerHTML += `
@@ -628,146 +611,119 @@ function renderMain() {
     });
 }
 
-    function openAddForm() { 
-    buildOrari(); 
-    openMod('form-overlay'); 
-    document.getElementById('form-title').innerText = "Nuova Scheda"; 
-    document.getElementById('save-btn-container').style.display = "block"; 
+function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
+function openManage() {
+    openMod('manage-overlay');
+    const t = document.getElementById('tree-container');
+    if (!t) return;
+    t.innerHTML = "";
     
-    document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { 
-        el.disabled = false; el.style.background = "white"; el.value = ""; if(el.type==='checkbox') el.checked = false; 
-    }); 
-
-    // --- AGGIUNGI QUESTE RIGHE QUI SOTTO ---
-    document.getElementById('f-h24').checked = false;
-    document.querySelector('.timetable').style.display = "table";
-    const oldB = document.getElementById('h24-banner'); if(oldB) oldB.remove();
-    // ---------------------------------------
-
-    const sel = document.getElementById('f-cat'); 
-    sel.innerHTML = '<option value="">Scegli...</option>'; 
-    Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
-}
-    function openSearch() { openMod('search-overlay'); const s = document.getElementById('s-cat'); s.innerHTML = '<option value="">Tutte</option>'; Object.keys(schema).sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
-    function openManage() {
-        openMod('manage-overlay');
-        const t = document.getElementById('tree-container');
-        if (!t) return;
-        t.innerHTML = "";
+    Object.keys(schema).sort().forEach(c => {
+        let h = `
+        <div class="tree-node">
+            <div class="tree-header" style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:5px;">
+                <span>${schema[c].icon} <b>${c}</b> 
+                    <button style="border:none; background:none; cursor:pointer;" onclick="renameCat('${c}')">✏️</button>
+                </span>
+                <span>
+                    <button class="btn-top" style="padding:5px 10px; font-size:12px; background:var(--secondary);" onclick="addSub('${c}')">[+] Sub</button>
+                    <button class="btn-top" style="padding:5px 10px; font-size:12px; background:#d9534f;" onclick="delCat('${c}')">❌</button>
+                </span>
+            </div>`;
         
-        Object.keys(schema).sort().forEach(c => {
-            let h = `
-            <div class="tree-node">
-                <div class="tree-header" style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:5px;">
-                    <span>${schema[c].icon} <b>${c}</b> 
-                        <button style="border:none; background:none; cursor:pointer;" onclick="renameCat('${c}')">✏️</button>
-                    </span>
-                    <span>
-                        <button class="btn-top" style="padding:5px 10px; font-size:12px; background:var(--secondary);" onclick="addSub('${c}')">[+] Sub</button>
-                        <button class="btn-top" style="padding:5px 10px; font-size:12px; background:#d9534f;" onclick="delCat('${c}')">❌</button>
-                    </span>
-                </div>`;
-            
-            if (schema[c].sub) {
-                schema[c].sub.sort().forEach(s => {
-                    h += `
-                    <div class="tree-sub" style="margin-left:20px; padding:5px; border-left:2px solid #ddd;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>- ${s} 
-                                <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSub('${c}','${s}')">✏️</button>
-                            </span>
-                            <span>
-                                <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#5bc0de;" onclick="addSS('${c}','${s}')">[+] SS</button>
-                                <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#f0ad4e;" onclick="delSub('${c}','${s}')">❌</button>
-                            </span>
+        if (schema[c].sub) {
+            schema[c].sub.sort().forEach(s => {
+                h += `
+                <div class="tree-sub" style="margin-left:20px; padding:5px; border-left:2px solid #ddd;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>- ${s} 
+                            <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSub('${c}','${s}')">✏️</button>
+                        </span>
+                        <span>
+                            <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#5bc0de;" onclick="addSS('${c}','${s}')">[+] SS</button>
+                            <button class="btn-top" style="padding:3px 8px; font-size:11px; background:#f0ad4e;" onclick="delSub('${c}','${s}')">❌</button>
+                        </span>
+                    </div>`;
+                
+                if(schema[c].subSub && schema[c].subSub[s]) {
+                    schema[c].subSub[s].sort().forEach(ss => {
+                        h += `
+                        <div style="margin-left:25px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
+                            <span>-- ${ss} <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSS('${c}','${s}','${ss}')">✏️</button></span>
+                            <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
                         </div>`;
-                    
-                    if(schema[c].subSub && schema[c].subSub[s]) {
-    schema[c].subSub[s].sort().forEach(ss => {
-        h += `
-        <div style="margin-left:25px; font-size:0.85em; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
-            <span>-- ${ss} <button style="border:none; background:none; cursor:pointer; font-size:10px;" onclick="renameSS('${c}','${s}','${ss}')">✏️</button></span>
-            <button style="border:none; background:none; color:red; cursor:pointer;" onclick="delSS('${c}','${s}','${ss}')">❌</button>
-        </div>`;
+                    });
+                }
+                h += `</div>`;
+            });
+        }
+        h += `</div>`;
+        t.innerHTML += h;
     });
 }
-                    h += `</div>`;
-                });
-            }
-            h += `</div>`;
-            t.innerHTML += h;
-        });
-    }
-    function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
-    function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
-    function renameCat(vecchioNome) {
-        const nuovoNome = prompt("Rinomina Sezione:", vecchioNome);
-        if (nuovoNome && nuovoNome !== vecchioNome) {
-            schema[nuovoNome] = schema[vecchioNome];
-            delete schema[vecchioNome];
-            // Aggiorna anche i contatti esistenti per non perderli!
-            contacts.forEach(c => { if(c.cat === vecchioNome) c.cat = nuovoNome; });
-            localStorage.setItem('app_contacts', JSON.stringify(contacts));
-            saveSchema();
-        }
-    }
 
-    function renameSub(c, vecchioSub) {
-        const nuovoSub = prompt("Rinomina Sottocategoria:", vecchioSub);
-        if (nuovoSub && nuovoSub !== vecchioSub) {
-            const idx = schema[c].sub.indexOf(vecchioSub);
-            if (idx !== -1) schema[c].sub[idx] = nuovoSub;
-            // Sposta anche le eventuali sottosottocategorie
-            if (schema[c].subSub && schema[c].subSub[vecchioSub]) {
-                schema[c].subSub[nuovoSub] = schema[c].subSub[vecchioSub];
-                delete schema[c].subSub[vecchioSub];
-            }
-            // Aggiorna contatti
-            contacts.forEach(con => { if(con.cat === c && con.sub === vecchioSub) con.sub = nuovoSub; });
-            localStorage.setItem('app_contacts', JSON.stringify(contacts));
-            saveSchema();
-        }
+function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
+function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
+function renameCat(vecchioNome) {
+    const nuovoNome = prompt("Rinomina Sezione:", vecchioNome);
+    if (nuovoNome && nuovoNome !== vecchioNome) {
+        schema[nuovoNome] = schema[vecchioNome];
+        delete schema[vecchioNome];
+        contacts.forEach(c => { if(c.cat === vecchioNome) c.cat = nuovoNome; });
+        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        saveSchema();
     }
+}
 
-    function renameSS(c, s, vecchioSS) {
-        const nuovoSS = prompt("Rinomina Livello 3:", vecchioSS);
-        if (nuovoSS && nuovoSS !== vecchioSS) {
-            const idx = schema[c].subSub[s].indexOf(vecchioSS);
-            if (idx !== -1) schema[c].subSub[s][idx] = nuovoSS;
-            // Aggiorna contatti
-            contacts.forEach(con => { if(con.cat === c && con.sub === s && con.ss === vecchioSS) con.ss = nuovoSS; });
-            localStorage.setItem('app_contacts', JSON.stringify(contacts));
-            saveSchema();
+function renameSub(c, vecchioSub) {
+    const nuovoSub = prompt("Rinomina Sottocategoria:", vecchioSub);
+    if (nuovoSub && nuovoSub !== vecchioSub) {
+        const idx = schema[c].sub.indexOf(vecchioSub);
+        if (idx !== -1) schema[c].sub[idx] = nuovoSub;
+        if (schema[c].subSub && schema[c].subSub[vecchioSub]) {
+            schema[c].subSub[nuovoSub] = schema[c].subSub[vecchioSub];
+            delete schema[c].subSub[vecchioSub];
         }
+        contacts.forEach(con => { if(con.cat === c && con.sub === vecchioSub) con.sub = nuovoSub; });
+        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        saveSchema();
     }
-    function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
-    function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
-    function saveSchema() {
+}
+
+function renameSS(c, s, vecchioSS) {
+    const nuovoSS = prompt("Rinomina Livello 3:", vecchioSS);
+    if (nuovoSS && nuovoSS !== vecchioSS) {
+        const idx = schema[c].subSub[s].indexOf(vecchioSS);
+        if (idx !== -1) schema[c].subSub[s][idx] = nuovoSS;
+        contacts.forEach(con => { if(con.cat === c && con.sub === s && con.ss === vecchioSS) con.ss = nuovoSS; });
+        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        saveSchema();
+    }
+}
+
+function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
+function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
+function saveSchema() {
     localStorage.setItem('app_schema', JSON.stringify(schema));
-    // Invece di ricaricare tutto, aggiorniamo solo la lista della gestione
     openManage(); 
 }
-    function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
-    function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
-    function deleteContact(i) {
+
+function openMod(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
+function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
+
+function deleteContact(i) {
     if(confirm("Eliminare definitivamente questo nominativo?")) {
-        // Memorizziamo la categoria in cui ci troviamo prima di cancellare
         const catCorrente = contacts[i].cat;
-        
-        // Eliminiamo il contatto
         contacts.splice(i, 1);
         localStorage.setItem('app_contacts', JSON.stringify(contacts));
-        
-        // Invece di location.reload(), rinfreschiamo la categoria
-        // così rimani dove sei!
         openCat(catCorrente);
-        
         alert("Nominativo eliminato con successo.");
     }
 }
-    function exportData() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); a.download = 'rubrica.json'; a.click(); }
-    function importData() {
+
+function exportData() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); a.download = 'rubrica.json'; a.click(); }
+function importData() {
     const i = document.createElement('input');
     i.type = 'file';
     i.accept = '.json'; 
@@ -779,10 +735,7 @@ function renderMain() {
                 let datiCaricati = JSON.parse(x.target.result);
                 let listaNuova = [];
 
-                // --- ESTRAZIONE FORZATA DEI DATI ---
                 if (datiCaricati.contacts) {
-                    // Se è un oggetto singolo {id...}, lo mettiamo in una lista. 
-                    // Se è già una lista, la usiamo così com'è.
                     listaNuova = Array.isArray(datiCaricati.contacts) ? datiCaricati.contacts : [datiCaricati.contacts];
                 } else if (Array.isArray(datiCaricati)) {
                     listaNuova = datiCaricati;
@@ -793,7 +746,6 @@ function renderMain() {
                 const integra = confirm("Scegli: OK per AGGIUNGERE i dati, ANNULLA per SOSTITUIRE tutto.");
 
                 if (integra) {
-                    // Ci assicuriamo che 'contacts' (quello dell'app) sia una lista
                     if (!Array.isArray(contacts)) contacts = [];
                     contacts = contacts.concat(listaNuova);
                     alert("Dati aggiunti con successo!");
@@ -813,8 +765,9 @@ function renderMain() {
     };
     i.click();
 }
-    function resetAll() { if (confirm("Cancellare tutto?")) { localStorage.removeItem('app_contacts'); location.reload(); } }
-    // FUNZIONE PER DUPLICARE IL NOMINATIVO
+
+function resetAll() { if (confirm("Cancellare tutto?")) { localStorage.removeItem('app_contacts'); location.reload(); } }
+
 function duplicateContact(index) {
     const copia = JSON.parse(JSON.stringify(contacts[index]));
     copia.nome += " (Copia)";
@@ -824,29 +777,85 @@ function duplicateContact(index) {
     alert("Nominativo duplicato!");
 }
 
-// NUOVA FUNZIONE SPOSTA CON TENDINE
 function moveContact(index) {
     const x = contacts[index];
-    // Riapriamo la scheda in modalità modifica, ma puntiamo subito alle categorie
     editContact(index); 
-    
-    // Cambiamo il titolo per far capire all'utente cosa sta facendo
     document.getElementById('form-title').innerText = "📦 Sposta / Ricolloca: " + x.nome;
-    
-    // Portiamo il focus sulla selezione della categoria
     document.getElementById('f-cat').focus();
-    
     alert("Usa le tendine per cambiare Categoria o Sottocategoria, poi clicca su SALVA.");
 }
-    window.onload = init;
-    // --- NUOVA FUNZIONE PER IL TASTO ALL ---
-    function renderAllFromCat(categoria) {
-    const list = document.getElementById('records-list');
+
+function printAllContacts() {
+    if (!contacts || contacts.length === 0) {
+        return alert("Nessun nominativo da stampare!");
+    }
+
+    const contattiOrdinati = [...contacts].sort((a, b) => {
+        if (a.cat !== b.cat) return a.cat.localeCompare(b.cat);
+        return a.nome.localeCompare(b.nome);
+    });
+
+    const finestraStampa = window.open('', '_blank');
     
-    // Filtriamo prendendo ogni contatto che appartiene alla categoria principale
+    let contenutoHtml = `
+        <html>
+        <head>
+            <title>Rubrica Completa - Numeri Utili</title>
+            <style>
+                body { font-family: sans-serif; padding: 20px; color: #333; }
+                h1 { color: #003366; text-align: center; border-bottom: 2px solid #003366; padding-bottom: 10px; }
+                .cat-title { background: #f4f7f9; padding: 8px; margin-top: 30px; border-left: 5px solid #003366; font-size: 1.3em; text-transform: uppercase; }
+                .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
+                .scheda { border: 1px solid #ccc; padding: 15px; border-radius: 8px; page-break-inside: avoid; background: white; }
+                .nome { font-size: 1.1em; color: #003366; font-weight: bold; }
+                .dettagli { font-size: 0.9em; margin-top: 5px; color: #555; }
+                @media print { body { padding: 0; } }
+            </style>
+        </head>
+        <body>
+            <h1>Rubrica Completa - Numeri Utili di Tiziana Pascali</h1>
+    `;
+
+    let ultimaCategoria = "";
+    
+    contattiOrdinati.forEach((x, idx) => {
+        if (x.cat !== ultimaCategoria) {
+            if (ultimaCategoria !== "") contenutoHtml += `</div>`; 
+            ultimaCategoria = x.cat;
+            contenutoHtml += `<div class="cat-title">${x.cat}</div><div class="grid">`;
+        }
+
+        const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
+
+        contenutoHtml += `
+            <div class="scheda">
+                <div style="font-size:0.75em; color:#888; text-transform:uppercase;">${percorsoInfo}</div>
+                <div class="nome">${x.nome}</div>
+                <div class="dettagli">
+                    📍 ${x.via || '-'}, ${x.loc || '-'}<br>
+                    📞 Fisso: ${x.tel || '-'} | 📱 Cell: ${x.cell || '-'}<br>
+                    🚗 Distanza: ${x.km || '0'} KM
+                    ${x.note ? `<br><span style="font-style:italic; color:#666;">📝 Note: ${x.note}</span>` : ''}
+                </div>
+            </div>
+        `;
+    });
+
+    contenutoHtml += `</div></body></html>`;
+
+    finestraStampa.document.write(contenutoHtml);
+    finestraStampa.document.close();
+    
+    finestraStampa.setTimeout(() => {
+        finestraStampa.print();
+        finestraStampa.close();
+    }, 500);
+}
+
+function renderAllFromCat(categoria) {
+    const list = document.getElementById('records-list');
     let fil = contacts.filter(x => x.cat === categoria);
 
-    // Ordiniamo per KM (Crescente: dal più vicino al più lontano)
     fil.sort((a, b) => (parseFloat(a.km) || 0) - (parseFloat(b.km) || 0));
 
     list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato in questa sezione.</p>";
@@ -854,8 +863,6 @@ function moveContact(index) {
     fil.forEach(x => {
         const index = contacts.indexOf(x);
         const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
-        
-        // Costruiamo il percorso completo per chiarezza (es. ETNICO > CINESE)
         let infoPercorso = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
         
         list.innerHTML += `
@@ -864,11 +871,9 @@ function moveContact(index) {
                 ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin:10px 0;">` : ''}
                 <b style="font-size:1.2em; color:#003366">${x.nome}</b><br>
                 <div style="margin-top:5px; font-size:14px;">📍 ${x.via}, ${x.loc}<br>📞 ${x.tel || '-'} | 📱 ${x.cell || '-'}</div>
-                
                 <div style="position:absolute; bottom:20px; right:20px; color:#d9534f; font-weight:bold; font-size:1.1em; display:flex; align-items:center; gap:5px;">
                     🚗 ${x.km || '0'} KM
                 </div>
-
                 <div style="margin-top:10px; display:flex; gap:5px;" onclick="event.stopPropagation()">
                     <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
                     <button onclick="editContact(${index})" title="Modifica">📝</button>
@@ -878,10 +883,10 @@ function moveContact(index) {
             </div>`;
     });
 }
-    function addSS(cat, sub) {
+
+function addSS(cat, sub) {
     const ssName = prompt(`Aggiungi Sotto-Sottosezione per "${sub}":`);
     if (ssName) {
-        // Usiamo subSub per coerenza con il tuo codice esistente
         if (!schema[cat].subSub) schema[cat].subSub = {}; 
         if (!schema[cat].subSub[sub]) schema[cat].subSub[sub] = []; 
         
@@ -894,15 +899,13 @@ function moveContact(index) {
     }
 }
 
-// Aggiungiamo anche la funzione per eliminare le SS, così il lavoro è completo
 function delSS(c, s, ss) {
     if(confirm(`Eliminare "${ss}"?`)) {
-        // Usiamo subSub come nel resto del tuo file
         schema[c].subSub[s] = schema[c].subSub[s].filter(x => x !== ss);
-        saveSchema(); // Questa funzione nel tuo codice salva e fa il refresh
+        saveSchema(); 
     }
 }
-            // Questo codice serve a nascondere la tabella in tempo reale quando clicchi H24
+
 document.addEventListener('change', function(e) {
     if (e.target && e.target.id === 'f-h24') {
         const table = document.querySelector('.timetable');
@@ -913,11 +916,14 @@ document.addEventListener('change', function(e) {
         }
     }
 });
+
+window.onload = init;
 </script>
 
 <div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white;">
     <button class="btn-top" style="background:#555" onclick="exportData()">ESPORTA</button>
     <button class="btn-top" style="background:#555" onclick="importData()">IMPORTA</button>
+    <button class="btn-top" style="background:#003366" onclick="printAllContacts()">🖨️ STAMPA TUTTO</button>
     <button class="btn-top" style="background:#d9534f; margin-left: auto;" onclick="resetAll()">RESET TOTALE</button>
 </div>
 
