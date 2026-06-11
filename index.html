@@ -722,7 +722,22 @@ function deleteContact(i) {
     }
 }
 
-function exportData() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); a.download = 'rubrica.json'; a.click(); }
+function exportData() { 
+    // Genera la data odierna nel formato AAAA-MM-GG
+    const oggi = new Date();
+    const anno = oggi.getFullYear();
+    const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+    const giorno = String(oggi.getDate()).padStart(2, '0');
+    const dataFormattata = `${anno}-${mese}-${giorno}`;
+
+    const a = document.createElement('a'); 
+    a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); 
+    
+    // Assegna il nome del file includendo la data dinamica
+    a.download = `rubrica_${dataFormattata}.json`; 
+    
+    a.click(); 
+}
 function importData() {
     const i = document.createElement('input');
     i.type = 'file';
