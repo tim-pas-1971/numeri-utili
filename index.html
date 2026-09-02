@@ -247,7 +247,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-    // CONFIGURAZIONE FIREBASE INTEGRATA CON URL EUROPE-WEST1
     const firebaseConfig = {
         apiKey: "AIzaSyAXgGNk2vCMkSFi7Ub6WSp7gBvJT7Mbi1Q",
         authDomain: "studio-82288772-a99ab.firebaseapp.com",
@@ -279,12 +278,15 @@
 
     let schema = defaultSchema;
     let contacts = [];
+    let isAdmin = false;
 
     function init() {
-        const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+        isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
         if (!isAdmin) {
             document.querySelectorAll('#admin-menu button:not([onclick*="Search"])')
                     .forEach(b => b.style.display='none');
+            const adminFooter = document.getElementById('admin-footer');
+            if (adminFooter) adminFooter.style.display = 'none';
         }
 
         const ps = document.getElementById('f-prov');
@@ -297,14 +299,12 @@
 
         buildOrari();
 
-        // ASCOLTO IN TEMPO REALE DA FIREBASE PER I DATI
         db.ref('contacts').on('value', snapshot => {
             const val = snapshot.val();
             contacts = val ? Object.values(val) : [];
             renderMain();
         });
 
-        // ASCOLTO IN TEMPO REALE PER LO SCHEMA
         db.ref('schema').on('value', snapshot => {
             const val = snapshot.val();
             schema = val ? val : defaultSchema;
@@ -404,6 +404,12 @@ function renderRecs(c, s, ss) {
         const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
         const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
         
+        const adminButtons = isAdmin ? `
+            <button onclick="editContact(${index})" title="Modifica">📝</button>
+            <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
+            <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
+        ` : '';
+
         list.innerHTML += `
             <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; cursor:pointer; position:relative;" onclick="showFullDetails(${index})">
                 <div style="font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">${percorsoInfo}</div>
@@ -415,9 +421,7 @@ function renderRecs(c, s, ss) {
                 </div>
                 <div style="margin-top:10px; display:flex; gap:5px;" onclick="event.stopPropagation()">
                     <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
-                    <button onclick="editContact(${index})" title="Modifica">📝</button>
-                    <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
-                    <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
+                    ${adminButtons}
                 </div>
             </div>`;
     });
@@ -628,13 +632,17 @@ function renderRecsFromSearch(arr) {
     arr.forEach(x => {
         const index = contacts.findIndex(c => c.nome === x.nome && c.tel === x.tel);
         
+        const adminSearchButtons = isAdmin ? `
+            <button class="btn-top" style="background:#28a745; padding:5px 10px; font-size:12px;" onclick="editContact(${index})">📝 CORREGGI</button>
+            <button class="btn-top" style="background:#d9534f; padding:5px 10px; font-size:12px;" onclick="deleteContact(${index})">🗑️ ELIMINA</button>
+        ` : '';
+
         list.innerHTML += `
             <div style="background:white; padding:15px; border-radius:10px; border-left:5px solid #d9534f; margin-bottom:10px;">
                 <b style="color:#003366">${x.nome}</b><br>
                 <small style="color:#888">Categoria: ${x.cat || '⚠️ NON ASSEGNATA'}</small>
                 <div style="margin-top:10px; display:flex; gap:10px;">
-                    <button class="btn-top" style="background:#28a745; padding:5px 10px; font-size:12px;" onclick="editContact(${index})">📝 CORREGGI</button>
-                    <button class="btn-top" style="background:#d9534f; padding:5px 10px; font-size:12px;" onclick="deleteContact(${index})">🗑️ ELIMINA</button>
+                    ${adminSearchButtons}
                 </div>
             </div>`;
     });
@@ -987,6 +995,12 @@ function renderAllFromCat(categoria) {
         const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via)}+${encodeURIComponent(x.loc)}`;
         let infoPercorso = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub}`;
         
+        const adminButtons = isAdmin ? `
+            <button onclick="editContact(${index})" title="Modifica">📝</button>
+            <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
+            <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
+        ` : '';
+
         list.innerHTML += `
             <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #28a745; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; cursor:pointer; position:relative;" onclick="showFullDetails(${index})">
                 <div style="font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">${infoPercorso}</div>
@@ -998,9 +1012,7 @@ function renderAllFromCat(categoria) {
                 </div>
                 <div style="margin-top:10px; display:flex; gap:5px;" onclick="event.stopPropagation()">
                     <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
-                    <button onclick="editContact(${index})" title="Modifica">📝</button>
-                    <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
-                    <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
+                    ${adminButtons}
                 </div>
             </div>`;
     });
