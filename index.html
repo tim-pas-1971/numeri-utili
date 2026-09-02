@@ -65,9 +65,6 @@
             z-index: 100;
         }
 
-        /* ==========================================
-           AGGIUNTO: REGOLE PER LA STAMPA DEGLI ELENCHI
-           ========================================== */
         @media print {
             header, #admin-menu, .btn-top, button, #sidebar, #admin-footer, #sub-buttons-container {
                 display: none !important;
@@ -245,7 +242,25 @@
     </div>
 </div>
 
+<!-- SDK FIREBASE COMPATIBILI -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
+    // CONFIGURAZIONE FIREBASE INTEGRATA CON URL EUROPE-WEST1
+    const firebaseConfig = {
+        apiKey: "AIzaSyAXgGNk2vCMkSFi7Ub6WSp7gBvJT7Mbi1Q",
+        authDomain: "studio-82288772-a99ab.firebaseapp.com",
+        databaseURL: "https://studio-82288772-a99ab-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "studio-82288772-a99ab",
+        storageBucket: "studio-82288772-a99ab.firebasestorage.app",
+        messagingSenderId: "48796554059",
+        appId: "1:48796554059:web:a5f152abd6837566f6oece"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const PROVINCE = ["MI","BG","BS","CO","CR","LC","LO","MB","MN","PV","SO","VA","AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BZ","CA","CB","CE","CH","CL","CN","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LE","LI","LT","LU","MC","ME","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VB","VC","VE","VI","VR","VT","VV"];
     
     const defaultSchema = {
@@ -262,8 +277,8 @@
         "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"], subSub: { "Ristorante Classico / Pizzeria": ["Carne", "Pesce", "Pizza"], "Etnico": ["Cinese", "Fusion", "Giapponese", "Asia", "Africa", "EstEuropa", "Altro"] } }
     };
 
-    let schema = JSON.parse(localStorage.getItem('app_schema')) || defaultSchema;
-    let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
+    let schema = defaultSchema;
+    let contacts = [];
 
     function init() {
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
@@ -271,8 +286,6 @@
             document.querySelectorAll('#admin-menu button:not([onclick*="Search"])')
                     .forEach(b => b.style.display='none');
         }
-
-        renderMain();
 
         const ps = document.getElementById('f-prov');
         if(ps) {
@@ -283,6 +296,20 @@
         }
 
         buildOrari();
+
+        // ASCOLTO IN TEMPO REALE DA FIREBASE PER I DATI
+        db.ref('contacts').on('value', snapshot => {
+            const val = snapshot.val();
+            contacts = val ? Object.values(val) : [];
+            renderMain();
+        });
+
+        // ASCOLTO IN TEMPO REALE PER LO SCHEMA
+        db.ref('schema').on('value', snapshot => {
+            const val = snapshot.val();
+            schema = val ? val : defaultSchema;
+            renderMain();
+        });
     }
 
 function renderMain() {
@@ -327,18 +354,20 @@ function openCat(c) {
     };
     row2.appendChild(btnAll);
 
-    schema[c].sub.sort().forEach(s => {
-        const btn = document.createElement('button'); btn.innerText = s; btn.className = "nav-btn-l2";
-        Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
-        btn.onclick = () => {
-            document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
-            btnAll.style.background = "transparent";
-            btn.style.background = "#f0ad4e";
-            renderRecs(c, s); 
-            showSubSub(c, s, row3);
-        };
-        row2.appendChild(btn);
-    });
+    if(schema[c] && schema[c].sub) {
+        schema[c].sub.sort().forEach(s => {
+            const btn = document.createElement('button'); btn.innerText = s; btn.className = "nav-btn-l2";
+            Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+            btn.onclick = () => {
+                document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
+                btnAll.style.background = "transparent";
+                btn.style.background = "#f0ad4e";
+                renderRecs(c, s); 
+                showSubSub(c, s, row3);
+            };
+            row2.appendChild(btn);
+        });
+    }
     sc.appendChild(row2); sc.appendChild(row3);
 
     renderAllFromCat(c);
@@ -404,7 +433,7 @@ function buildOrari() {
 function updateSub(p) {
     const c = document.getElementById(p + '-cat').value;
     const s = document.getElementById(p + '-sub'); s.innerHTML = '<option value="">Scegli...</option>';
-    if(schema[c]) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
+    if(schema[c] && schema[c].sub) schema[c].sub.sort().forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
     updateSubSub(p);
 }
 
@@ -455,7 +484,7 @@ function saveData() {
     });
 
     contacts.push(nuovo); 
-    localStorage.setItem('app_contacts', JSON.stringify(contacts)); 
+    db.ref('contacts').set(contacts); 
     
     closeMod('form-overlay'); 
 
@@ -468,7 +497,7 @@ function saveData() {
         renderMain();
     }
     
-    alert("Scheda salvata con successo!");
+    alert("Scheda salvata e sincronizzata online con successo!");
 }
 
 function showFullDetails(i) {
@@ -663,14 +692,14 @@ function openManage() {
 }
 
 function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
-function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { schema[c].sub.push(n); saveSchema(); } }
+function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { if(!schema[c].sub) schema[c].sub = []; schema[c].sub.push(n); saveSchema(); } }
 function renameCat(vecchioNome) {
     const nuovoNome = prompt("Rinomina Sezione:", vecchioNome);
     if (nuovoNome && nuovoNome !== vecchioNome) {
         schema[nuovoNome] = schema[vecchioNome];
         delete schema[vecchioNome];
         contacts.forEach(c => { if(c.cat === vecchioNome) c.cat = nuovoNome; });
-        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        db.ref('contacts').set(contacts);
         saveSchema();
     }
 }
@@ -685,7 +714,7 @@ function renameSub(c, vecchioSub) {
             delete schema[c].subSub[vecchioSub];
         }
         contacts.forEach(con => { if(con.cat === c && con.sub === vecchioSub) con.sub = nuovoSub; });
-        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        db.ref('contacts').set(contacts);
         saveSchema();
     }
 }
@@ -696,7 +725,7 @@ function renameSS(c, s, vecchioSS) {
         const idx = schema[c].subSub[s].indexOf(vecchioSS);
         if (idx !== -1) schema[c].subSub[s][idx] = nuovoSS;
         contacts.forEach(con => { if(con.cat === c && con.sub === s && con.ss === vecchioSS) con.ss = nuovoSS; });
-        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        db.ref('contacts').set(contacts);
         saveSchema();
     }
 }
@@ -704,7 +733,7 @@ function renameSS(c, s, vecchioSS) {
 function delCat(c) { if(confirm("Eliminare?")) { delete schema[c]; saveSchema(); } }
 function delSub(c,s) { schema[c].sub = schema[c].sub.filter(x => x!==s); saveSchema(); }
 function saveSchema() {
-    localStorage.setItem('app_schema', JSON.stringify(schema));
+    db.ref('schema').set(schema);
     openManage(); 
 }
 
@@ -716,14 +745,13 @@ function deleteContact(i) {
     if(confirm("Eliminare definitivamente questo nominativo?")) {
         const catCorrente = contacts[i].cat;
         contacts.splice(i, 1);
-        localStorage.setItem('app_contacts', JSON.stringify(contacts));
+        db.ref('contacts').set(contacts);
         openCat(catCorrente);
         alert("Nominativo eliminato con successo.");
     }
 }
 
 function exportData() { 
-    // Genera la data odierna nel formato AAAA-MM-GG
     const oggi = new Date();
     const anno = oggi.getFullYear();
     const mese = String(oggi.getMonth() + 1).padStart(2, '0');
@@ -732,12 +760,10 @@ function exportData() {
 
     const a = document.createElement('a'); 
     a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(contacts)); 
-    
-    // Assegna il nome del file includendo la data dinamica
     a.download = `rubrica_${dataFormattata}.json`; 
-    
     a.click(); 
 }
+
 function importData() {
     const i = document.createElement('input');
     i.type = 'file';
@@ -769,8 +795,7 @@ function importData() {
                     alert("Database sostituito con successo!");
                 }
 
-                localStorage.setItem('app_contacts', JSON.stringify(contacts));
-                location.reload();
+                db.ref('contacts').set(contacts);
 
             } catch (err) {
                 alert("Errore nel leggere il file: " + err.message);
@@ -781,13 +806,13 @@ function importData() {
     i.click();
 }
 
-function resetAll() { if (confirm("Cancellare tutto?")) { localStorage.removeItem('app_contacts'); location.reload(); } }
+function resetAll() { if (confirm("Cancellare tutto dal database cloud?")) { db.ref('contacts').remove(); } }
 
 function duplicateContact(index) {
     const copia = JSON.parse(JSON.stringify(contacts[index]));
     copia.nome += " (Copia)";
     contacts.push(copia);
-    localStorage.setItem('app_contacts', JSON.stringify(contacts));
+    db.ref('contacts').set(contacts);
     openCat(copia.cat);
     alert("Nominativo duplicato!");
 }
@@ -805,7 +830,6 @@ function printAllContacts() {
         return alert("Nessun nominativo da stampare!");
     }
 
-    // Ordiniamo tutti i contatti prima per Categoria e poi per Nome
     const contattiOrdinati = [...contacts].sort((a, b) => {
         if (a.cat !== b.cat) return a.cat.localeCompare(b.cat);
         return a.nome.localeCompare(b.nome);
@@ -820,35 +844,20 @@ function printAllContacts() {
             <style>
                 body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; color: #1e293b; background: #fff; line-height: 1.4; }
                 h1 { color: #1e3a8a; text-align: center; border-bottom: 3px double #1e3a8a; padding-bottom: 10px; margin-bottom: 25px; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
-                
-                /* STILE MACRO SEZIONE (CATEGORIA) */
                 .cat-title { background: #1e3a8a; color: #ffffff; padding: 8px 15px; margin-top: 30px; font-size: 1.25em; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; border-radius: 4px; }
-                
                 .scheda-completa { border-bottom: 1px dashed #cbd5e1; padding: 18px 5px; page-break-inside: avoid; }
                 .riga-principale { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-                
-                /* EVIDENZIAZIONE NOME ATTIVITÀ */
                 .nome { font-size: 1.3em; color: #2563eb; font-weight: bold; letter-spacing: 0.5px; }
-                
-                /* SOTTO-CATEGORIE PERCORSO */
                 .percorso { font-size: 0.8em; color: #475569; text-transform: uppercase; font-weight: 600; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; margin-left: 8px; border: 1px solid #e2e8f0; }
-                
-                /* BADGE KM DA PREGNANA */
                 .km { font-weight: bold; color: #c2410c; font-size: 0.9em; background: #ffedd5; padding: 4px 10px; border-radius: 20px; border: 1px solid #fed7aa; }
-                
                 .blocco-info { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 8px; font-size: 0.95em; }
                 .info-item { min-width: 220px; }
                 b { color: #334155; }
-                
                 .blocco-specifico { background: #f0fdf4; border-left: 4px solid #16a34a; padding: 6px 12px; margin-top: 10px; font-size: 0.9em; display: flex; gap: 20px; border-radius: 0 4px 4px 0; }
-                
                 .sezione-orari { margin-top: 10px; font-size: 0.85em; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #f1f5f9; }
                 .orari-lista { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
                 .giorno-ora { background: #fff; padding: 3px 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-                
                 .note-stampa { font-style: italic; color: #334155; margin-top: 8px; font-size: 0.9em; background: #fefce8; padding: 6px 10px; border-left: 4px solid #eab308; border-radius: 0 4px 4px 0; }
-                
-                /* FORZATURA COLORI PER LA STAMPA CARTACEA/PDF */
                 @media print { 
                     body { padding: 0; } 
                     .cat-title { background: #1e3a8a !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } 
@@ -868,7 +877,6 @@ function printAllContacts() {
     let ultimaCategoria = "";
     
     contattiOrdinati.forEach((x) => {
-        // Gestione macro-categoria divisoria
         if (x.cat !== ultimaCategoria) {
             ultimaCategoria = x.cat;
             contenutoHtml += `<div class="cat-title">${x.cat}</div>`;
@@ -895,7 +903,6 @@ function printAllContacts() {
                 </div>
         `;
 
-        // Dati specifici (Cucina, Costo, Giudizio) - Utili per Ristoranti/Bar
         if (x.cucina || x.costo || x.giudizio) {
             contenutoHtml += `
                 <div class="blocco-specifico">
@@ -906,7 +913,6 @@ function printAllContacts() {
             `;
         }
 
-        // Sezione Orari di Apertura Completi
         contenutoHtml += `<div class="sezione-orari"><b>Orari di Apertura:</b> `;
         if (x.h24) {
             contenutoHtml += `<span style="color:#2563eb; font-weight:bold;">🕒 APERTO H24 - 7 GIORNI SU 7</span>`;
@@ -918,25 +924,20 @@ function printAllContacts() {
                 const info = x.orari[g];
                 if (info) {
                     let dettagliGiorno = [];
-                    
-                    // Controlla mattina
                     if (info.ch1) {
                         dettagliGiorno.push("Chiuso Mattina");
                     } else if (info.m1 && info.m2) {
                         dettagliGiorno.push(`${info.m1}-${info.m2}`);
                     }
                     
-                    // Controlla pomeriggio
                     if (info.ch2) {
                         dettagliGiorno.push("Chiuso Pomeriggio");
                     } else if (info.p1 && info.p2) {
                         dettagliGiorno.push(`${info.p1}-${info.p2}`);
                     }
                     
-                    // Sostituzione testo giorno per la stampa estesa
                     let giornoEsteso = g === "Sat" ? "Sab" : g;
                     
-                    // Se è tutto chiuso o non inserito
                     if (info.ch1 && info.ch2) {
                         orariStringhe.push(`<span class="giorno-ora"><b>${giornoEsteso}:</b> Chiuso ❌</span>`);
                     } else if (dettagliGiorno.length > 0) {
@@ -955,12 +956,11 @@ function printAllContacts() {
         }
         contenutoHtml += `</div>`;
 
-        // Note testuali estese
         if (x.note && x.note.trim() !== "") {
             contenutoHtml += `<div class="note-stampa"><b>Note e Dettagli:</b> ${x.note}</div>`;
         }
 
-        contenutoHtml += `</div>`; // Chiude scheda-completa
+        contenutoHtml += `</div>`;
     });
 
     contenutoHtml += `</body></html>`;
@@ -973,6 +973,7 @@ function printAllContacts() {
         finestraStampa.close();
     }, 500);
 }
+
 function renderAllFromCat(categoria) {
     const list = document.getElementById('records-list');
     let fil = contacts.filter(x => x.cat === categoria);
