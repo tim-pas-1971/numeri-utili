@@ -1,0 +1,16 @@
+{
+  "name": "Numeri Utili",
+  "short_name": "Numeri Utili",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#8ec3eb",
+  "theme_color": "#8ec3eb",
+  "icons": [
+    {
+      "src": "icona-app.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
