@@ -1,22 +1,24 @@
 const PROVINCE = ["AG", "AL", "AN", "AO", "AR", "AP", "AT", "AV", "BA", "BT", "BL", "BN", "BO", "BR", "BS", "BZ", "CA", "CB", "CE", "CH", "CL", "CN", "CO", "CR", "CS", "CT", "CZ", "EN", "FC", "FE", "FG", "FI", "FM", "FR", "GE", "GO", "GR", "IM", "IS", "KR", "LC", "LE", "LI", "LO", "LT", "LU", "MB", "MC", "ME", "MI", "MN", "MO", "MS", "MT", "NA", "NO", "NU", "OR", "PA", "PC", "PD", "PE", "PG", "PI", "PN", "PO", "PR", "PT", "PU", "PV", "PZ", "RA", "RC", "RE", "RG", "RI", "RM", "RN", "RO", "SA", "SI", "SO", "SP", "SR", "SS", "SU", "SV", "TA", "TE", "TN", "TO", "TP", "TR", "TS", "TV", "UD", "VA", "VB", "VC", "VE", "VI", "VR", "VT", "VV"];
 
-const schema = {
-    "AUTO": { icon: "🚗", sub: ["Carrozzeria", "Elettrauto", "Gommista", "Meccanico"] },
-    "BAR/TABACCHI": { icon: "☕", sub: ["Bar", "Tabaccheria"] },
-    "BRICOLAGE": { icon: "🛠️", sub: ["Ferramenta"] },
-    "CASA (PROF.)": { icon: "🏠", sub: ["Idraulico", "Elettricista", "Muratore"] },
-    "CENTRI COMM.": { icon: "🏬", sub: ["Supermerkato"] },
-    "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Centro Estetica"] },
-    "GARDEN": { icon: "🌻", sub: ["Vivai"] },
-    "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Scarpe / Borse", "Gioielleria", "Animali"] },
-    "SALUTE": { icon: "🏥", sub: ["Centro Diagnostico", "Farmacia", "Laboratorio di analisi", "Medico Mutua / Specialista", "Ospedale", "Veterinario"] },
-    "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Pub / Birreria", "Altro"] }
+const defaultSchema = {
+    "AUTO": { icon: "🚗", sub: ["Elettrauto / Gommista / Meccanico", "Carrozzeria"] },
+    "BAR / TABACCHI": { icon: "☕", sub: ["Bar", "Bar / Tabacchi", "Tabaccheria"] },
+    "B&B / AFFITTACAMERE / ALBERGHI": { icon: "🛌", sub: ["B&B", "Affittacamere", "Alberghi"] },
+    "BRICOLAGE / FAI DA TE": { icon: "🛠️", sub: ["FAI DA TE"] },
+    "CASA (PROF.)": { icon: "🏠", sub: ["Amministrazione", "Antennista", "Elettricista", "Fabbro", "Falegname", "Idraulico", "Imbianchino", "Muratore", "Pavimentista / Piastrellista", "Tecnico Caldaia", "Tecnico Pc"] },
+    "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato", "Centro Commerciale"] },
+    "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Estetista", "Solarium", "Unghie"] },
+    "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista", "Manutenzione Verde"] },
+    "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Alimentari", "Scarpe", "Gioielleria", "Animali", "Ottica", "Casalinghi"] },
+    "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico Mutua", "Medico Specialista", "Ospedale", "Veterinario"], subSub: { "Medico Specialista": ["Oculista", "Altro"] } },
+    "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"], subSub: { "Ristorante Classico / Pizzeria": ["Carne", "Pesce", "Pizza"], "Etnico": ["Cinese", "Fusion", "Giapponese", "Asia", "Africa", "EstEuropa", "Altro"] } }
 };
 
-let contacts = JSON.parse(localStorage.getItem('app_contacts')) || [];
-let curCat = "";
+let schema = defaultSchema;
+let contacts = [];
+let isAdmin = false;
 
-// --- FUNZIONI UTILI PER TELEFONO E SITO WEB ---
+// --- FUNZIONI DI FORMATTAZIONE TELEFONO E SITO WEB ---
 function formattaTelefono(tel) {
     if (!tel) return '';
     return tel.replace(/[^0-9+]/g, '');
@@ -31,37 +33,120 @@ function formattaUrl(url) {
     return u;
 }
 
-// --- INIZIO APP ---
-document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('admin') !== '1') {
-        document.querySelectorAll('button[onclick*="openManage"], button[onclick*="openAddForm"], button[onclick*="toggleGoogleSearch"]').forEach(el => el.style.display = 'none');
+// --- INIZIALIZZAZIONE FIREBASE ED APP ---
+function init() {
+    isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+    if (!isAdmin) {
+        document.querySelectorAll('#admin-menu button:not([onclick*="Search"])')
+                .forEach(b => b.style.display='none');
+        const adminFooter = document.getElementById('admin-footer');
+        if (adminFooter) adminFooter.style.display = 'none';
     }
-    renderMainGrid();
-    const pSel = document.getElementById('f-prov');
-    if (pSel) PROVINCE.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
-});
 
-function renderMainGrid() {
-    const g = document.getElementById('view-main');
-    if (!g) return;
-    g.innerHTML = "";
-    Object.keys(schema).sort().forEach(c => {
-        g.innerHTML += `<div class="card-cat" onclick="openCategory('${c}')"><i>${schema[c].icon}</i><b>${c}</b></div>`;
+    const ps = document.getElementById('f-prov');
+    if(ps) {
+        ps.innerHTML = '<option value="">Prov.</option>'; 
+        PROVINCE.forEach(p => {
+            ps.innerHTML += `<option value="${p}">${p}</option>`;
+        });
+    }
+
+    buildOrari();
+
+    db.ref('contacts').on('value', snapshot => {
+        const val = snapshot.val();
+        contacts = val ? Object.values(val) : [];
+        renderMain();
+    });
+
+    db.ref('schema').on('value', snapshot => {
+        const val = snapshot.val();
+        schema = val ? val : defaultSchema;
+        renderMain();
     });
 }
 
-function openCategory(cat) {
-    curCat = cat;
+function renderMain() {
+    const g = document.getElementById('view-main'); 
+    if(!g) return;
+    g.innerHTML = "";
+    
+    Object.keys(schema).sort().forEach(c => {
+        const count = contacts.filter(item => item.cat === c).length;
+        const badge = count > 0 ? `<span class="badge-count">${count}</span>` : "";
+        
+        g.innerHTML += `
+            <div class="card-cat" onclick="openCat('${c}')" style="position: relative;">
+                ${badge}
+                <i>${schema[c].icon}</i>
+                <b>${c}</b>
+            </div>`;
+    });
+}
+
+function openCat(c) {
     document.getElementById('view-main').classList.add('hidden');
     document.getElementById('view-detail').classList.remove('hidden');
-    document.getElementById('title-detail').innerText = cat;
-    renderAllFromCat(cat);
+    document.getElementById('title-detail').innerText = c;
+    const sc = document.getElementById('sub-buttons-container'); 
+    if(sc) sc.innerHTML = "";
+    
+    const row2 = document.createElement('div');
+    Object.assign(row2.style, { display: "flex", flexWrap: "wrap", gap: "4px", background: "#003366", padding: "10px", borderRadius: "8px", width: "100%", boxSizing: "border-box" });
+    
+    const row3 = document.createElement('div');
+    row3.id = "subsub-container"; row3.style.display = "none"; row3.style.width = "100%"; row3.style.marginTop = "5px";
+
+    const btnAll = document.createElement('button');
+    btnAll.innerText = "🌟 TUTTI";
+    btnAll.className = "nav-btn-l2";
+    Object.assign(btnAll.style, { border: "2px solid #fff", background: "#f39c12", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+    
+    btnAll.onclick = () => {
+        document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
+        btnAll.style.background = "#f39c12";
+        row3.style.display = "none";
+        renderAllFromCat(c); 
+    };
+    row2.appendChild(btnAll);
+
+    if(schema[c] && schema[c].sub) {
+        schema[c].sub.sort().forEach(s => {
+            const btn = document.createElement('button'); btn.innerText = s; btn.className = "nav-btn-l2";
+            Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+            btn.onclick = () => {
+                document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
+                btnAll.style.background = "transparent";
+                btn.style.background = "#f0ad4e";
+                renderRecs(c, s); 
+                showSubSub(c, s, row3);
+            };
+            row2.appendChild(btn);
+        });
+    }
+    if(sc) { sc.appendChild(row2); sc.appendChild(row3); }
+
+    renderAllFromCat(c);
+}
+
+function showSubSub(c, s, container) {
+    container.innerHTML = "";
+    if (!schema[c].subSub || !schema[c].subSub[s]) { container.style.display = "none"; return; }
+    container.style.display = "flex"; container.style.flexWrap = "wrap"; container.style.gap = "8px"; container.style.background = "#e9ecef"; container.style.padding = "10px"; container.style.borderRadius = "8px";
+    schema[c].subSub[s].sort().forEach(ss => {
+        const btn = document.createElement('button'); btn.innerText = ss; btn.className = "nav-btn-l3";
+        Object.assign(btn.style, { border: "1px solid #1e7e34", background: "#28a745", color: "white", padding: "8px 15px", cursor: "pointer", borderRadius: "5px", fontSize: "0.85em", fontWeight: "600" });
+        btn.onclick = () => {
+            document.querySelectorAll('.nav-btn-l3').forEach(b => b.style.background = "#28a745");
+            btn.style.background = "#0b4d1a"; renderRecs(c, s, ss);
+        };
+        container.appendChild(btn);
+    });
 }
 
 function renderRecs(c, s, ss) {
     const list = document.getElementById('records-list');
-    if (!list) return;
+    if(!list) return;
 
     let fil = contacts.filter(x => { 
         const m = x.cat === c && x.sub === s; 
@@ -81,7 +166,6 @@ function renderRecs(c, s, ss) {
         const telCell = formattaTelefono(x.cell);
         const sitoUrl = formattaUrl(x.sito);
 
-        const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
         const adminButtons = isAdmin ? `
             <button onclick="editContact(${index})" title="Modifica">📝</button>
             <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
@@ -118,7 +202,7 @@ function renderRecs(c, s, ss) {
 
 function renderAllFromCat(categoria) {
     const list = document.getElementById('records-list');
-    if (!list) return;
+    if(!list) return;
 
     let fil = contacts.filter(x => x.cat === categoria);
 
@@ -135,7 +219,6 @@ function renderAllFromCat(categoria) {
         const telCell = formattaTelefono(x.cell);
         const sitoUrl = formattaUrl(x.sito);
 
-        const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
         const adminButtons = isAdmin ? `
             <button onclick="editContact(${index})" title="Modifica">📝</button>
             <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
@@ -168,33 +251,4 @@ function renderAllFromCat(categoria) {
                 </div>
             </div>`;
     });
-}
-
-function goHome() {
-    document.getElementById('view-main').classList.remove('hidden');
-    document.getElementById('view-detail').classList.add('hidden');
-}
-
-// --- TASTI E PANNELLI ---
-function openAddForm() {
-    document.getElementById('form-overlay').classList.remove('hidden');
-    const sel = document.getElementById('f-cat');
-    sel.innerHTML = "<option value=''>Scegli...</option>";
-    Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-}
-
-function closeAddForm() { document.getElementById('form-overlay').classList.add('hidden'); }
-function openSearchPanel() { document.getElementById('search-overlay').classList.remove('hidden'); }
-function closeSearchPanel() { document.getElementById('search-overlay').classList.add('hidden'); }
-function openManage() { document.getElementById('manage-overlay').classList.remove('hidden'); }
-function closeManage() { document.getElementById('manage-overlay').classList.add('hidden'); }
-function toggleGoogleSearch() { document.getElementById('sidebar').classList.toggle('open'); }
-
-function updateFormSubCats() {
-    const c = document.getElementById('f-cat').value;
-    const s = document.getElementById('f-subcat');
-    if (s && schema[c]) {
-        s.innerHTML = "<option value=''>Scegli...</option>";
-        schema[c].sub.sort().forEach(i => s.innerHTML += `<option value="${i}">${i}</option>`);
-    }
 }
