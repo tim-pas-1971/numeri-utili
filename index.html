@@ -1036,7 +1036,7 @@ function renderAllFromCat(categoria) {
     fil.forEach(x => {
         const index = contacts.indexOf(x);
         const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via || '')}+${encodeURIComponent(x.loc || '')}`;
-        let infoPercorso = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub || ''}`;
+        const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub || ''}`;
         
         const telFisso = formattaTelefono(x.tel);
         const telCell = formattaTelefono(x.cell);
@@ -1064,7 +1064,7 @@ function renderAllFromCat(categoria) {
                     </div>
                 </div>
 
-                <!-- RIGA BOTTONI E KM SEPARATI (Senza Sovrapposizione) -->
+                <!-- RIGA BOTTONI E KM SEPARATI -->
                 <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px solid #f0f0f0; padding-top:10px;" onclick="event.stopPropagation()">
                     <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap;">
                         <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
