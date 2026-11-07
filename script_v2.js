@@ -16,7 +16,7 @@ const defaultSchema = {
 
 // --- CONFIGURAZIONE SUPABASE ---
 const SUPABASE_URL = 'https://zcicgivsmamljqwbnfdx.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_zmIerEkMsUbLkyZcoY9ozg_tFb53oL_...'; // <-- Inserisci qui la tua Publishable Key
+const SUPABASE_KEY = 'sb_publishable_zmIerEkMsUbLkyZcoY9ozg_tFb53oL_'; // <-- Inserisci qui la tua Publishable Key
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let schema = defaultSchema;
