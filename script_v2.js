@@ -14,12 +14,73 @@ const defaultSchema = {
     "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"], subSub: { "Ristorante Classico / Pizzeria": ["Carne", "Pesce", "Pizza"], "Etnico": ["Cinese", "Fusion", "Giapponese", "Asia", "Africa", "EstEuropa", "Altro"] } }
 };
 
+// --- CONFIGURAZIONE SUPABASE ---
+const SUPABASE_URL = 'https://zcicgivsmamljqwbnfdx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zmIerEkMsUbLkyZcoY9ozg_tFb53oL_...'; // <-- Inserisci qui la tua Publishable Key
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let schema = defaultSchema;
 let contacts = [];
 let isAdmin = false;
 
-// --- GESTIONE LOCALSTORAGE ---
-function loadInitialContacts() {
+// --- GESTIONE DATI (SUPABASE + LOCALSTORAGE) ---
+async function loadContacts() {
+    try {
+        // Tenta di caricare dal database Supabase (tabella 'contatti', colonna 'data')
+        const { data, error } = await supabaseClient
+            .from('contatti')
+            .select('*');
+
+        if (error) throw error;
+
+        if (data && data.length > 0 && data[0].data) {
+            // Se troviamo i dati su Supabase, li usiamo e aggiorniamo la cache locale
+            contacts = data[0].data;
+            saveContactsToLocalStorage(contacts);
+        } else {
+            // Fallback sul localStorage se Supabase è vuoto
+            contacts = loadInitialContactsFromStorage();
+        }
+    } catch (e) {
+        console.warn("Connessione cloud non disponibile, uso i dati locali:", e);
+        contacts = loadInitialContactsFromStorage();
+    }
+    renderMain();
+}
+
+async function saveContacts(newData) {
+    contacts = newData;
+    saveContactsToLocalStorage(contacts);
+
+    try {
+        // Sincronizzazione su Supabase salvando l'intero array nella colonna 'data'
+        // Verifichiamo prima se esiste già una riga nella tabella 'contatti'
+        const { data: existing, error: fetchError } = await supabaseClient
+            .from('contatti')
+            .select('id');
+
+        if (fetchError) throw fetchError;
+
+        if (existing && existing.length > 0) {
+            // Aggiorna la riga esistente
+            const { error: updateError } = await supabaseClient
+                .from('contatti')
+                .update({ data: contacts })
+                .eq('id', existing[0].id);
+            if (updateError) throw updateError;
+        } else {
+            // Inserisce la prima riga se la tabella è vuota
+            const { error: insertError } = await supabaseClient
+                .from('contatti')
+                .insert([{ data: contacts }]);
+            if (insertError) throw insertError;
+        }
+    } catch (e) {
+        console.error("Errore durante il salvataggio su Supabase:", e);
+    }
+}
+
+function loadInitialContactsFromStorage() {
     const localData = localStorage.getItem("numeri_utili_contacts");
     if (localData) {
         try {
@@ -51,12 +112,11 @@ function formattaUrl(url) {
 }
 
 // --- AVVIO APPLICAZIONE ---
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
     
-    // Caricamento contatti
-    contacts = loadInitialContacts();
-    renderMain();
+    // Caricamento asincrono dei contatti (Cloud + Locale)
+    await loadorticetti = loadContacts();
 
     // Gestione select province se presente
     const ps = document.getElementById('f-prov');
@@ -140,7 +200,6 @@ function renderRecs(c, s) {
     list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato in questa sottocategoria.</p>";
 
     fil.forEach(x => {
-        const index = contacts.indexOf(x);
         const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via || '')}+${encodeURIComponent(x.loc || '')}`;
         
         list.innerHTML += `
@@ -193,14 +252,13 @@ function importJSON(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             const data = JSON.parse(e.target.result);
             if (Array.isArray(data)) {
-                contacts = data;
-                saveContactsToStorage(contacts);
+                await saveContacts(data); // Salva sul Cloud e in locale
                 renderMain();
-                alert(`Ripristino completato! Caricati ${contacts.length} contatti.`);
+                alert(`Ripristino completato e sincronizzato! Caricati ${contacts.length} contatti.`);
             } else {
                 alert("Il file JSON non è valido.");
             }
