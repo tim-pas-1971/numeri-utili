@@ -30,7 +30,7 @@
         .header-left h1 { margin: 0; font-size: 24px; color: var(--primary); cursor: pointer; }
         
         .grid-main { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
-        .card-cat { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.04); transition: 0.3s; border-bottom: 4px solid var(--primary); min-height: 130px; display: flex; flex-direction: column; justify-content: center; }
+        .card-cat { background: var(--white); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.04); transition: 0.3s; border-bottom: 4px solid var(--primary); min-height: 130px; display: flex; flex-direction: column; justify-content: center; position: relative; }
         .card-cat:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .card-cat i { font-size: 50px; display: block; margin-bottom: 10px; font-style: normal; }
         .card-cat b { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); }
@@ -252,13 +252,13 @@
     </div>
 </div>
 
-<!-- SCRIPT COMPLETO UNIFICATO (SUPABASE + LOGICA) -->
+<!-- SCRIPT COMPLETO INTEGRATO CON SUPABASE (Tabella 'contacts') -->
 <script>
     const SUPABASE_URL = 'https://zcicgivsmamljqwbnfdx.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_zmIerEkMsUbLkyZcoY9ozg_tFb53oL_'; // Inserisci la tua publishable key completa
+    const SUPABASE_KEY = 'sb_publishable_zmIerEkMsUbLkyZcoY9ozg_tFb53oL_'; // <-- Inserisci qui la tua Publishable Key intera
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const PROVINCE = ["MI","BG","BS","CO","CR","LC","LO","MB","MN","PV","SO","VA","AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BZ","CA","CB","CE","CH","CL","CN","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LE","LI","LT","LU","MC","ME","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VB","VC","VE","VI","VR","VT","VV"];
+    const PROVINCE = ["AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BS","BZ","CA","CB","CE","CH","CL","CN","CO","CR","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LC","LE","LI","LO","LT","LU","MB","MC","ME","MI","MN","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PV","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SO","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VA","VB","VC","VE","VI","VR","VT","VV"];
     
     const defaultSchema = {
         "AUTO": { icon: "🚗", sub: ["Elettrauto / Gommista / Meccanico", "Carrozzeria"] },
@@ -269,7 +269,7 @@
         "CENTRI COMM.": { icon: "🏬", sub: ["Supermercato", "Centro Commerciale"] },
         "ESTETICA": { icon: "💅", sub: ["Parrucchiere", "Estetista", "Solarium", "Unghie"] },
         "GARDEN": { icon: "🌻", sub: ["Vivai", "Fiorista", "Manutenzione Verde"] },
-        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Agriturismo", "Alimentari", "Scarpe", "Gioielleria", "Animali", "Ottica", "Casalinghi"] },
+        "NEGOZI": { icon: "🛍️", sub: ["Abbigliamento", "Alimentari", "Scarpe", "Gioielleria", "Animali", "Ottica", "Casalinghi"] },
         "SALUTE": { icon: "🏥", sub: ["Diagnostica", "Farmacia", "Medico Mutua", "Medico Specialista", "Ospedale", "Veterinario"], subSub: { "Medico Specialista": ["Oculista", "Altro"] } },
         "RISTORANTI": { icon: "🍴", sub: ["Ristorante Classico / Pizzeria", "Etnico", "Osteria / Trattoria", "Agriturismo", "Vegetariano / Vegano", "Pub / Birreria", "Altro"], subSub: { "Ristorante Classico / Pizzeria": ["Carne", "Pesce", "Pizza"], "Etnico": ["Cinese", "Fusion", "Giapponese", "Asia", "Africa", "EstEuropa", "Altro"] } }
     };
@@ -280,10 +280,10 @@
 
     async function loadData() {
         try {
-            const { data, error } = await supabaseClient.from('contatti').select('*');
+            const { data, error } = await supabaseClient.from('contacts').select('*');
             if (error) throw error;
-            if (data && data.length > 0 && data[0].data) {
-                contacts = data[0].data;
+            if (data && data.length > 0) {
+                contacts = data;
                 persistDataToLocal(contacts);
             } else {
                 loadLocalContacts();
@@ -313,12 +313,11 @@
     async function persistData() {
         persistDataToLocal(contacts);
         try {
-            const { data: existing, error: fetchError } = await supabaseClient.from('contatti').select('id');
-            if (fetchError) throw fetchError;
-            if (existing && existing.length > 0) {
-                await supabaseClient.from('contatti').update({ data: contacts }).eq('id', existing[0].id);
-            } else {
-                await supabaseClient.from('contatti').insert([{ data: contacts }]);
+            await supabaseClient.from('contacts').delete().neq('id', 0);
+            if (contacts.length > 0) {
+                const cleaned = contacts.map(({ id, ...rest }) => rest);
+                const { error: insError } = await supabaseClient.from('contacts').insert(cleaned);
+                if (insError) throw insError;
             }
         } catch (e) {
             console.error("Errore salvataggio Supabase:", e);
