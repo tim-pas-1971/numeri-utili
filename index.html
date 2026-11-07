@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<!-- Riferimento all'icona -->
-<link rel="icon" type="image/png" href="icona-app.png">
-<link rel="apple-touch-icon" href="icona-app.png">
+    <!-- Riferimento all'icona -->
+    <link rel="icon" type="image/png" href="icona-app.png">
+    <link rel="apple-touch-icon" href="icona-app.png">
 
-<!-- Riferimento al manifest per Android -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#8ec3eb">
+    <!-- Riferimento al manifest per Android -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8ec3eb">
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Numeri Utili - Tiziana Pascali</title>
-
-    <!-- Libreria Client Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root { --primary: #003366; --secondary: #28a745; --bg: #f4f7f9; --white: #ffffff; }
@@ -252,12 +249,8 @@
     </div>
 </div>
 
-<!-- SCRIPT COMPLETO INTEGRATO CON SUPABASE (Tabella 'contacts') -->
+<!-- SCRIPT APPLICAZIONE (Locale + Esportazione Excel/CSV diretta) -->
 <script>
-    const SUPABASE_URL = 'https://zcicgivsmamljqwbnfdx.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_zmIerEkMsUbLkyZcoY9ozg_tFb53oL_'; // <-- Inserisci qui la tua Publishable Key intera
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     const PROVINCE = ["AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BS","BZ","CA","CB","CE","CH","CL","CN","CO","CR","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LC","LE","LI","LO","LT","LU","MB","MC","ME","MI","MN","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PV","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SO","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VA","VB","VC","VE","VI","VR","VT","VV"];
     
     const defaultSchema = {
@@ -278,19 +271,10 @@
     let contacts = [];
     let isAdmin = false;
 
-    async function loadData() {
-        try {
-            const { data, error } = await supabaseClient.from('contacts').select('*');
-            if (error) throw error;
-            if (data && data.length > 0) {
-                contacts = data;
-                persistDataToLocal(contacts);
-            } else {
-                loadLocalContacts();
-            }
-        } catch (e) {
-            console.warn("Connessione cloud non disponibile, uso i dati locali:", e);
-            loadLocalContacts();
+    function loadData() {
+        const localContacts = localStorage.getItem("numeri_utili_contacts");
+        if (localContacts) {
+            try { contacts = JSON.parse(localContacts); } catch(e) { contacts = []; }
         }
 
         const localSchema = localStorage.getItem("numeri_utili_schema");
@@ -299,29 +283,8 @@
         }
     }
 
-    function loadLocalContacts() {
-        const localContacts = localStorage.getItem("numeri_utili_contacts");
-        if (localContacts) {
-            try { contacts = JSON.parse(localContacts); } catch(e) { contacts = []; }
-        }
-    }
-
-    function persistDataToLocal(data) {
-        localStorage.setItem("numeri_utili_contacts", JSON.stringify(data));
-    }
-
-    async function persistData() {
-        persistDataToLocal(contacts);
-        try {
-            await supabaseClient.from('contacts').delete().neq('id', 0);
-            if (contacts.length > 0) {
-                const cleaned = contacts.map(({ id, ...rest }) => rest);
-                const { error: insError } = await supabaseClient.from('contacts').insert(cleaned);
-                if (insError) throw insError;
-            }
-        } catch (e) {
-            console.error("Errore salvataggio Supabase:", e);
-        }
+    function persistData() {
+        localStorage.setItem("numeri_utili_contacts", JSON.stringify(contacts));
     }
 
     function persistSchema() {
@@ -342,7 +305,7 @@
         return u;
     }
 
-    async function init() {
+    function init() {
         isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
         if (!isAdmin) {
             document.querySelectorAll('#admin-menu button:not([onclick*="Search"])').forEach(b => b.style.display='none');
@@ -359,7 +322,7 @@
         }
 
         buildOrari();
-        await loadData();
+        loadData();
         renderMain();
     }
 
@@ -528,7 +491,7 @@
         }
     }
 
-    async function saveData() {
+    function saveData() {
         const n = document.getElementById('f-nome').value;
         if(!n) return alert("Inserisci il nome!");
         
@@ -557,7 +520,7 @@
         });
 
         contacts.push(nuovo); 
-        await persistData(); 
+        persistData(); 
         
         closeMod('form-overlay'); 
 
@@ -570,7 +533,7 @@
             renderMain();
         }
         
-        alert("Scheda salvata e sincronizzata con successo!");
+        alert("Scheda salvata con successo!");
     }
 
     function showFullDetails(i) {
@@ -645,13 +608,13 @@
         Object.keys(schema).sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
     }
 
-    async function editContact(i) {
+    function editContact(i) {
         const x = contacts[i]; showFullDetails(i);
         document.getElementById('form-title').innerText = "📝 Modifica: " + x.nome;
         document.getElementById('save-btn-container').style.display = "block";
         document.querySelectorAll('#form-overlay input, #form-overlay select, #form-overlay textarea').forEach(el => { el.disabled = false; el.style.background = "white"; });
         contacts.splice(i, 1);
-        await persistData();
+        persistData();
     }
 
     function applySearch() {
@@ -773,18 +736,18 @@
     function addMainCat() { const n = prompt("Nome Sezione:"); if(n) { const i = prompt("Emoji:", "📁"); schema[n] = {icon:i, sub:[]}; saveSchema(); } }
     function addSub(c) { const n = prompt("Sottocategoria:"); if(n) { if(!schema[c].sub) schema[c].sub = []; schema[c].sub.push(n); saveSchema(); } }
     
-    async function renameCat(vecchioNome) {
+    function renameCat(vecchioNome) {
         const nuovoNome = prompt("Rinomina Sezione:", vecchioNome);
         if (nuovoNome && nuovoNome !== vecchioNome) {
             schema[nuovoNome] = schema[vecchioNome];
             delete schema[vecchioNome];
             contacts.forEach(c => { if(c.cat === vecchioNome) c.cat = nuovoNome; });
-            await persistData();
+            persistData();
             saveSchema();
         }
     }
 
-    async function renameSub(c, vecchioSub) {
+    function renameSub(c, vecchioSub) {
         const nuovoSub = prompt("Rinomina Sottocategoria:", vecchioSub);
         if (nuovoSub && nuovoSub !== vecchioSub) {
             const idx = schema[c].sub.indexOf(vecchioSub);
@@ -794,18 +757,18 @@
                 delete schema[c].subSub[vecchioSub];
             }
             contacts.forEach(con => { if(con.cat === c && con.sub === vecchioSub) con.sub = nuovoSub; });
-            await persistData();
+            persistData();
             saveSchema();
         }
     }
 
-    async function renameSS(c, s, vecchioSS) {
+    function renameSS(c, s, vecchioSS) {
         const nuovoSS = prompt("Rinomina Livello 3:", vecchioSS);
         if (nuovoSS && nuovoSS !== vecchioSS) {
             const idx = schema[c].subSub[s].indexOf(vecchioSS);
             if (idx !== -1) schema[c].subSub[s][idx] = nuovoSS;
             contacts.forEach(con => { if(con.cat === c && con.sub === s && con.ss === vecchioSS) con.ss = nuovoSS; });
-            await persistData();
+            persistData();
             saveSchema();
         }
     }
@@ -823,25 +786,79 @@
     function closeMod(id) { document.getElementById(id).classList.add('hidden'); }
     function toggleGoogle() { document.getElementById('app-wrapper').classList.toggle('sidebar-open'); if(document.getElementById('app-wrapper').classList.contains('sidebar-open')) document.getElementById('g-frame').src="https://www.google.com/search?igu=1"; }
 
-    async function deleteContact(i) {
+    function deleteContact(i) {
         if(confirm("Eliminare definitivamente questo nominativo?")) {
             const catCorrente = contacts[i].cat;
             contacts.splice(i, 1);
-            await persistData();
+            persistData();
             openCat(catCorrente);
             alert("Nominativo eliminato con successo.");
         }
     }
 
-    function exportData() { 
+    // --- NUOVA ESPORTAZIONE EXCEL (.XLSX compatibile) & CSV ---
+    function exportExcel() {
+        if (!contacts || contacts.length === 0) return alert("Nessun contatto da esportare!");
+        
+        // Creiamo un formato XML compatibile con Excel (Excel Spreadsheet XML / HTML Table) apribile direttamente come .xls/.xlsx
+        let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n`;
+        xmlContent += `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n`;
+        xmlContent += `<Worksheet ss:Name="Contatti">\n<Table>\n`;
+        
+        // Intestazioni colonne
+        xmlContent += `<Row>\n`;
+        ["Categoria", "Sottocategoria", "Livello 3", "Nome Attività", "Telefono Fisso", "Cellulare", "Indirizzo", "Città", "Provincia", "Distanza (Km)", "Sito Web", "Email", "Cucina", "Costo", "Giudizio", "Note"].forEach(h => {
+            xmlContent += `<Cell><Data ss:Type="String">${h}</Data></Cell>\n`;
+        });
+        xmlContent += `</Row>\n`;
+
+        // Righe dati
+        contacts.forEach(x => {
+            xmlContent += `<Row>\n`;
+            [x.cat, x.sub, x.ss, x.nome, x.tel, x.cell, x.via, x.loc, x.prov, x.km, x.sito, x.email, x.cucina, x.costo, x.giudizio, x.note].forEach(val => {
+                let v = val ? String(val).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+                xmlContent += `<Cell><Data ss:Type="String">${v}</Data></Cell>\n`;
+            });
+            xmlContent += `</Row>\n`;
+        });
+
+        xmlContent += `</Table>\n</Worksheet>\n</Workbook>`;
+
         const oggi = new Date().toISOString().split('T')[0];
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(contacts, null, 2));
-        const a = document.createElement('a'); 
-        a.setAttribute("href", dataStr);
-        a.setAttribute("download", `Numeri_Utili _ backup contatti ${oggi}.json`); 
-        document.body.appendChild(a);
-        a.click(); 
-        a.remove();
+        const blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Numeri_Utili_${oggi}.xls`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
+    function exportCSV() {
+        if (!contacts || contacts.length === 0) return alert("Nessun contatto da esportare!");
+        
+        let csvContent = "\uFEFF"; // BOM per UTF-8 in Excel
+        csvContent += "Categoria;Sottocategoria;Livello 3;Nome Attività;Telefono Fisso;Cellulare;Indirizzo;Città;Provincia;Distanza (Km);Sito Web;Email;Cucina;Costo;Giudizio;Note\n";
+
+        contacts.forEach(x => {
+            let row = [
+                x.cat || '', x.sub || '', x.ss || '', x.nome || '', 
+                x.tel || '', x.cell || '', x.via || '', x.loc || '', 
+                x.prov || '', x.km || '', x.sito || '', x.email || '', 
+                x.cucina || '', x.costo || '', x.giudizio || '', (x.note || '').replace(/[\n\r]+/g, ' ')
+            ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(";");
+
+            csvContent += row + "\n";
+        });
+
+        const oggi = new Date().toISOString().split('T')[0];
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Numeri_Utili_${oggi}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
     }
 
     function importData() {
@@ -851,7 +868,7 @@
         
         i.onchange = e => {
             const r = new FileReader();
-            r.onload = async x => {
+            r.onload = x => {
                 try {
                     let datiCaricati = JSON.parse(x.target.result);
                     let listaNuova = [];
@@ -875,7 +892,7 @@
                         alert("Database sostituito con successo!");
                     }
 
-                    await persistData();
+                    persistData();
                     renderMain();
 
                 } catch (err) {
@@ -887,20 +904,20 @@
         i.click();
     }
 
-    async function resetAll() { 
+    function resetAll() { 
         if (confirm("Cancellare tutti i contatti salvati?")) { 
             contacts = []; 
-            await persistData(); 
+            persistData(); 
             renderMain(); 
             alert("Tutti i dati sono stati azzerati.");
         } 
     }
 
-    async function duplicateContact(index) {
+    function duplicateContact(index) {
         const copia = JSON.parse(JSON.stringify(contacts[index]));
         copia.nome += " (Copia)";
         contacts.push(copia);
-        await persistData();
+        persistData();
         openCat(copia.cat);
         alert("Nominativo duplicato!");
     }
@@ -1133,9 +1150,10 @@
     window.onload = init;
 </script>
 
-<div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white;">
-    <button class="btn-top" style="background:#555" onclick="exportData()">ESPORTA</button>
+<div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white; flex-wrap: wrap;">
     <button class="btn-top" style="background:#555" onclick="importData()">IMPORTA</button>
+    <button class="btn-top" style="background:#28a745" onclick="exportExcel()">📊 ESPORTA EXCEL (.XLS)</button>
+    <button class="btn-top" style="background:#17a2b8" onclick="exportCSV()">📄 ESPORTA CSV</button>
     <button class="btn-top" style="background:#003366" onclick="printAllContacts()">🖨️ STAMPA TUTTO</button>
     <button class="btn-top" style="background:#d9534f; margin-left: auto;" onclick="resetAll()">RESET TOTALE</button>
 </div>
