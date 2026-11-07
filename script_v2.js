@@ -16,29 +16,26 @@ const defaultSchema = {
 
 // --- CONFIGURAZIONE SUPABASE ---
 const SUPABASE_URL = 'https://zcicgivsmamljqwbnfdx.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_zmIerEkMsUbLkyZcoY9ozg_tFb53oL_TUA_CHIAVE_COMPLETA'; // <-- Inserisci qui la tua Publishable Key intera
+const SUPABASE_KEY = 'sb_publishable_zmIerEkMsUbLkyZcoY9ozg_tFb53oL_TUA_CHIAVE'; // <-- Inserisci qui la tua Publishable Key intera
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let schema = defaultSchema;
 let contacts = [];
 let isAdmin = false;
 
-// --- GESTIONE DATI (SUPABASE + LOCALSTORAGE) ---
+// --- GESTIONE DATI (SUPABASE 'contacts' + LOCALSTORAGE) ---
 async function loadContacts() {
     try {
-        // Tenta di caricare dal database Supabase (tabella 'contatti', colonna 'data')
         const { data, error } = await supabaseClient
-            .from('contatti')
+            .from('contacts')
             .select('*');
 
         if (error) throw error;
 
-        if (data && data.length > 0 && data[0].data) {
-            // Se troviamo i dati su Supabase, li usiamo e aggiorniamo la cache locale
-            contacts = data[0].data;
+        if (data && data.length > 0) {
+            contacts = data;
             saveContactsToLocalStorage(contacts);
         } else {
-            // Fallback sul localStorage se Supabase è vuoto
             contacts = loadInitialContactsFromStorage();
         }
     } catch (e) {
@@ -53,26 +50,14 @@ async function saveContacts(newData) {
     saveContactsToLocalStorage(contacts);
 
     try {
-        // Sincronizzazione su Supabase salvando l'intero array nella colonna 'data'
-        // Verifichiamo prima se esiste già una riga nella tabella 'contatti'
-        const { data: existing, error: fetchError } = await supabaseClient
-            .from('contatti')
-            .select('id');
-
-        if (fetchError) throw fetchError;
-
-        if (existing && existing.length > 0) {
-            // Aggiorna la riga esistente
-            const { error: updateError } = await supabaseClient
-                .from('contatti')
-                .update({ data: contacts })
-                .eq('id', existing[0].id);
-            if (updateError) throw updateError;
-        } else {
-            // Inserisce la prima riga se la tabella è vuota
+        // Svuota e ricarica la tabella contacts su Supabase
+        await supabaseClient.from('contacts').delete().neq('id', 0); // Cancella tutto
+        if (contacts.length > 0) {
+            // Pulisce gli oggetti per adattarli alle colonne della tabella
+            const cleanedContacts = contacts.map(({ id, ...rest }) => rest);
             const { error: insertError } = await supabaseClient
-                .from('contatti')
-                .insert([{ data: contacts }]);
+                .from('contacts')
+                .insert(cleanedContacts);
             if (insertError) throw insertError;
         }
     } catch (e) {
@@ -115,10 +100,8 @@ function formattaUrl(url) {
 document.addEventListener("DOMContentLoaded", async () => {
     isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
     
-    // Caricamento asincrono dei contatti (Cloud + Locale)
-    await loadorticetti = loadContacts();
+    await loadContacts();
 
-    // Gestione select province se presente
     const ps = document.getElementById('f-prov');
     if(ps) {
         ps.innerHTML = '<option value="">Prov.</option>'; 
@@ -256,7 +239,7 @@ function importJSON(event) {
         try {
             const data = JSON.parse(e.target.result);
             if (Array.isArray(data)) {
-                await saveContacts(data); // Salva sul Cloud e in locale
+                await saveContacts(data);
                 renderMain();
                 alert(`Ripristino completato e sincronizzato! Caricati ${contacts.length} contatti.`);
             } else {
