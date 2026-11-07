@@ -18,7 +18,24 @@ let schema = defaultSchema;
 let contacts = [];
 let isAdmin = false;
 
-// --- FUNZIONI DI FORMATTAZIONE TELEFONO E SITO WEB ---
+// --- GESTIONE LOCALSTORAGE ---
+function loadInitialContacts() {
+    const localData = localStorage.getItem("numeri_utili_contacts");
+    if (localData) {
+        try {
+            return JSON.parse(localData);
+        } catch (e) {
+            console.error("Errore lettura LocalStorage:", e);
+        }
+    }
+    return [];
+}
+
+function saveContactsToStorage(data) {
+    localStorage.setItem("numeri_utili_contacts", JSON.stringify(data));
+}
+
+// --- FORMATTAZIONE ---
 function formattaTelefono(tel) {
     if (!tel) return '';
     return tel.replace(/[^0-9+]/g, '');
@@ -33,16 +50,15 @@ function formattaUrl(url) {
     return u;
 }
 
-// --- INIZIALIZZAZIONE FIREBASE ED APP ---
-function init() {
+// --- AVVIO APPLICAZIONE ---
+document.addEventListener("DOMContentLoaded", () => {
     isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
-    if (!isAdmin) {
-        document.querySelectorAll('#admin-menu button:not([onclick*="Search"])')
-                .forEach(b => b.style.display='none');
-        const adminFooter = document.getElementById('admin-footer');
-        if (adminFooter) adminFooter.style.display = 'none';
-    }
+    
+    // Caricamento contatti
+    contacts = loadInitialContacts();
+    renderMain();
 
+    // Gestione select province se presente
     const ps = document.getElementById('f-prov');
     if(ps) {
         ps.innerHTML = '<option value="">Prov.</option>'; 
@@ -50,21 +66,7 @@ function init() {
             ps.innerHTML += `<option value="${p}">${p}</option>`;
         });
     }
-
-    buildOrari();
-
-    db.ref('contacts').on('value', snapshot => {
-        const val = snapshot.val();
-        contacts = val ? Object.values(val) : [];
-        renderMain();
-    });
-
-    db.ref('schema').on('value', snapshot => {
-        const val = snapshot.val();
-        schema = val ? val : defaultSchema;
-        renderMain();
-    });
-}
+});
 
 function renderMain() {
     const g = document.getElementById('view-main'); 
@@ -73,38 +75,40 @@ function renderMain() {
     
     Object.keys(schema).sort().forEach(c => {
         const count = contacts.filter(item => item.cat === c).length;
-        const badge = count > 0 ? `<span class="badge-count">${count}</span>` : "";
+        const badge = count > 0 ? `<span class="badge-count" style="background:#d9534f; color:white; padding:2px 8px; border-radius:10px; font-size:0.8em; position:absolute; top:10px; right:10px;">${count}</span>` : "";
         
         g.innerHTML += `
-            <div class="card-cat" onclick="openCat('${c}')" style="position: relative;">
+            <div class="card-cat" onclick="openCat('${c}')" style="background:white; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); cursor:pointer; position:relative; text-align:center; transition:0.2s;">
                 ${badge}
-                <i>${schema[c].icon}</i>
-                <b>${c}</b>
+                <div style="font-size:2em; margin-bottom:8px;">${schema[c].icon}</div>
+                <b style="color:#003366; font-size:1.1em;">${c}</b>
             </div>`;
     });
 }
 
 function openCat(c) {
     document.getElementById('view-main').classList.add('hidden');
-    document.getElementById('view-detail').classList.remove('hidden');
-    document.getElementById('title-detail').innerText = c;
+    const detailView = document.getElementById('view-detail');
+    if(detailView) detailView.classList.remove('hidden');
+    
+    const titleDetail = document.getElementById('title-detail');
+    if(titleDetail) titleDetail.innerText = c;
+    
     const sc = document.getElementById('sub-buttons-container'); 
     if(sc) sc.innerHTML = "";
     
     const row2 = document.createElement('div');
-    Object.assign(row2.style, { display: "flex", flexWrap: "wrap", gap: "4px", background: "#003366", padding: "10px", borderRadius: "8px", width: "100%", boxSizing: "border-box" });
+    Object.assign(row2.style, { display: "flex", flexWrap: "wrap", gap: "6px", background: "#003366", padding: "10px", borderRadius: "8px", width: "100%", boxSizing: "border-box" });
     
     const row3 = document.createElement('div');
-    row3.id = "subsub-container"; row3.style.display = "none"; row3.style.width = "100%"; row3.style.marginTop = "5px";
+    row3.id = "subsub-container"; 
+    Object.assign(row3.style, { display: "none", width: "100%", marginTop: "5px" });
 
     const btnAll = document.createElement('button');
     btnAll.innerText = "🌟 TUTTI";
-    btnAll.className = "nav-btn-l2";
-    Object.assign(btnAll.style, { border: "2px solid #fff", background: "#f39c12", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+    Object.assign(btnAll.style, { border: "2px solid #fff", background: "#f39c12", color: "white", padding: "8px 12px", cursor: "pointer", fontWeight: "bold", borderRadius: "5px" });
     
     btnAll.onclick = () => {
-        document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
-        btnAll.style.background = "#f39c12";
         row3.style.display = "none";
         renderAllFromCat(c); 
     };
@@ -112,14 +116,11 @@ function openCat(c) {
 
     if(schema[c] && schema[c].sub) {
         schema[c].sub.sort().forEach(s => {
-            const btn = document.createElement('button'); btn.innerText = s; btn.className = "nav-btn-l2";
-            Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "10px 15px", cursor: "pointer", fontWeight: "bold", fontSize: "0.9em", borderRadius: "5px" });
+            const btn = document.createElement('button'); 
+            btn.innerText = s;
+            Object.assign(btn.style, { border: "none", background: "transparent", color: "white", padding: "8px 12px", cursor: "pointer", fontWeight: "bold", borderRadius: "5px" });
             btn.onclick = () => {
-                document.querySelectorAll('.nav-btn-l2').forEach(b => b.style.background = "transparent");
-                btnAll.style.background = "transparent";
-                btn.style.background = "#f0ad4e";
                 renderRecs(c, s); 
-                showSubSub(c, s, row3);
             };
             row2.appendChild(btn);
         });
@@ -129,73 +130,25 @@ function openCat(c) {
     renderAllFromCat(c);
 }
 
-function showSubSub(c, s, container) {
-    container.innerHTML = "";
-    if (!schema[c].subSub || !schema[c].subSub[s]) { container.style.display = "none"; return; }
-    container.style.display = "flex"; container.style.flexWrap = "wrap"; container.style.gap = "8px"; container.style.background = "#e9ecef"; container.style.padding = "10px"; container.style.borderRadius = "8px";
-    schema[c].subSub[s].sort().forEach(ss => {
-        const btn = document.createElement('button'); btn.innerText = ss; btn.className = "nav-btn-l3";
-        Object.assign(btn.style, { border: "1px solid #1e7e34", background: "#28a745", color: "white", padding: "8px 15px", cursor: "pointer", borderRadius: "5px", fontSize: "0.85em", fontWeight: "600" });
-        btn.onclick = () => {
-            document.querySelectorAll('.nav-btn-l3').forEach(b => b.style.background = "#28a745");
-            btn.style.background = "#0b4d1a"; renderRecs(c, s, ss);
-        };
-        container.appendChild(btn);
-    });
-}
-
-function renderRecs(c, s, ss) {
+function renderRecs(c, s) {
     const list = document.getElementById('records-list');
     if(!list) return;
 
-    let fil = contacts.filter(x => { 
-        const m = x.cat === c && x.sub === s; 
-        return ss ? (m && x.ss === ss) : m; 
-    });
-
+    let fil = contacts.filter(x => x.cat === c && x.sub === s);
     fil.sort((a, b) => (parseFloat(a.km) || 0) - (parseFloat(b.km) || 0));
 
-    list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato.</p>";
+    list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato in questa sottocategoria.</p>";
 
     fil.forEach(x => {
         const index = contacts.indexOf(x);
         const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via || '')}+${encodeURIComponent(x.loc || '')}`;
-        const percorsoInfo = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub || ''}`;
         
-        const telFisso = formattaTelefono(x.tel);
-        const telCell = formattaTelefono(x.cell);
-        const sitoUrl = formattaUrl(x.sito);
-
-        const adminButtons = isAdmin ? `
-            <button onclick="editContact(${index})" title="Modifica">📝</button>
-            <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
-            <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
-        ` : '';
-
         list.innerHTML += `
-            <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; cursor:pointer; position:relative;" onclick="showFullDetails(${index})">
-                <div style="font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">${percorsoInfo}</div>
-                ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin:10px 0;">` : ''}
+            <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #003366; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; position:relative;">
                 <b style="font-size:1.2em; color:#003366">${x.nome}</b><br>
-                
                 <div style="margin-top:5px; font-size:14px;">📍 ${x.via || ''}, ${x.loc || ''}</div>
-
-                <!-- PULSANTI TELEFONO E CELLULARE PER CHIAMATA DIRETTA -->
-                <div style="margin-top:8px; font-size:14px; display:flex; gap:10px; flex-wrap:wrap;" onclick="event.stopPropagation()">
-                    ${telFisso ? `<a href="tel:${telFisso}" style="color:#003366; text-decoration:none; font-weight:bold; background:#eef6ff; padding:4px 8px; border-radius:6px; border:1px solid #d1e3f8; display:inline-block;">📞 ${x.tel}</a>` : ''}
-                    ${telCell ? `<a href="tel:${telCell}" style="color:#28a745; text-decoration:none; font-weight:bold; background:#eafaf1; padding:4px 8px; border-radius:6px; border:1px solid #c3e6cb; display:inline-block;">📱 ${x.cell}</a>` : ''}
-                </div>
-
-                <div style="position:absolute; bottom:20px; right:20px; color:#d9534f; font-weight:bold; font-size:1.1em; display:flex; align-items:center; gap:5px;">
-                    🚗 ${x.km || '0'} KM
-                </div>
-
-                <!-- BOTTONI MAPPA, SITO WEB E ADMIN -->
-                <div style="margin-top:12px; display:flex; gap:5px; align-items:center;" onclick="event.stopPropagation()">
-                    <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
-                    ${sitoUrl ? `<a href="${sitoUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><button style="background:#17a2b8; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" title="Visita Sito Web">🌐 Sito</button></a>` : ''}
-                    ${adminButtons}
-                </div>
+                <div style="margin-top:8px; font-size:14px;">📞 ${x.tel || ''}</div>
+                <div style="margin-top:12px;"><button onclick="window.open('${mapUrl}')" style="background:#003366; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">🗺️ Mappa</button></div>
             </div>`;
     });
 }
@@ -205,50 +158,56 @@ function renderAllFromCat(categoria) {
     if(!list) return;
 
     let fil = contacts.filter(x => x.cat === categoria);
-
     fil.sort((a, b) => (parseFloat(a.km) || 0) - (parseFloat(b.km) || 0));
 
     list.innerHTML = fil.length ? "" : "<p style='padding:20px;'>Nessun contatto salvato in questa sezione.</p>";
 
     fil.forEach(x => {
-        const index = contacts.indexOf(x);
         const mapUrl = `https://www.google.it/maps/dir/Via+Cascina+Comune+24,+Pregnana+Milanese/${encodeURIComponent(x.via || '')}+${encodeURIComponent(x.loc || '')}`;
-        let infoPercorso = x.ss ? `${x.sub} > ${x.ss}` : `${x.sub || ''}`;
         
-        const telFisso = formattaTelefono(x.tel);
-        const telCell = formattaTelefono(x.cell);
-        const sitoUrl = formattaUrl(x.sito);
-
-        const adminButtons = isAdmin ? `
-            <button onclick="editContact(${index})" title="Modifica">📝</button>
-            <button onclick="duplicateContact(${index})" title="Duplica">📄</button>
-            <button onclick="deleteContact(${index})" title="Elimina">🗑️</button>
-        ` : '';
-
         list.innerHTML += `
-            <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #28a745; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; cursor:pointer; position:relative;" onclick="showFullDetails(${index})">
-                <div style="font-size:0.75em; color:#888; text-transform:uppercase; margin-bottom:5px;">${infoPercorso}</div>
-                ${x.foto ? `<img src="${x.foto}" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin:10px 0;">` : ''}
+            <div style="background:white; padding:20px; border-radius:15px; border-left:6px solid #28a745; box-shadow:0 4px 10px rgba(0,0,0,0.05); margin-bottom:15px; position:relative;">
                 <b style="font-size:1.2em; color:#003366">${x.nome}</b><br>
-                
                 <div style="margin-top:5px; font-size:14px;">📍 ${x.via || ''}, ${x.loc || ''}</div>
-
-                <!-- PULSANTI TELEFONO E CELLULARE PER CHIAMATA DIRETTA -->
-                <div style="margin-top:8px; font-size:14px; display:flex; gap:10px; flex-wrap:wrap;" onclick="event.stopPropagation()">
-                    ${telFisso ? `<a href="tel:${telFisso}" style="color:#003366; text-decoration:none; font-weight:bold; background:#eef6ff; padding:4px 8px; border-radius:6px; border:1px solid #d1e3f8; display:inline-block;">📞 ${x.tel}</a>` : ''}
-                    ${telCell ? `<a href="tel:${telCell}" style="color:#28a745; text-decoration:none; font-weight:bold; background:#eafaf1; padding:4px 8px; border-radius:6px; border:1px solid #c3e6cb; display:inline-block;">📱 ${x.cell}</a>` : ''}
-                </div>
-
-                <div style="position:absolute; bottom:20px; right:20px; color:#d9534f; font-weight:bold; font-size:1.1em; display:flex; align-items:center; gap:5px;">
-                    🚗 ${x.km || '0'} KM
-                </div>
-
-                <!-- BOTTONI MAPPA, SITO WEB E ADMIN -->
-                <div style="margin-top:12px; display:flex; gap:5px; align-items:center;" onclick="event.stopPropagation()">
-                    <button onclick="window.open('${mapUrl}')" title="Mappa">🗺️</button>
-                    ${sitoUrl ? `<a href="${sitoUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><button style="background:#17a2b8; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" title="Visita Sito Web">🌐 Sito</button></a>` : ''}
-                    ${adminButtons}
-                </div>
+                <div style="margin-top:8px; font-size:14px;">📞 ${x.tel || ''}</div>
+                <div style="margin-top:12px;"><button onclick="window.open('${mapUrl}')" style="background:#003366; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">🗺️ Mappa</button></div>
             </div>`;
     });
+}
+
+// --- ESPORTAZIONE CON DATA ---
+function exportJSON() {
+    const oggi = new Date().toISOString().split('T')[0];
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(contacts, null, 2));
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", `Numeri_Utili _ backup contatti ${oggi}.json`);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+// --- IMPORTAZIONE ---
+function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (Array.isArray(data)) {
+                contacts = data;
+                saveContactsToStorage(contacts);
+                renderMain();
+                alert(`Ripristino completato! Caricati ${contacts.length} contatti.`);
+            } else {
+                alert("Il file JSON non è valido.");
+            }
+        } catch (err) {
+            alert("Errore nella lettura: " + err.message);
+        }
+    };
+    reader.readAsText(file, 'UTF-8');
+    event.target.value = '';
 }
