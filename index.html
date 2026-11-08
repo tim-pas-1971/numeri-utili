@@ -249,7 +249,7 @@
     </div>
 </div>
 
-<!-- SCRIPT APPLICAZIONE (Locale + Esportazione Excel/CSV diretta) -->
+<!-- SCRIPT APPLICAZIONE -->
 <script>
     const PROVINCE = ["AG","AL","AN","AO","AR","AP","AT","AV","BA","BT","BL","BN","BO","BR","BS","BZ","CA","CB","CE","CH","CL","CN","CO","CR","CS","CT","CZ","EN","FC","FE","FG","FI","FM","FR","GE","GO","GR","IM","IS","KR","LC","LE","LI","LO","LT","LU","MB","MC","ME","MI","MN","MO","MS","MT","NA","NO","NU","OR","PA","PC","PD","PE","PG","PI","PN","PO","PR","PT","PU","PV","PZ","RA","RC","RE","RG","RI","RM","RN","RO","SA","SI","SO","SP","SR","SS","SU","SV","TA","TE","TN","TO","TP","TR","TS","TV","UD","VA","VB","VC","VE","VI","VR","VT","VV"];
     
@@ -796,23 +796,31 @@
         }
     }
 
-    // --- NUOVA ESPORTAZIONE EXCEL (.XLSX compatibile) & CSV ---
+    // --- FUNZIONI ESPORTAZIONE E IMPORTAZIONE (.JSON, .XLS, .CSV) ---
+    function exportJSON() {
+        if (!contacts || contacts.length === 0) return alert("Nessun contatto da esportare!");
+        const oggi = new Date().toISOString().split('T')[0];
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(contacts, null, 2));
+        const a = document.createElement('a');
+        a.setAttribute("href", dataStr);
+        a.setAttribute("download", `Numeri_Utili_backup_${oggi}.json`);
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+
     function exportExcel() {
         if (!contacts || contacts.length === 0) return alert("Nessun contatto da esportare!");
-        
-        // Creiamo un formato XML compatibile con Excel (Excel Spreadsheet XML / HTML Table) apribile direttamente come .xls/.xlsx
         let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n`;
         xmlContent += `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n`;
         xmlContent += `<Worksheet ss:Name="Contatti">\n<Table>\n`;
         
-        // Intestazioni colonne
         xmlContent += `<Row>\n`;
         ["Categoria", "Sottocategoria", "Livello 3", "Nome Attività", "Telefono Fisso", "Cellulare", "Indirizzo", "Città", "Provincia", "Distanza (Km)", "Sito Web", "Email", "Cucina", "Costo", "Giudizio", "Note"].forEach(h => {
             xmlContent += `<Cell><Data ss:Type="String">${h}</Data></Cell>\n`;
         });
         xmlContent += `</Row>\n`;
 
-        // Righe dati
         contacts.forEach(x => {
             xmlContent += `<Row>\n`;
             [x.cat, x.sub, x.ss, x.nome, x.tel, x.cell, x.via, x.loc, x.prov, x.km, x.sito, x.email, x.cucina, x.costo, x.giudizio, x.note].forEach(val => {
@@ -836,8 +844,7 @@
 
     function exportCSV() {
         if (!contacts || contacts.length === 0) return alert("Nessun contatto da esportare!");
-        
-        let csvContent = "\uFEFF"; // BOM per UTF-8 in Excel
+        let csvContent = "\uFEFF";
         csvContent += "Categoria;Sottocategoria;Livello 3;Nome Attività;Telefono Fisso;Cellulare;Indirizzo;Città;Provincia;Distanza (Km);Sito Web;Email;Cucina;Costo;Giudizio;Note\n";
 
         contacts.forEach(x => {
@@ -1151,8 +1158,9 @@
 </script>
 
 <div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white; flex-wrap: wrap;">
-    <button class="btn-top" style="background:#555" onclick="importData()">IMPORTA</button>
-    <button class="btn-top" style="background:#28a745" onclick="exportExcel()">📊 ESPORTA EXCEL (.XLS)</button>
+    <button class="btn-top" style="background:#555" onclick="exportJSON()">📦 ESPORTA JSON</button>
+    <button class="btn-top" style="background:#666" onclick="importData()">📂 IMPORTA JSON</button>
+    <button class="btn-top" style="background:#28a745" onclick="exportExcel()">📊 ESPORTA EXCEL</button>
     <button class="btn-top" style="background:#17a2b8" onclick="exportCSV()">📄 ESPORTA CSV</button>
     <button class="btn-top" style="background:#003366" onclick="printAllContacts()">🖨️ STAMPA TUTTO</button>
     <button class="btn-top" style="background:#d9534f; margin-left: auto;" onclick="resetAll()">RESET TOTALE</button>
