@@ -75,7 +75,7 @@
         }
 
         @media print {
-            header, #admin-menu, .btn-top, button, #sidebar, #admin-footer, #sub-buttons-container, #mobile-import-container {
+            header, #admin-menu, .btn-top, button, #sidebar, #admin-footer, #sub-buttons-container {
                 display: none !important;
             }
             body { background: white !important; color: black !important; padding: 0 !important; }
@@ -112,13 +112,6 @@
                 <button class="btn-top" onclick="toggleGoogle()" style="background:#4285F4">GOOGLE</button>
             </div>
         </header>
-
-        <!-- Barra extra visibile anche nella vista dettaglio (utile da cellulare) -->
-        <div id="mobile-import-container" style="margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-            <span style="font-size: 0.85em; font-weight: bold; color: #003366; margin-right: 5px;">📱 Gestione Rapida:</span>
-            <button class="btn-top" style="background:#666; padding: 8px 12px; font-size: 13px; margin: 0;" onclick="importData()">📂 IMPORTA JSON</button>
-            <button class="btn-top" style="background:#555; padding: 8px 12px; font-size: 13px; margin: 0;" onclick="exportJSON()">📦 ESPORTA JSON</button>
-        </div>
 
         <div id="view-main" class="grid-main"></div>
         <div id="view-detail" class="hidden">
