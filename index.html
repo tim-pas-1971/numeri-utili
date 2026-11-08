@@ -75,7 +75,7 @@
         }
 
         @media print {
-            header, #admin-menu, .btn-top, button, #sidebar, #admin-footer, #sub-buttons-container {
+            header, #admin-menu, .btn-top, button, #sidebar, #footer-bar, #sub-buttons-container {
                 display: none !important;
             }
             body { background: white !important; color: black !important; padding: 0 !important; }
@@ -308,9 +308,8 @@
     function init() {
         isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
         if (!isAdmin) {
+            // Nella versione utente nascondiamo solo i tasti di amministrazione avanzata (Gestisci, Aggiungi) ma LASCIAMO la barra in basso
             document.querySelectorAll('#admin-menu button:not([onclick*="Search"])').forEach(b => b.style.display='none');
-            const adminFooter = document.getElementById('admin-footer');
-            if (adminFooter) adminFooter.style.display = 'none';
         }
 
         const ps = document.getElementById('f-prov');
@@ -1157,7 +1156,8 @@
     window.onload = init;
 </script>
 
-<div id="admin-footer" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white; flex-wrap: wrap;">
+<!-- Barra in basso visibile SEMPRE (sia in modalità admin che utente/cellulare) -->
+<div id="footer-bar" style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; display: flex; gap: 10px; background: white; flex-wrap: wrap;">
     <button class="btn-top" style="background:#555" onclick="exportJSON()">📦 ESPORTA JSON</button>
     <button class="btn-top" style="background:#666" onclick="importData()">📂 IMPORTA JSON</button>
     <button class="btn-top" style="background:#28a745" onclick="exportExcel()">📊 ESPORTA EXCEL</button>
